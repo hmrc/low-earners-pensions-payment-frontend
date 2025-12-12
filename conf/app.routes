@@ -2,4 +2,5 @@
 
 ->         /hmrc-frontend           hmrcfrontend.Routes
 GET        /                        uk.gov.hmrc.lowearnerspensionspaymentfrontend.controllers.HelloWorldController.helloWorld
+GET        /language/:lang          uk.gov.hmrc.lowearnerspensionspaymentfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)

@@ -15,7 +15,7 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
     scalacOptions += "-Wconf:msg=unused import&src=html/.*:s",
     pipelineStages := Seq(gzip),
   )
-  .settings(CodeCoverageSettings.settings: _*)
+  .settings(CodeCoverageSettings.settings *)
 
 lazy val it = project
   .enablePlugins(PlayScala)
