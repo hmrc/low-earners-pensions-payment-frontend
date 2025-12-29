@@ -14,35 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lowearnerspensionspaymentfrontend.controllers
+package config
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.http.Status
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeRequest
 
-class HelloWorldControllerSpec
-  extends AnyWordSpec
-     with Matchers
-     with GuiceOneAppPerSuite:
+class ErrorHandlerSpec extends AnyWordSpec
+  with Matchers
+  with GuiceOneAppPerSuite
+  with ScalaFutures:
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .build()
 
   private val fakeRequest = FakeRequest("GET", "/")
-  private val controller  = app.injector.instanceOf[HelloWorldController]
+  private val handler     = app.injector.instanceOf[ErrorHandler]
 
-  "GET /" should:
-    "return 200" in:
-      val result = controller.helloWorld(fakeRequest)
-      status(result) shouldBe Status.OK
-
-    "return HTML" in:
-      val result = controller.helloWorld(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
+  "standardErrorTemplate" should:
+    "render HTML" in:
+      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest).futureValue
+      html.contentType shouldBe "text/html"

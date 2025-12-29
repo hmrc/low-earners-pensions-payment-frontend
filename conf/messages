@@ -1,2 +1,19 @@
-service.name = low-earners-pensions-payment-frontend
+service.name = Low Earners Pensions Payment
 service.text = This is your new service
+
+whatYouWillNeed.title = Claim your low income pension payment
+whatYouWillNeed.heading = Claim your low income pension payment
+whatYouWillNeed.p1 = This service gives an annual payment to people who earned below the standard Personal Allowance of £12,570 and paid into a pension through their employer.
+whatYouWillNeed.p2 = The payment is made once per tax year, directly into your bank account, once you have provided us with your bank details.
+whatYouWillNeed.h2.p1 = If you are on benefits
+whatYouWillNeed.p3 = This payment is not classed as income and it will not affect any benefits that you receive, your national insurance position or your taxable income.
+whatYouWillNeed.h2.p2 = Before you start
+
+whatYouWillNeed.p4 = To use this service, you'll need your bank details.
+
+timeout.title = You''re about to be signed out
+timeout.message = For your security, we will sign you out in
+timeout.keepAlive = Stay signed in
+timeout.signOut = Sign out
+
+site.start = Start now

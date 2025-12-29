@@ -24,6 +24,7 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
       "uk.gov.hmrc.hmrcfrontend.views.config._",
+      "views.ViewUtils._",
       "controllers.routes._",
       "uk.gov.hmrc.hmrcfrontend.views.viewmodels._"
     ),

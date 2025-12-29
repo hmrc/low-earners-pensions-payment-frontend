@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lowearnerspensionspaymentfrontend.config
+package config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 
 @Singleton
 class AppConfig @Inject()(config: Configuration):
+
+
+  private def loadConfig(key: String): String = config.get[String](key)
+
+  //Application config
+  val host: String = loadConfig("host")
+  val appName: String = loadConfig("appName")
+  // Feedback config
+  val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback")
+
+  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback")
+
+  //Timeout config
+  val timeout: Int = config.get[Int]("timeout-dialog.timeout")
+  val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)

@@ -1,5 +1,13 @@
 # microservice specific routes
 
 ->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        uk.gov.hmrc.lowearnerspensionspaymentfrontend.controllers.HelloWorldController.helloWorld
+
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+
+# Start page
+GET         /                                                                   controllers.WhatYouWillNeedController.start
+GET         /start                                                              controllers.WhatYouWillNeedController.onPageLoad()
+
+# Auth actions
+GET         /account/sign-out-survey                                            controllers.auth.AuthController.signOut()
+GET         /account/timeout                                                    controllers.auth.AuthController.sessionTimeout()
