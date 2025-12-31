@@ -1,0 +1,102 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
+@import views.html.helper.CSPNonce
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{HmrcStandardPageParams, ServiceURLs, TemplateOverrides}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
+@this(
+  appConfig: AppConfig,
+  hmrcTimeoutDialog: HmrcTimeoutDialog,
+  hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+  hmrcStandardPage: HmrcStandardPage
+)
+
+@(
+    pageTitle: String,
+    showBackLink: Boolean = true,
+    timeout: Boolean = true,
+    showSignOut: Boolean = true,
+    showHmrcBanner: Boolean = false,
+    backLinkUrl: Option[String] = None,
+    beforeContent: Option[Html] = None,
+    fullWidthContent: Boolean = false,
+    withReportTechnicalIssueLink: Boolean = true,
+    signOutUrl: String = controllers.auth.routes.AuthController.signOut().url
+)(contentBlock: Html)(
+    implicit rh: RequestHeader,
+    messages: Messages
+)
+
+@head = {
+<link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="screen, print" rel="stylesheet" type="text/css" />
+@if(timeout) {
+@hmrcTimeoutDialog(TimeoutDialog(
+    timeout             = Some(appConfig.timeout),
+    countdown           = Some(appConfig.countdown),
+    signOutUrl          = Some(signOutUrl),
+    signOutButtonText   = Some(messages("timeout.signOut")),
+    timeoutUrl          = Some(controllers.auth.routes.AuthController.sessionTimeout().url),
+    title               = Some(messages("timeout.title")),
+    message             = Some(messages("timeout.message")),
+    language            = Some(messages.lang.code)
+))
+}
+}
+
+@mainTemplateClass = {
+    @if(fullWidthContent) { "govuk-grid-column-full" } else { "govuk-grid-column-two-thirds" }
+}
+
+@mainContentLayout = {
+<div class="govuk-grid-row">
+    <div class=@mainTemplateClass>
+        @content
+
+        @if(withReportTechnicalIssueLink) {
+        <div class="govuk-!-margin-top-8">
+            @hmrcReportTechnicalIssueHelper()
+        </div>
+        }
+    </div>
+</div>
+}
+
+@content = {
+    @contentBlock
+}
+
+@hmrcStandardPage(HmrcStandardPageParams(
+    pageTitle = Some(pageTitle),
+    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    templateOverrides = TemplateOverrides(
+    additionalHeadBlock = Some(head),
+    beforeContentBlock = beforeContent,
+    mainContentLayout = Some(_ => mainContentLayout)
+),
+serviceURLs = ServiceURLs(
+    serviceUrl = Some(routes.WhatYouWillNeedController.onPageLoad().url),
+    signOutUrl = if(showSignOut) Some(signOutUrl) else None
+),
+backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
+))(content)
+
