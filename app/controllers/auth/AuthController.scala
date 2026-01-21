@@ -26,14 +26,13 @@ import javax.inject.Inject
 
 
 class AuthController @Inject()(val controllerComponents: MessagesControllerComponents,
-                               config: AppConfig) extends FrontendBaseController with I18nSupport {
+                               config: AppConfig) extends FrontendBaseController with I18nSupport :
 
-  def signOut(): Action[AnyContent] = Action {
+  def signOut(): Action[AnyContent] = Action:
     implicit request =>
             Redirect(config.exitSurveyUrl).withNewSession
-  }
 
-  def sessionTimeout(): Action[AnyContent] = Action {
+  def sessionTimeout(): Action[AnyContent] = Action:
     implicit request =>
           Redirect(
             url = config.signOutUrl,
@@ -42,5 +41,3 @@ class AuthController @Inject()(val controllerComponents: MessagesControllerCompo
               "origin" -> Seq(config.appName)
             )
           ).withNewSession
-        }
-}

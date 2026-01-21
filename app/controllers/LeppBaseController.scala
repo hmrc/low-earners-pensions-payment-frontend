@@ -26,9 +26,7 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
-                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport {
+                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport :
 
   def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (identify andThen getData).async :
     implicit request => f(request)
-
-}
