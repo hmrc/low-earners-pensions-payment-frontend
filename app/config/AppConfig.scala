@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject()(config: Configuration):
 
-
   private def loadConfig(key: String): String = config.get[String](key)
 
   //Application config
@@ -31,11 +30,22 @@ class AppConfig @Inject()(config: Configuration):
   // Feedback config
   val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback")
 
+  //URLs
+  val loginUrl: String = loadConfig("urls.login")
+  val loginContinueUrl: String = loadConfig("urls.loginContinue")
   lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback")
 
   //Timeout config
   val timeout: Int = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
+  //MongoDB config
+  val sessionDataTtl: Long = config.get[Int]("mongodb.sessionDataTtl")
+  val encryptionKey: String = config.get[String]("mongodb.encryption.key")
+  val useEncryption: Boolean = config.get[Boolean]("mongodb.encryption.enabled")
+
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+
+  //Beta feedback config
+  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"

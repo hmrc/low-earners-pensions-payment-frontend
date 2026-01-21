@@ -1,6 +1,13 @@
 service.name = Low Earners Pensions Payment
 service.text = This is your new service
 
+# Unauthorised page
+unauthorised.title = You can''t access this service with this account
+unauthorised.heading = You can''t access this service with this account
+unauthorised.guidance.preform = If you think you need access to this service, you can
+unauthorised.guidance.formLink = request it through the feedback form
+unauthorised.guidance.postform = . We will respond to you within 5 working days.
+
 whatYouWillNeed.title = Claim your low income pension payment
 whatYouWillNeed.heading = Claim your low income pension payment
 whatYouWillNeed.p1 = This service gives an annual payment to people who earned below the standard Personal Allowance of £12,570 and paid into a pension through their employer.
