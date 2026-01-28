@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ package base
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import controllers.actions.*
+import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -42,6 +44,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
@@ -67,14 +70,28 @@ trait SpecBase
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
+  val userAnswersId: String = "id"
+
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
 
-  protected def applicationBuilder(): GuiceApplicationBuilder = new GuiceApplicationBuilder()
+  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(parsers)
+
+  protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
+                                   identifierAction: IdentifierAction = fakeIdentifierAction,
+                                   servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
+    new GuiceApplicationBuilder()
+      .configure(servicesConfig)
+      .overrides(
+        bind[IdentifierAction].toInstance(identifierAction),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+      )
 
   def runningApplication(block: Application => Unit): Unit =
-    running(_ => applicationBuilder())(block)
+    running(_ => applicationBuilder(emptyUserAnswers))(block)
 
   protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 

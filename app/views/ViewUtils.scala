@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,13 @@
 
 package views
 
-import play.api.data.Form
 import play.api.i18n.Messages
 
 object ViewUtils {
-
-  def title(form: Form[_], title: String, section: Option[String] = None)(implicit messages: Messages): String =
-    titleNoForm(
-      title   = s"${errorPrefix(form)} ${messages(title)}",
-      section = section
-    )
 
   def titleNoForm(title: String, section: Option[String] = None)(implicit messages: Messages): String =
     s"${messages(title)} - " +
       s"${section.fold("")(messages(_) + " - ")}" +
       s"${messages("service.name")} - ${messages("site.govuk")}"
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
-    if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
-  }
 }

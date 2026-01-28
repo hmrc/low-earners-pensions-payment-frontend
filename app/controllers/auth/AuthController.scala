@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@ import javax.inject.Inject
 
 
 class AuthController @Inject()(val controllerComponents: MessagesControllerComponents,
-                               config: AppConfig) extends FrontendBaseController with I18nSupport {
+                               config: AppConfig) extends FrontendBaseController with I18nSupport :
 
-  def signOut(): Action[AnyContent] = Action {
+  def signOut(): Action[AnyContent] = Action:
     implicit request =>
             Redirect(config.exitSurveyUrl).withNewSession
-  }
 
-  def sessionTimeout(): Action[AnyContent] = Action {
+  def sessionTimeout(): Action[AnyContent] = Action:
     implicit request =>
           Redirect(
             url = config.signOutUrl,
@@ -42,5 +41,3 @@ class AuthController @Inject()(val controllerComponents: MessagesControllerCompo
               "origin" -> Seq(config.appName)
             )
           ).withNewSession
-        }
-}

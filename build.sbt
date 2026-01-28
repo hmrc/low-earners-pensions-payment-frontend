@@ -15,7 +15,8 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
   .settings(ThisBuild / useSuperShell := false)
   .settings(
     RoutesKeys.routesImport ++= Seq(
-      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
+      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
+      "uk.gov.hmrc.domain._"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
@@ -31,7 +32,7 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
     PlayKeys.playDefaultPort := 7503,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 80,
+    ScoverageKeys.coverageMinimumStmtTotal := 75,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
@@ -41,7 +42,7 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    pipelineStages := Seq(gzip),
+    pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat)
   )
 

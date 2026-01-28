@@ -11,3 +11,4 @@ GET         /start                                                              
 # Auth actions
 GET         /account/sign-out-survey                                            controllers.auth.AuthController.signOut()
 GET         /account/timeout                                                    controllers.auth.AuthController.sessionTimeout()
+GET         /unauthorised                                                       controllers.auth.UnauthorisedController.onPageLoad()

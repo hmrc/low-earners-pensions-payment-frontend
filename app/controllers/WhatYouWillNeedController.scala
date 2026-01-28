@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,27 @@
 package controllers
 
 
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.WhatYouWillNeedView
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class WhatYouWillNeedController @Inject()(
+                                           identify: IdentifierAction,
+                                           getData: DataRetrievalAction,
                                            val controllerComponents: MessagesControllerComponents,
                                            whatYouWillNeedView: WhatYouWillNeedView
-                                         ) extends LeppBaseController with I18nSupport:
+                                         ) extends LeppBaseController(identify, getData) with I18nSupport:
 
   val start: Action[AnyContent] =
     Action:
       implicit request => Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad())
 
 
-  def onPageLoad(): Action[AnyContent] = Action:
+  def onPageLoad(): Action[AnyContent] = handle:
     implicit request =>
-      Ok(whatYouWillNeedView())
+      Future.successful(Ok(whatYouWillNeedView()))
 

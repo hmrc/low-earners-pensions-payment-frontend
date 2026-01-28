@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ package controllers.auth
 
 import base.SpecBase
 import config.AppConfig
+import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, IdentifierAction}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -31,7 +34,9 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
     "must clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
 
       val application =
-        applicationBuilder()
+        new GuiceApplicationBuilder().configure().overrides(
+            bind[IdentifierAction].toInstance(fakeIdentifierAction),
+            bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(emptyUserAnswers)))
           .build()
 
       running(application) {

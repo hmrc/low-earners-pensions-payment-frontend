@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
 
 package controllers
 
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.requests.DataRequest
 import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
-abstract class LeppBaseController @Inject() extends FrontendBaseController with I18nSupport {
+abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
+                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport :
 
-}
+  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (identify andThen getData).async :
+    implicit request => f(request)
