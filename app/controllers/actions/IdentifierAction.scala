@@ -19,7 +19,6 @@ package controllers.actions
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import config.AppConfig
 import models.requests.{AuthUser, IdentifierRequest}
-import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -27,6 +26,7 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,22 +46,19 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
 
     authorised()
       .retrieve(Retrievals.internalId and Retrievals.nino and Retrievals.confidenceLevel) {
-
-        case Some(internalId) ~ Some(nino) ~ confidenceLevel if confidenceLevel.level >= 250 =>
+        case Some(internalId) ~ Some(nino) ~ confidenceLevel if confidenceLevel >= config.confidenceLevelMinimum =>
           block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
+        case Some(_) ~ Some(_) ~ _ =>
+          logger.info("invokeBlock", "User has insufficient confidence level. Redirecting to IV uplift journey")
+          Future.successful(Redirect(config.ivUpliftUrl))
         case _ =>
-          throw InsufficientConfidenceLevel()
+          throw InternalError("Unknown error occurred in the auth process")
       } recoverWith {
       case _: NoActiveSession =>
         Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
-      case _: InsufficientConfidenceLevel =>
-        Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
       case err: AuthorisationException =>
-        logger.error(logContext + s"An authorisation error occurred with message", err)
+        logger.underlying.error(logContext + s"An authorisation error occurred with message", err)
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
-      case e: Exception =>
-        logger.error(logContext + s"Unknown error occurred in auth process" + e.printStackTrace())
-        throw new UnauthorizedException("Unknown error")
     }
   }
 
