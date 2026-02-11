@@ -50,7 +50,7 @@ class AppConfig @Inject()(config: Configuration):
   private lazy val ivUpliftBaseUrl: String = servicesConfig.baseUrl("identity-verification-frontend")
   private val ivOrigin = "low-earners-pensions-payment"
   private val ivSuccessUrl: String = loginContinueUrl
-  private val ivFailureUrl: String = ""
+  private val ivFailureUrl: String = loadConfig("urls.ivUpliftFailureUrl")
 
   lazy val ivUpliftUrl: String =
     s"$ivUpliftBaseUrl/mdtp/uplift" +
