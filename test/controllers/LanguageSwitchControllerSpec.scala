@@ -24,7 +24,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Cookie
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import controllers.routes
 
 class LanguageSwitchControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 

@@ -27,7 +27,8 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
       "uk.gov.hmrc.hmrcfrontend.views.config._",
       "views.ViewUtils._",
       "controllers.routes._",
-      "uk.gov.hmrc.hmrcfrontend.views.viewmodels._"
+      "uk.gov.hmrc.hmrcfrontend.views.viewmodels._",
+      "viewmodels.govuk.All._"
     ),
     PlayKeys.playDefaultPort := 7503,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +

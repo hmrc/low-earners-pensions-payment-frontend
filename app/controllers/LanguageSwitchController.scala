@@ -17,10 +17,9 @@
 package controllers
 
 import com.google.inject.Inject
+import config.AppConfig
 import play.api.i18n.Lang
 import play.api.mvc.ControllerComponents
-import config.AppConfig
-import controllers.routes
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 
 class LanguageSwitchController @Inject() (appConfig: AppConfig,
