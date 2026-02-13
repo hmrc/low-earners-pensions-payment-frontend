@@ -57,7 +57,7 @@
     keepAliveButtonText = Some(messages("timeout.keepAlive")),
     signOutUrl          = Some(signOutUrl),
     signOutButtonText   = Some(messages("timeout.signOut")),
-    timeoutUrl          = Some(controllers.auth.routes.SessionTimeoutController.onPageLoad().url),
+    timeoutUrl          = Some(controllers.auth.routes.AuthController.sessionTimeout().url),
     title               = Some(messages("timeout.title")),
     message             = Some(messages("timeout.message")),
     language            = Some(messages.lang.code)
