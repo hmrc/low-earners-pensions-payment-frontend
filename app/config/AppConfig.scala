@@ -18,6 +18,7 @@ package config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import play.api.i18n.Lang
 
 @Singleton
 class AppConfig @Inject()(config: Configuration):
@@ -43,6 +44,12 @@ class AppConfig @Inject()(config: Configuration):
   val sessionDataTtl: Long = config.get[Int]("mongodb.sessionDataTtl")
   val encryptionKey: String = config.get[String]("mongodb.encryption.key")
   val useEncryption: Boolean = config.get[Boolean]("mongodb.encryption.enabled")
+
+  //Language config
+  def languageMap: Map[String, Lang] =
+    config
+      .get[Seq[String]]("play.i18n.langs")
+      .map(lang => lang -> Lang(lang)).toMap
 
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
