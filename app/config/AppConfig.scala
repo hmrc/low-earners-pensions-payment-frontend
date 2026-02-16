@@ -47,14 +47,13 @@ class AppConfig @Inject()(config: Configuration):
       .fromInt(config.get[Int]("confidenceLevelMinimum"))
       .getOrElse(L250)
 
-  private lazy val ivUpliftBaseUrl: String = servicesConfig.baseUrl("identity-verification-frontend")
+  private lazy val ivUpliftBaseUrl: String = loadConfig("urls.ivUpliftBaseUrl")
   private val ivOrigin = "low-earners-pensions-payment"
-  private val ivUpliftRoute: String = loadConfig("microservice.services.identity-verification-frontend.route")
   private val ivSuccessUrl: String = loadConfig("urls.ivUpliftCallbackUrl")
   private val ivFailureUrl: String = loadConfig("urls.ivUpliftFailureUrl")
 
   lazy val ivUpliftUrl: String =
-    s"$ivUpliftBaseUrl/$ivUpliftRoute/uplift" +
+    s"$ivUpliftBaseUrl/uplift" +
       s"?origin=$ivOrigin" +
       s"&confidenceLevel=$confidenceLevelMinimum" +
       s"&completionURL=$ivSuccessUrl" +
