@@ -22,20 +22,19 @@ import config.AppConfig
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.*
-import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
 import play.api.test.Helpers.*
+import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.ConfidenceLevel.{L200, L250}
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionSpec extends SpecBase with StubPlayBodyParsersFactory {
+class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
 
   private val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
@@ -81,7 +80,7 @@ class AuthActionSpec extends SpecBase with StubPlayBodyParsersFactory {
     }
 
     "when the user has confidence level less than 250" - {
-      "must throw InsufficientConfidenceLevel error and redirect to login page" in {
+      "must redirect to IV uplift journey" in {
         setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200))
 
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
@@ -100,7 +99,7 @@ class AuthActionSpec extends SpecBase with StubPlayBodyParsersFactory {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value must startWith(appConfig.loginUrl)
+          redirectLocation(result).value must startWith(appConfig.ivUpliftUrl)
         }
       }
     }
@@ -114,7 +113,7 @@ class AuthActionSpec extends SpecBase with StubPlayBodyParsersFactory {
           val appConfig = application.injector.instanceOf[AppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            authConnector = new FakeFailingAuthConnector(InsufficientConfidenceLevel()),
+            authConnector = new FakeFailingAuthConnector(BearerTokenExpired()),
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -194,7 +193,7 @@ class AuthActionSpec extends SpecBase with StubPlayBodyParsersFactory {
           val controller = new Harness(authAction)
           val result: Future[Result] = controller.onPageLoad()(FakeRequest())
 
-          assertThrows[UnauthorizedException](
+          assertThrows[RuntimeException](
             await(result)
           )
         }

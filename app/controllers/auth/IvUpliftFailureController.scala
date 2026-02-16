@@ -16,27 +16,17 @@
 
 package controllers.auth
 
-import config.AppConfig
+import com.google.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.Logging
+import views.html.IvUpliftFailureView
 
-import javax.inject.Inject
-
-
-class AuthController @Inject()(val controllerComponents: MessagesControllerComponents,
-                               config: AppConfig) extends FrontendBaseController with I18nSupport:
-
-  def signOut(): Action[AnyContent] = Action:
+@Singleton
+class IvUpliftFailureController @Inject()(val controllerComponents: MessagesControllerComponents,
+                                          view: IvUpliftFailureView) extends FrontendBaseController with I18nSupport with Logging:
+  def onPageLoad(journeyId: Option[String]): Action[AnyContent] = Action:
     implicit * =>
-      Redirect(config.exitSurveyUrl).withNewSession
-
-  def sessionTimeout(): Action[AnyContent] = Action:
-    implicit * =>
-          Redirect(
-            url = config.signOutUrl,
-            queryStringParams = Map(
-              "continue" -> Seq(config.host + controllers.auth.routes.SessionTimeoutController.onPageLoad().url),
-              "origin" -> Seq(config.appName)
-            )
-          ).withNewSession
+      logger.info("onPageLoad", s"IV uplift journey failed for user with journeyId: ${journeyId.getOrElse("N/A")}")
+      Ok(view())

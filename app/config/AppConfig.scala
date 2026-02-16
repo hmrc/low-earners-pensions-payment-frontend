@@ -18,6 +18,9 @@ package config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.auth.core.ConfidenceLevel
+import uk.gov.hmrc.auth.core.ConfidenceLevel.L250
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import play.api.i18n.Lang
 
 @Singleton
@@ -28,6 +31,8 @@ class AppConfig @Inject()(config: Configuration):
   //Application config
   val host: String = loadConfig("host")
   val appName: String = loadConfig("appName")
+  private val servicesConfig = ServicesConfig(config)
+
   // Feedback config
   val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback")
 
@@ -35,6 +40,25 @@ class AppConfig @Inject()(config: Configuration):
   val loginUrl: String = loadConfig("urls.login")
   val loginContinueUrl: String = loadConfig("urls.loginContinue")
   lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback")
+
+  //IV uplift config
+  val confidenceLevelMinimum: ConfidenceLevel =
+    ConfidenceLevel
+      .fromInt(config.get[Int]("confidenceLevelMinimum"))
+      .getOrElse(L250)
+
+  private lazy val ivUpliftBaseUrl: String = servicesConfig.baseUrl("identity-verification-frontend")
+  private val ivOrigin = "low-earners-pensions-payment"
+  private val ivUpliftRoute: String = loadConfig("microservice.services.identity-verification-frontend.route")
+  private val ivSuccessUrl: String = loadConfig("urls.ivUpliftCallbackUrl")
+  private val ivFailureUrl: String = loadConfig("urls.ivUpliftFailureUrl")
+
+  lazy val ivUpliftUrl: String =
+    s"$ivUpliftBaseUrl/$ivUpliftRoute/uplift" +
+      s"?origin=$ivOrigin" +
+      s"&confidenceLevel=$confidenceLevelMinimum" +
+      s"&completionURL=$ivSuccessUrl" +
+      s"&failureURL=$ivFailureUrl"
 
   //Timeout config
   val timeout: Int = config.get[Int]("timeout-dialog.timeout")

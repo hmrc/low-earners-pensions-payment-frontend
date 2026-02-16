@@ -1,0 +1,53 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components._
+
+@this(
+    layout: templates.Layout,
+    heading: h1,
+    button: GovukButton,
+    appConfig: AppConfig
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("ivUpliftFailure.title")),
+    timeout   = false,
+    showSignOut  = true
+) {
+
+    @heading(messages("ivUpliftFailure.title"))
+
+    <div class="govuk-body">
+     <p>@messages("ivUpliftFailure.p1")</p>
+    </div>
+
+    <ul class="govuk-list govuk-list--bullet">
+     <li>@messages("ivUpliftFailure.li1")
+     <li>@messages("ivUpliftFailure.li2")
+     <li>@messages("ivUpliftFailure.li3")
+    </ul>
+
+    @button(Button(
+     attributes = Map("id" -> "continue"),
+     href = Some(controllers.auth.routes.AuthController.signOut().url),
+     content = Text(messages("common.signOut"))
+    ))
+}

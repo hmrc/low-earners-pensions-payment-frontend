@@ -8,6 +8,14 @@ unauthorised.guidance.preform = If you think you need access to this service, yo
 unauthorised.guidance.formLink = request it through the feedback form
 unauthorised.guidance.postform = . We will respond to you within 5 working days.
 
+# Uplift failure page
+ivUpliftFailure.title = There''s a problem
+ivUpliftFailure.p1 = You cannot access this service. This may be because:
+ivUpliftFailure.li1 = you took too long to enter information and the service has timed out
+ivUpliftFailure.li2 = you have failed to answer enough questions correctly
+ivUpliftFailure.li3 = we could not match your details to our system
+
+# What you will need page
 whatYouWillNeed.title = Claim your low income pension payment
 whatYouWillNeed.heading = Claim your low income pension payment
 whatYouWillNeed.p1 = This service gives an annual payment to people who earned below the standard Personal Allowance of £12,570 and paid into a pension through their employer.
@@ -15,12 +23,18 @@ whatYouWillNeed.p2 = The payment is made once per tax year, directly into your b
 whatYouWillNeed.h2.p1 = If you are on benefits
 whatYouWillNeed.p3 = This payment is not classed as income and it will not affect any benefits that you receive, your national insurance position or your taxable income.
 whatYouWillNeed.h2.p2 = Before you start
-
 whatYouWillNeed.p4 = To use this service, you'll need your bank details.
 
+# Timeout dialogue
 timeout.title = You''re about to be signed out
 timeout.message = For your security, we will sign you out in
 timeout.keepAlive = Stay signed in
-timeout.signOut = Sign out
 
+# Session timeout page
+sessionTimeout.title = For your security, we signed you out
+sessionTimeout.heading = For your security, we signed you out
+sessionTimeout.signIn = Sign in
+
+# Common content
+common.signOut = Sign out
 site.start = Start now
