@@ -15,6 +15,7 @@
  *@
 
 @import config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.config.ContactFrontendConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import views.html.helper.CSPNonce
@@ -25,11 +26,12 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
-  appConfig: AppConfig,
-  hmrcTimeoutDialog: HmrcTimeoutDialog,
-  hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-  hmrcStandardPage: HmrcStandardPage
-)
+    appConfig: AppConfig,
+    hmrcTimeoutDialog: HmrcTimeoutDialog,
+    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+    hmrcStandardPage: HmrcStandardPage,
+    standardBetaBanner: StandardBetaBanner
+)(implicit cfConfig: ContactFrontendConfig)
 
 @(
     pageTitle: String,
@@ -93,13 +95,15 @@
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head),
         beforeContentBlock = beforeContent,
-        mainContentLayout = Some(_ => mainContentLayout
-    )
-),
-serviceURLs = ServiceURLs(
-    serviceUrl = Some(routes.WhatYouWillNeedController.onPageLoad().url),
-    signOutUrl = if(showSignOut) Some(signOutUrl) else None
-),
-backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
+        mainContentLayout = Some(_ => mainContentLayout)
+    ),
+    serviceURLs = ServiceURLs(
+        serviceUrl = Some(routes.WhatYouWillNeedController.onPageLoad().url),
+        signOutUrl = if(showSignOut) Some(signOutUrl) else None
+    ),
+    banners = Banners(
+        displayHmrcBanner = showHmrcBanner,
+        phaseBanner = if (appConfig.feedbackBannerEnabled) Some(standardBetaBanner()) else None
+    ),
+    backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
 ))(content)
-

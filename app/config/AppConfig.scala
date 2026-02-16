@@ -77,5 +77,6 @@ class AppConfig @Inject()(config: Configuration):
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  //Beta feedback config
+  //Feedback banner config
+  val feedbackBannerEnabled: Boolean = config.get[Boolean]("contact-frontend.bannerEnabled")
   val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"
