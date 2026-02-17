@@ -16,8 +16,8 @@ ivUpliftFailure.li2 = you have failed to answer enough questions correctly
 ivUpliftFailure.li3 = we could not match your details to our system
 
 # What you will need page
-whatYouWillNeed.title = Accept your low income pension payment
-whatYouWillNeed.heading = Accept your low income pension payment
+whatYouWillNeed.title = Accept your low earners pension payment
+whatYouWillNeed.heading = Accept your low earners pension payment
 whatYouWillNeed.p1 = This service gives an annual payment to people who earned below the standard Personal Allowance of £12,570 and paid into a pension through their employer.
 whatYouWillNeed.p2 = The payment is made once per tax year, directly into your bank account, once you have provided us with your bank details.
 whatYouWillNeed.h2.p1 = If you are on benefits
