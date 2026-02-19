@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.auth
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -23,7 +23,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.UnauthorisedView
+import views.html.auth.UnauthorisedView
 
 class UnauthorisedViewSpec extends SpecBase {
 

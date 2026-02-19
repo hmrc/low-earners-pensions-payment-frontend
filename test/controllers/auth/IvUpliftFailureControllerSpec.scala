@@ -38,7 +38,7 @@ class IvUpliftFailureControllerSpec extends SpecBase with DefaultAwaitTimeout {
 
   "onPageLoad" - {
     "should serve correct view when request is received" in new Test {
-      val result: Document = Jsoup.parse(contentAsString(controller.onPageLoad(None)(FakeRequest())))
+      val result: Document = Jsoup.parse(contentAsString(controller.onPageLoad(None)(request)))
       result.toString mustBe view.toString
     }
   }

@@ -15,6 +15,7 @@
  *@
 
 @import config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.config.ContactFrontendConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import views.html.helper.CSPNonce
@@ -25,10 +26,13 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
-  appConfig: AppConfig,
-  hmrcTimeoutDialog: HmrcTimeoutDialog,
-  hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-  hmrcStandardPage: HmrcStandardPage
+    appConfig: AppConfig,
+    hmrcTimeoutDialog: HmrcTimeoutDialog,
+    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+    hmrcStandardPage: HmrcStandardPage,
+    standardBetaBanner: StandardBetaBanner
+)(
+    implicit cfConfig: ContactFrontendConfig
 )
 
 @(
@@ -42,27 +46,29 @@
     fullWidthContent: Boolean = false,
     withReportTechnicalIssueLink: Boolean = true,
     signOutUrl: String = controllers.auth.routes.AuthController.signOut().url
-)(contentBlock: Html)(
+)(
+    contentBlock: Html
+)(
     implicit rh: RequestHeader,
     messages: Messages
 )
 
 @head = {
-<link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="screen, print" rel="stylesheet" type="text/css" />
-@if(timeout) {
-@hmrcTimeoutDialog(TimeoutDialog(
-    timeout             = Some(appConfig.timeout),
-    countdown           = Some(appConfig.countdown),
-    keepAliveUrl        = Some(routes.KeepAliveController.keepAlive().url),
-    keepAliveButtonText = Some(messages("timeout.keepAlive")),
-    signOutUrl          = Some(signOutUrl),
-    signOutButtonText   = Some(messages("common.signOut")),
-    timeoutUrl          = Some(controllers.auth.routes.AuthController.sessionTimeout().url),
-    title               = Some(messages("timeout.title")),
-    message             = Some(messages("timeout.message")),
-    language            = Some(messages.lang.code)
-))
-}
+    <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="screen, print" rel="stylesheet" type="text/css"/>
+    @if(timeout) {
+        @hmrcTimeoutDialog(TimeoutDialog(
+            timeout             = Some(appConfig.timeout),
+            countdown           = Some(appConfig.countdown),
+            keepAliveUrl        = Some(routes.KeepAliveController.keepAlive().url),
+            keepAliveButtonText = Some(messages("timeout.keepAlive")),
+            signOutUrl          = Some(signOutUrl),
+            signOutButtonText   = Some(messages("common.signOut")),
+            timeoutUrl          = Some(controllers.auth.routes.AuthController.sessionTimeout().url),
+            title               = Some(messages("timeout.title")),
+            message             = Some(messages("timeout.message")),
+            language            = Some(messages.lang.code)
+        ))
+    }
 }
 
 @mainTemplateClass = {
@@ -70,17 +76,17 @@
 }
 
 @mainContentLayout = {
-<div class="govuk-grid-row">
-    <div class=@mainTemplateClass>
-        @content
+    <div class="govuk-grid-row">
+        <div class=@mainTemplateClass>
+            @content
 
-        @if(withReportTechnicalIssueLink) {
-        <div class="govuk-!-margin-top-8">
-            @hmrcReportTechnicalIssueHelper()
+            @if(withReportTechnicalIssueLink) {
+                <div class="govuk-!-margin-top-8">
+                    @hmrcReportTechnicalIssueHelper()
+                </div>
+            }
         </div>
-        }
     </div>
-</div>
 }
 
 @content = {
@@ -93,13 +99,15 @@
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head),
         beforeContentBlock = beforeContent,
-        mainContentLayout = Some(_ => mainContentLayout
-    )
-),
-serviceURLs = ServiceURLs(
-    serviceUrl = Some(routes.WhatYouWillNeedController.onPageLoad().url),
-    signOutUrl = if(showSignOut) Some(signOutUrl) else None
-),
-backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
+        mainContentLayout = Some(_ => mainContentLayout)
+    ),
+    serviceURLs = ServiceURLs(
+        serviceUrl = Some(routes.WhatYouWillNeedController.onPageLoad().url),
+        signOutUrl = if(showSignOut) Some(signOutUrl) else None
+    ),
+    banners = Banners(
+        displayHmrcBanner = showHmrcBanner,
+        phaseBanner = if (appConfig.feedbackBannerEnabled) Some(standardBetaBanner()) else None
+    ),
+    backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
 ))(content)
-
