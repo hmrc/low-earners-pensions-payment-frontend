@@ -16,12 +16,12 @@
 
 package config
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import play.api.i18n.Lang
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.ConfidenceLevel.L250
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import play.api.i18n.Lang
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(config: Configuration):
@@ -31,7 +31,6 @@ class AppConfig @Inject()(config: Configuration):
   //Application config
   val host: String = loadConfig("host")
   val appName: String = loadConfig("appName")
-  private val servicesConfig = ServicesConfig(config)
 
   // Feedback config
   val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback")
