@@ -30,6 +30,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.Constants
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,10 +41,17 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
   def authResult(internalId: Option[String],
                  nino: Option[String],
-                 confidenceLevel: ConfidenceLevel): Option[String] ~ Option[String] ~ ConfidenceLevel =
-    internalId and nino and confidenceLevel
+                 confidenceLevel: ConfidenceLevel,
+                 enrolments: Enrolment*): Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments =
+    internalId and nino and confidenceLevel and Enrolments(enrolments.toSet)
 
-  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel): Unit =
+  val ptaEnrolment: Enrolment =
+    Enrolment(Constants.ptaEnrolmentKey, Seq(EnrolmentIdentifier("Some_Id", "A2100001")), "Activated")
+
+  val invalidEnrolment: Enrolment =
+    Enrolment("INVALID", Seq.empty, "Activated")
+
+  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments): Unit =
     setAuthValue(Future.successful(value))
 
   def setAuthValue[A](value: Future[A]): Unit =
@@ -57,7 +65,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
   "Auth Action" - {
     "when the user logged in" - {
       "must return a valid IdentifierRequest" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
 
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
@@ -77,11 +85,34 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
           status(result) mustBe OK
         }
       }
+      "but not enrolled must return unauthorised page" in {
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, invalidEnrolment))
+
+        val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig = application.injector.instanceOf[AppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = mockAuthConnector,
+            config = appConfig,
+            playBodyParsers = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          val expectedUrl = controllers.auth.routes.UnauthorisedController.onPageLoad().url
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe expectedUrl
+        }
+      }
     }
 
     "when the user has confidence level less than 250" - {
       "must redirect to IV uplift journey" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200, ptaEnrolment))
 
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 

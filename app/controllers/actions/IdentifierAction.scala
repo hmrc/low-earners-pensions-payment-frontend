@@ -21,12 +21,12 @@ import config.AppConfig
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.Logging
+import utils.{Constants, Logging}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,15 +44,18 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     val logContext: String = "[AuthenticatedIdentifierAction][invokeBlock] - "
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised()
-      .retrieve(Retrievals.internalId and Retrievals.nino and Retrievals.confidenceLevel) {
-        case Some(internalId) ~ Some(nino) ~ confidenceLevel if confidenceLevel >= config.confidenceLevelMinimum =>
-          block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
-        case Some(_) ~ Some(_) ~ _ =>
-          logger.info("invokeBlock", "User has insufficient confidence level. Redirecting to IV uplift journey")
-          Future.successful(Redirect(config.ivUpliftUrl))
+    authorised(Enrolment(Constants.ptaEnrolmentKey))
+      .retrieve(Retrievals.internalId and Retrievals.nino and Retrievals.confidenceLevel and Retrievals.authorisedEnrolments) {
+        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments if hasEnrolments(enrolments) =>
+          if(confidenceLevel >= config.confidenceLevelMinimum) {
+            block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
+          }else {
+            logger.info("invokeBlock", "User has insufficient confidence level. Redirecting to IV uplift journey")
+            Future.successful(Redirect(config.ivUpliftUrl))
+          }
         case _ =>
-          throw InternalError("Unknown error occurred in the auth process")
+          logger.info("invokeBlock", "User doesn't have PTA enrolment, not authorised to access this service.")
+          Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
       } recoverWith {
       case _: NoActiveSession =>
         Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
@@ -61,6 +64,9 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
     }
   }
+
+  private def hasEnrolments(enrolments: Enrolments): Boolean =
+    enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty
 
   override def parser: BodyParser[AnyContent] = playBodyParsers
 
