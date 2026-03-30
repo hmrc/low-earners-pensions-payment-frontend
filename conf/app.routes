@@ -9,6 +9,9 @@ GET     /language/:lang                     controllers.LanguageSwitchController
 GET     /                                   controllers.WhatYouWillNeedController.start
 GET     /start                              controllers.WhatYouWillNeedController.onPageLoad()
 
+# Bank account details page
+GET    /check-bank-account-details          controllers.WhatAreYourBankDetailsController.checkBankAccountDetails(name: Option[String], accountNumber: Option[String], sortCode: Option[String], rollNumber: Option[String])
+
 # Auth actions
 GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()
 GET     /account/timeout                    controllers.auth.AuthController.sessionTimeout()

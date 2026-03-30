@@ -20,13 +20,15 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.ConfidenceLevel.L250
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(config: Configuration):
-
   private def loadConfig(key: String): String = config.get[String](key)
+  private val servicesConfig = ServicesConfig(config)
+
 
   //Application config
   val host: String = loadConfig("host")
@@ -66,6 +68,11 @@ class AppConfig @Inject()(config: Configuration):
   val sessionDataTtl: Long = config.get[Int]("mongodb.sessionDataTtl")
   val encryptionKey: String = config.get[String]("mongodb.encryption.key")
   val useEncryption: Boolean = config.get[Boolean]("mongodb.encryption.enabled")
+  
+  //BARS config
+  private val barsBaseUrl: String = servicesConfig.baseUrl("bars")
+  private val barsEnv: String = config.get("microservice.services.bars.env")
+  def barsUrl: String = barsBaseUrl + (if (barsEnv == "local") "" else "/bank-account-reputation")
 
   //Language config
   def languageMap: Map[String, Lang] =
