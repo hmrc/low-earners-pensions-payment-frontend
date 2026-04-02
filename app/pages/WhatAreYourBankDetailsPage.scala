@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels
+package pages
 
-package object govuk {
+import models.bars.BarsRequestWithMandatory
+import play.api.libs.json.JsPath
 
-  object All
-    extends ImplicitConversions
-      with ButtonFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with SummaryListFluency
-      with InsetTextFluency
+object WhatAreYourBankDetailsPage extends QuestionPage[BarsRequestWithMandatory] {
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "bankDetails"
 }

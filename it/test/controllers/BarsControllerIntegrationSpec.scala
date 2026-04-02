@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class BarsControllerIntegrationSpec extends IntegrationSpecBase {
 
-  "/check-bank-account-details" should {
+  "/bank-account-details" should {
     val defaultParams: Map[String, String] = Map(
       "name" -> "aName",
       "accountNumber" -> "12345678",
@@ -45,7 +45,7 @@ class BarsControllerIntegrationSpec extends IntegrationSpecBase {
         case nonEmptyMap => "?" + nonEmptyMap.toSeq.map((k, v) => s"$k=$v").mkString("&")
       }
 
-      "/low-earners-pensions-payment/check-bank-account-details" + queryString
+      "/low-earners-pensions-payment/bank-account-details" + queryString
     }
 
     val requestJson: JsValue = Json.toJson(

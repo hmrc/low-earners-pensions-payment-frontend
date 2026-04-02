@@ -24,15 +24,15 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
   private[forms] def stripSortCode(str: String): String = str.strip().replaceAll("(?<=[0-9])-(?=[0-9])", "")
   private[forms] def formatSortCode(str: String): String = s"${str.take(2)}-${str.slice(2, 4)}-${str.drop(4)}"
   private[forms] def formatAccountName(str: String): String = str.toLowerCase.split(" ").map(_.capitalize).mkString(" ")
-  
-  private val bankAccountDetails = "bankAccountDetails"
-  
+
+  private val bankDetails = "bankDetails"
+
   def apply(): Form[BarsRequestWithMandatory] = Form[BarsRequestWithMandatory](
     mapping(
-      mandatoryTextField("accountName", bankAccountDetails, 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
-      mandatoryTextField("accountNumber", bankAccountDetails, 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
-      mandatoryTextField("sortCode", bankAccountDetails, 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
-      optionalTextField("buildingSocietyRollNumber", bankAccountDetails, 1, 18, "^[A-Z0-9]{1,18}$")
+      mandatoryTextField("accountName", bankDetails, 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
+      mandatoryTextField("accountNumber", bankDetails, 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
+      mandatoryTextField("sortCode", bankDetails, 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
+      optionalTextField("rollNumber", bankDetails, 1, 18, "^[A-Z0-9]{1,18}$")
     )(BarsRequestWithMandatory.apply)(BarsRequestWithMandatory.unapply)
   )
 }

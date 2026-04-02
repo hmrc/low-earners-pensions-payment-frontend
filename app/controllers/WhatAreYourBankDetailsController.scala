@@ -20,13 +20,18 @@ import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import controllers.validators.BarsRequestValidator
-import models.bars.RawBarsRequest
+import forms.WhatAreYourBankDetailsFormProvider
+import models.bars.{BarsRequestWithMandatory, RawBarsRequest}
 import models.{CorrelationId, ResponseWrapper}
+import pages.WhatAreYourBankDetailsPage
+import play.api.data.Form
+import viewmodels.Mode
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.BarsService
 import utils.{Constants, CorrelationIdOptional}
+import views.html.WhatAreYourBankDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,34 +41,43 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  validator: BarsRequestValidator,
                                                  service: BarsService,
                                                  correlationIdHandler: CorrelationIdOptional,
+                                                 formProvider: WhatAreYourBankDetailsFormProvider,
+                                                 view: WhatAreYourBankDetailsView,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
-  def checkBankAccountDetails(name: Option[String],
-                              accountNumber: Option[String],
-                              sortCode: Option[String],
-                              rollNumber: Option[String]): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request)(correlationId =>
-      def result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
-        barsRequest <- EitherT.fromEither[Future](validator.validate(
-          request = RawBarsRequest(name, accountNumber, sortCode, rollNumber),
-          correlationId = correlationId
-        ))
-        barsResult <- service.checkBankAccountDetails(barsRequest, correlationId)
-      } yield {
-        Ok(Json.toJson(barsResult.value)).withHeaders(
-          Constants.correlationIdKey -> barsResult.correlationId
-        )
-      }
+  private val form: Form[BarsRequestWithMandatory] = formProvider()
 
-      result.leftMap(errorResult => {
-        errorResult
-          .value.toResult
-          .withHeaders(
-            Constants.correlationIdKey -> errorResult.correlationId
-          )
-      }).merge
+  def onPageLoad(mode: Mode): Action[AnyContent] = handle { implicit request =>
+    request.userAnswers.get(WhatAreYourBankDetailsPage) match {
+      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
+      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+    }
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit request =>
+    correlationIdHandler.handleCorrelationId(request)(correlationId =>
+      Future.successful(Ok(""))
+      /*      def result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
+              barsRequest <- EitherT.fromEither[Future](validator.validate(
+                request = RawBarsRequest(name, accountNumber, sortCode, rollNumber),
+                correlationId = correlationId
+              ))
+              barsResult <- service.checkBankAccountDetails(barsRequest, correlationId)
+            } yield {
+              Ok(Json.toJson(barsResult.value)).withHeaders(
+                Constants.correlationIdKey -> barsResult.correlationId
+              )
+            }
+      
+            result.leftMap(errorResult => {
+              errorResult
+                .value.toResult
+                .withHeaders(
+                  Constants.correlationIdKey -> errorResult.correlationId
+                )
+            }).merge*/
     )
   }
 }

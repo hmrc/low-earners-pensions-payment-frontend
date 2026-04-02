@@ -37,7 +37,7 @@ import utils.CorrelationIdOptional
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class WhatAreYourBankAccountDetailsController extends SpecBase {
+class WhatAreYourBankDetailsControllerSpec extends SpecBase {
 
   trait Test {
     val mockIdentifierAction: IdentifierAction = new FakeIdentifierAction()
@@ -54,6 +54,8 @@ class WhatAreYourBankAccountDetailsController extends SpecBase {
       getData = mockDataRetrievalAction,
       validator = mockValidator,
       service = mockService,
+      ???,
+      ???,
       correlationIdHandler = idHandler,
       controllerComponents = mockCc
     )

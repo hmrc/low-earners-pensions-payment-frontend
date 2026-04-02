@@ -16,6 +16,8 @@
 
 package models.bars
 
+import play.api.libs.json.{Json, OFormat}
+
 case class BarsRequestWithMandatory(name: String,
                                     sortCode: String,
                                     accountNumber: String,
@@ -23,4 +25,6 @@ case class BarsRequestWithMandatory(name: String,
 
 object BarsRequestWithMandatory {
   def unapply(req: BarsRequestWithMandatory) = Some(req.name, req.sortCode, req.accountNumber, req.rollNumber)
+  
+  implicit val format: OFormat[BarsRequestWithMandatory] = Json.format[BarsRequestWithMandatory]
 }

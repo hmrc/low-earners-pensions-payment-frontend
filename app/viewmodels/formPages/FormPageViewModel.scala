@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.formPages
 
-package object govuk {
+import play.api.mvc.Call
+import viewmodels.DisplayMessage.Message
+import viewmodels.{Mode, NormalMode}
 
-  object All
-    extends ImplicitConversions
-      with ButtonFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with SummaryListFluency
-      with InsetTextFluency
-}
+case class FormPageViewModel(
+  mode: Mode = NormalMode,
+  buttonText: Message = Message("site.continue"),
+  onSubmit: Call,
+  backLinkUrl: Option[String] = None,
+  showBackLink: Boolean = true
+)

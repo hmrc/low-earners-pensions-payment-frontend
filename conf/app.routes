@@ -10,7 +10,8 @@ GET     /                                   controllers.WhatYouWillNeedControlle
 GET     /start                              controllers.WhatYouWillNeedController.onPageLoad()
 
 # Bank account details page
-GET    /check-bank-account-details          controllers.WhatAreYourBankDetailsController.checkBankAccountDetails(name: Option[String], accountNumber: Option[String], sortCode: Option[String], rollNumber: Option[String])
+GET    /bank-account-details                controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST   /bank-account-details                controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = NormalMode)
 
 # Auth actions
 GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()

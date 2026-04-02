@@ -16,16 +16,17 @@
 
 package viewmodels
 
-package object govuk {
+import play.api.mvc.JavascriptLiteral
 
-  object All
-    extends ImplicitConversions
-      with ButtonFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with SummaryListFluency
-      with InsetTextFluency
+sealed trait Mode
+
+case object CheckMode extends Mode
+case object NormalMode extends Mode
+
+object Mode {
+
+  implicit val jsLiteral: JavascriptLiteral[Mode] = {
+    case NormalMode => "NormalMode"
+    case CheckMode => "CheckMode"
+  }
 }

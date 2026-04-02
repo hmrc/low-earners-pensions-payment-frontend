@@ -25,6 +25,19 @@ whatYouWillNeed.p3 = This payment is not classed as income and it will not affec
 whatYouWillNeed.h2.p2 = Before you start
 whatYouWillNeed.p4 = To use this service, you'll need your bank details.
 
+# Bank account details page
+bankDetails.title = What are your bank details?
+bankDetails.heading = What are your bank details?
+bankDetails.securityInset = For your security, we do not save your bank details.
+bankDetails.accountName = Name on the account
+bankDetails.accountName.hint = Exactly as it appears on your bank statement
+bankDetails.sortCode = Sort code
+bankDetails.sortCode.hint = Must be 6 digits long
+bankDetails.accountNumber = Account number
+bankDetails.accountNumber.hint = Must be between 6 and 8 digits long
+bankDetails.rollNumber = Building society roll number (if you have one)
+bankDetails.rollNumber.hint = You can find it on your card, statement or passbook
+
 # Timeout dialogue
 timeout.title = You''re about to be signed out
 timeout.message = For your security, we will sign you out in
@@ -38,3 +51,5 @@ sessionTimeout.signIn = Sign in
 # Common content
 common.signOut = Sign out
 site.start = Start now
+site.continue = Continue
+
