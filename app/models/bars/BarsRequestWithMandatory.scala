@@ -20,3 +20,7 @@ case class BarsRequestWithMandatory(name: String,
                                     sortCode: String,
                                     accountNumber: String,
                                     rollNumber: Option[String])
+
+object BarsRequestWithMandatory {
+  def unapply(req: BarsRequestWithMandatory) = Some(req.name, req.sortCode, req.accountNumber, req.rollNumber)
+}

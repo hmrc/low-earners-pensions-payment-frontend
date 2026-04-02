@@ -27,6 +27,26 @@ class MappingsSpec extends SpecBase {
         result.getOrElse("N/A") mustBe "value"
       }
     }
+    
+    "textOpt" - {
+      "should return None when field is missing" in new Test {
+        val result: Either[Seq[FormError], Option[String]] = optStringFormatter().bind("field", Map.empty)
+        result mustBe a[Right[_, _]]
+        result.getOrElse(Some("N/A")) mustBe None
+      }
+
+      "should return None for an empty field value" in new Test {
+        val result: Either[Seq[FormError], Option[String]] = optStringFormatter().bind("field", Map("field" -> "   "))
+        result mustBe a[Right[_, _]]
+        result.getOrElse(Some("N/A")) mustBe None
+      }
+
+      "should bind for a valid value" in new Test {
+        val result: Either[Seq[FormError], Option[String]] = optStringFormatter().bind("field", Map("field" -> "value"))
+        result mustBe a[Right[_, _]]
+        result.getOrElse(Some("N/A")) mustBe Some("value")
+      }
+    }
   }
 
 }

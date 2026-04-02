@@ -20,6 +20,11 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 trait Constraints {
 
+  protected def firstErrorOpt[A](constraints: Constraint[A]*): Constraint[Option[A]] =
+    Constraint {
+      _.fold(Valid)(input => firstError[A](constraints :_*)(input))
+    }
+
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
     Constraint { input =>
       constraints
@@ -44,11 +49,21 @@ trait Constraints {
         Invalid(errorKey, minimum)
     }
 
-  protected def maxLength(maximum: Int, errorKey: String): Constraint[String] =
+  protected def maxLength(maximum: Int, errorKey: String): Constraint[String] = {
     Constraint {
       case str if str.length <= maximum =>
         Valid
       case _ =>
         Invalid(errorKey, maximum)
     }
+  }
+
+  protected def exactLength(length: Int, errorKey: String): Constraint[String] = {
+    Constraint {
+      case str if str.length == length =>
+        Valid
+      case _ =>
+        Invalid(errorKey, length)
+    }
+  }
 }

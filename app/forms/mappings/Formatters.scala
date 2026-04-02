@@ -32,4 +32,18 @@ trait Formatters {
       override def unbind(key: String, value: String): Map[String, String] =
         Map(key -> value)
     }
+
+  private[mappings] def optStringFormatter(): Formatter[Option[String]] =
+    new Formatter[Option[String]] {
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] =
+        Right(data.get(key).flatMap(
+          value => value.trim match {
+            case str if str.isEmpty => None
+            case str => Some(str)
+          }
+        ))
+
+      override def unbind(key: String, value: Option[String]): Map[String, String] =
+        value.fold(Map.empty)(value => Map(key -> value))
+    }
 }

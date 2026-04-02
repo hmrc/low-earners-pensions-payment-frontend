@@ -25,6 +25,48 @@ class ConstraintsSpec extends SpecBase {
   private trait Test extends Constraints
   
   "Constraints" - {
+    "firstErrorOpt" - {
+      "must return Valid when all constraints pass" in new Test {
+        val result: ValidationResult = firstErrorOpt(
+          maxLength(10, "error.length"),
+          regexp("""^\w+$""", "error.regexp")
+        )(Some("foo"))
+        result mustEqual Valid
+      }
+
+      "must return Invalid when the first constraint fails" in new Test {
+        val result: ValidationResult = firstErrorOpt(
+          maxLength(10, "error.length"),
+          regexp("""^\w+$""", "error.regexp")
+        )(Some("a" * 11))
+        result mustEqual Invalid("error.length", 10)
+      }
+
+      "must return Invalid when the second constraint fails" in new Test {
+        val result: ValidationResult = firstErrorOpt(
+          maxLength(10, "error.length"),
+          regexp("""^\w+$""", "error.regexp")
+        )(Some(""))
+        result mustEqual Invalid("error.regexp", """^\w+$""")
+      }
+
+      "must return Invalid for the first error when both constraints fail" in new Test {
+        val result: ValidationResult = firstErrorOpt(
+          maxLength(-1, "error.length"),
+          regexp("""^\w+$""", "error.regexp")
+        )(Some(""))
+        result mustEqual Invalid("error.length", -1)
+      }
+
+      "must return Valid for an empty value" in new Test {
+        val result: ValidationResult = firstErrorOpt(
+          maxLength(-1, "error.length"),
+          regexp("""^\w+$""", "error.regexp")
+        )(None)
+        result mustEqual Valid
+      }
+    }
+    
     "firstError" - {
       "must return Valid when all constraints pass" in new Test {
         val result: ValidationResult = firstError(
