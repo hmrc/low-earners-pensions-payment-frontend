@@ -28,31 +28,29 @@ trait BaseForm extends Mappings {
   private type MappingFor[A] = (String, Mapping[A])
 
   def mandatoryTextField(fieldName: String,
-                         errorKeyPrefix: String,
                          minAcceptedLength: Int,
                          maxAcceptedLength: Int,
                          regex: String,
                          bindMap: String => String = stripWhitespace,
                          unbindMap: String => String = identity[String]): MappingFor[String] =
-    fieldName -> text(s"$errorKeyPrefix.formError.required.$fieldName")
+    fieldName -> text(s"$fieldName.formError.required")
       .transform(bindMap, unbindMap)
       .verifying(
         if (minAcceptedLength != maxAcceptedLength) {
           firstError(
-            minLength(minAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            maxLength(maxAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            regexp(regex, s"$errorKeyPrefix.formError.format.$fieldName")
+            minLength(minAcceptedLength, s"$fieldName.formError.length"),
+            maxLength(maxAcceptedLength, s"$fieldName.formError.length"),
+            regexp(regex, s"$fieldName.formError.format")
           )
         } else {
           firstError(
-            exactLength(minAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            regexp(regex, s"$errorKeyPrefix.formError.format.$fieldName")
+            exactLength(minAcceptedLength, s"$fieldName.formError.length"),
+            regexp(regex, s"$fieldName.formError.format")
           )
         }
       )
 
   def optionalTextField(fieldName: String,
-                        errorKeyPrefix: String,
                         minAcceptedLength: Int,
                         maxAcceptedLength: Int,
                         regex: String,
@@ -63,14 +61,14 @@ trait BaseForm extends Mappings {
       .verifying(
         if (minAcceptedLength != maxAcceptedLength) {
           firstErrorOpt(
-            minLength(minAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            maxLength(maxAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            regexp(regex, s"$errorKeyPrefix.formError.format.$fieldName")
+            minLength(minAcceptedLength, s"$fieldName.formError.length"),
+            maxLength(maxAcceptedLength, s"$fieldName.formError.length"),
+            regexp(regex, s"$fieldName.formError.format")
           )
         } else {
           firstErrorOpt(
-            exactLength(minAcceptedLength, s"$errorKeyPrefix.formError.length.$fieldName"),
-            regexp(regex, s"$errorKeyPrefix.formError.format.$fieldName")
+            exactLength(minAcceptedLength, s"$fieldName.formError.length"),
+            regexp(regex, s"$fieldName.formError.format")
           )
         }
       )

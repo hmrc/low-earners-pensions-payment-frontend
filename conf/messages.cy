@@ -37,6 +37,17 @@ bankDetails.accountNumber = Account number
 bankDetails.accountNumber.hint = Must be between 6 and 8 digits long
 bankDetails.rollNumber = Building society roll number (if you have one)
 bankDetails.rollNumber.hint = You can find it on your card, statement or passbook
+bankDetails.accountName.formError.required = Enter the name on the account
+bankDetails.sortCode.formError.required = Enter a sort code
+bankDetails.accountNumber.formError.required = Enter an account number
+bankDetails.accountName.formError.length = Account name must be between 1 and 18 characters
+bankDetails.sortCode.formError.length = Enter a valid sort code like 309430
+bankDetails.accountNumber.formError.length = Account number must be between 6 and 8 digits
+bankDetails.rollNumber.formError.length = Building society roll number must be between 1 and 18 characters
+bankDetails.accountName.formError.format = Account name must only include letters a to z, hyphens, spaces, or apostrophes
+bankDetails.sortCode.formError.format = Enter a valid sort code like 309430
+bankDetails.accountNumber.formError.format = Enter a valid account number like 00733445
+bankDetails.rollNumber.formError.format = Building society roll number must only include letters a to z, numbers, hyphens, spaces, forward slashes and full stops
 
 # Timeout dialogue
 timeout.title = You''re about to be signed out

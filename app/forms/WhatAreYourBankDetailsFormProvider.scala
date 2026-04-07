@@ -29,10 +29,10 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
 
   def apply(): Form[BarsRequestWithMandatory] = Form[BarsRequestWithMandatory](
     mapping(
-      mandatoryTextField("accountName", bankDetails, 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
-      mandatoryTextField("accountNumber", bankDetails, 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
-      mandatoryTextField("sortCode", bankDetails, 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
-      optionalTextField("rollNumber", bankDetails, 1, 18, "^[A-Z0-9]{1,18}$")
+      mandatoryTextField(s"$bankDetails.accountName", 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
+      mandatoryTextField(s"$bankDetails.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
+      mandatoryTextField(s"$bankDetails.sortCode", 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
+      optionalTextField(s"$bankDetails.rollNumber", 1, 18, "^[A-Z0-9]{1,18}$")
     )(BarsRequestWithMandatory.apply)(BarsRequestWithMandatory.unapply)
   )
 }
