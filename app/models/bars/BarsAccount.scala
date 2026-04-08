@@ -18,8 +18,8 @@ package models.bars
 
 import play.api.libs.json.{Format, Json}
 
-case class BarsAccount(sortCode: String,
-                       accountNumber: String,
+case class BarsAccount(accountNumber: String,
+                       sortCode: String,
                        rollNumber: Option[String])
 
 object BarsAccount {
