@@ -141,7 +141,7 @@ trait SpecBase
     lastName = Some("Payer")
   )
 
-  val dummyValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+  val dummyValidatedBarsRequest: BarsRequest = BarsRequest(
     account = BarsAccount(
       sortCode = "N/A",
       accountNumber = "N/A",
@@ -155,7 +155,7 @@ trait SpecBase
     )
   )
 
-  val testValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+  val testValidatedBarsRequest: BarsRequest = BarsRequest(
     account = testBarsAccount,
     subject = BarsSubject(name = Some("Taxwell Payer"))
   )

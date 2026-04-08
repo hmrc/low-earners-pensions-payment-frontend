@@ -16,10 +16,10 @@
 
 package pages
 
-import models.bars.BarsRequestWithMandatory
+import models.userAnswers.BankAccountDetails
 import play.api.libs.json.JsPath
 
-object WhatAreYourBankDetailsPage extends QuestionPage[BarsRequestWithMandatory] {
+object WhatAreYourBankDetailsPage extends QuestionPage[BankAccountDetails] {
   override def path: JsPath = JsPath \ toString
   override def toString: String = "bankDetails"
 }

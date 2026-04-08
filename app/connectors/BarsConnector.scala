@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpHandlers.BarsHttpHandler
 import models.CorrelationId
-import models.bars.{BarsResponse, ValidatedBarsRequest}
+import models.bars.{BarsResponse, BarsRequest}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,7 +34,7 @@ import scala.concurrent.ExecutionContext
 class BarsConnector @Inject()(config: AppConfig,
                               httpClient: HttpClientV2) extends BarsHttpHandler {
 
-  def checkBankAccountDetails(request: ValidatedBarsRequest, correlationId: CorrelationId)
+  def checkBankAccountDetails(request: BarsRequest, correlationId: CorrelationId)
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): ConnectorResponse[BarsResponse] =
     EitherT(
       httpClient

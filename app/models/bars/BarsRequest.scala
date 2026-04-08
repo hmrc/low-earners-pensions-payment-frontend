@@ -16,13 +16,10 @@
 
 package models.bars
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites}
 
-case class RawBarsRequest(name: Option[String],
-                          sortCode: Option[String],
-                          accountNumber: Option[String],
-                          rollNumber: Option[String])
+case class BarsRequest(account: BarsAccount, subject: BarsSubject)
 
-object RawBarsRequest {
-  implicit val reads: Reads[RawBarsRequest] = Json.reads[RawBarsRequest]
+object BarsRequest {
+  implicit val format: OWrites[BarsRequest] = Json.writes[BarsRequest]
 }

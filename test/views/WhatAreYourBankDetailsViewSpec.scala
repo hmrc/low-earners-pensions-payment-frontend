@@ -19,11 +19,9 @@ package views
 import base.SpecBase
 import controllers.routes
 import forms.WhatAreYourBankDetailsFormProvider
-import models.bars.BarsRequestWithMandatory
-import viewmodels.NormalMode
+import models.userAnswers.BankAccountDetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -42,7 +40,7 @@ class WhatAreYourBankDetailsViewSpec extends SpecBase {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
     private val formProvider = new WhatAreYourBankDetailsFormProvider()
-    private val form: Form[BarsRequestWithMandatory] = formProvider()
+    private val form: Form[BankAccountDetails] = formProvider()
     private val onSubmit = routes.WhatAreYourBankDetailsController.onSubmit()
     private val backLinkUrl = routes.WhatAreYourBankDetailsController.onSubmit().url
     private val viewModel: FormPageViewModel = FormPageViewModel(onSubmit = onSubmit, backLinkUrl = Some(backLinkUrl))

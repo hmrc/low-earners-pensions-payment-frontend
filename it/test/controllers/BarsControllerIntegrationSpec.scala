@@ -18,7 +18,7 @@ package controllers
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import common.IntegrationSpecBase
-import models.bars.{BarsAccount, BarsSubject, ValidatedBarsRequest}
+import models.bars.{BarsAccount, BarsSubject, BarsRequest}
 import play.api.Application
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Result
@@ -49,7 +49,7 @@ class BarsControllerIntegrationSpec extends IntegrationSpecBase {
     }
 
     val requestJson: JsValue = Json.toJson(
-      ValidatedBarsRequest(
+      BarsRequest(
         account = BarsAccount(
           sortCode = "123456",
           accountNumber = "12345678",

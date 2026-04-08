@@ -19,7 +19,7 @@ package models.bars
 import base.SpecBase
 import play.api.libs.json.{JsValue, Json}
 
-class ValidatedBarsRequestSpec extends SpecBase {
+class BarsRequestSpec extends SpecBase {
 
   private val testJson: JsValue = Json.parse(
     """

@@ -16,10 +16,9 @@
 
 package navigation
 
-import viewmodels.Mode
-import models.userAnswers.UserAnswers
 import pages.*
 import play.api.mvc.Call
+import viewmodels.Mode
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
   override def nextPage(page: Page, mode: Mode): Call = desiredRoute

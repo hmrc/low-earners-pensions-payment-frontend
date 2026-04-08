@@ -16,7 +16,7 @@
 
 package forms
 
-import models.bars.BarsRequestWithMandatory
+import models.userAnswers.BankAccountDetails
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -27,12 +27,12 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
 
   private val bankDetails = "bankDetails"
 
-  def apply(): Form[BarsRequestWithMandatory] = Form[BarsRequestWithMandatory](
+  def apply(): Form[BankAccountDetails] = Form[BankAccountDetails](
     mapping(
       mandatoryTextField(s"$bankDetails.accountName", 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
       mandatoryTextField(s"$bankDetails.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
       mandatoryTextField(s"$bankDetails.sortCode", 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
       optionalTextField(s"$bankDetails.rollNumber", 1, 18, "^[A-Z0-9]{1,18}$")
-    )(BarsRequestWithMandatory.apply)(BarsRequestWithMandatory.unapply)
+    )(BankAccountDetails.apply)(BankAccountDetails.unapply)
   )
 }

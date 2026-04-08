@@ -16,13 +16,13 @@
 
 package forms
 
-import models.bars.BarsRequestWithMandatory
+import models.userAnswers.BankAccountDetails
 import play.api.data.Form
 
 class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
   "WhatAreYourBankDetailsFormProvider" - {
     val formProvider: WhatAreYourBankDetailsFormProvider = WhatAreYourBankDetailsFormProvider()
-    val form: Form[BarsRequestWithMandatory] = formProvider()
+    val form: Form[BankAccountDetails] = formProvider()
 
     "stripSortCode" - {
       "should remove any trailing whitespace, leading whitespace, and single dashes from sort-code" in {
@@ -63,7 +63,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           "bankDetails.accountNumber" -> "  12345678  ",
           "bankDetails.sortCode" -> "  112233  ",
           "bankDetails.rollNumber" -> "      "
-        )).get mustBe BarsRequestWithMandatory("name nameson", "12345678", "112233", None)
+        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", None)
       }
 
       "should strip dashes from sort code field" in {
@@ -72,7 +72,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           "bankDetails.accountNumber" -> "12345678",
           "bankDetails.sortCode" -> "11-22-33",
           "bankDetails.rollNumber" -> "ABCDEF"
-        )).get mustBe BarsRequestWithMandatory("name nameson", "12345678", "112233", Some("ABCDEF"))
+        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", Some("ABCDEF"))
       }
     }
   }

@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package models.bars
+package models.userAnswers
 
+import models.bars.{BarsAccount, BarsRequest, BarsSubject}
 import play.api.libs.json.{Json, OFormat}
 
-case class BarsRequestWithMandatory(name: String,
-                                    accountNumber: String,
-                                    sortCode: String,
-                                    rollNumber: Option[String]) {
-  def toValidatedBarsRequest = ValidatedBarsRequest(
+case class BankAccountDetails(name: String,
+                              accountNumber: String,
+                              sortCode: String,
+                              rollNumber: Option[String]) {
+  def toValidatedBarsRequest = BarsRequest(
     account = BarsAccount(accountNumber, sortCode, rollNumber),
     subject = BarsSubject(name = Some(name))
   )
 }
 
-object BarsRequestWithMandatory {
-  def unapply(req: BarsRequestWithMandatory) = Some(req.name, req.sortCode, req.accountNumber, req.rollNumber)
+object BankAccountDetails {
+  def unapply(req: BankAccountDetails) = Some(req.name, req.sortCode, req.accountNumber, req.rollNumber)
 
-  implicit val format: OFormat[BarsRequestWithMandatory] = Json.format[BarsRequestWithMandatory]
+  implicit val format: OFormat[BankAccountDetails] = Json.format[BankAccountDetails]
 }

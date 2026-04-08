@@ -39,7 +39,7 @@ abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
     )
 
   protected def submitUrl(mode: Mode, page: Page): Call = page match {
-    case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onPageLoad()
+    case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit()
     case _ => routes.WhatYouWillNeedController.onPageLoad() //Placeholder to avoid warnings
   }
 

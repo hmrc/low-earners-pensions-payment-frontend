@@ -18,8 +18,6 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import models.*
-import models.userAnswers.UserAnswers
 import pages.*
 import viewmodels.{CheckMode, NormalMode}
 
