@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package pages
+package navigation
 
-import scala.language.implicitConversions
+import controllers.routes
+import models.*
+import models.userAnswers.UserAnswers
+import pages.*
+import play.api.mvc.Call
+import viewmodels.{CheckMode, Mode, NormalMode}
 
-trait Page
+import javax.inject.{Inject, Singleton}
 
-object Page {
-  implicit def toString(page: Page): String = page.toString
+@Singleton
+class Navigator @Inject() {
+  private val normalRoutes: Page => Call = _ => routes.WhatYouWillNeedController.onPageLoad()
+  private val checkRouteMap: Page => Call = _ => routes.WhatYouWillNeedController.onPageLoad()
+
+  def nextPage(page: Page, mode: Mode): Call = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRouteMap(page)
+  }
 }

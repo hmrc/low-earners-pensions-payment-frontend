@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package navigation
 
-import scala.language.implicitConversions
+import viewmodels.Mode
+import models.userAnswers.UserAnswers
+import pages.*
+import play.api.mvc.Call
 
-trait Page
-
-object Page {
-  implicit def toString(page: Page): String = page.toString
+class FakeNavigator(desiredRoute: Call) extends Navigator {
+  override def nextPage(page: Page, mode: Mode): Call = desiredRoute
 }
