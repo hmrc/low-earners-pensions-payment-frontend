@@ -19,6 +19,7 @@ package connectors.httpHandlers
 import base.SpecBase
 import connectors.DownstreamResponse
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper, SuccessWrapper}
+import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, NameMatches, NonStandardAccountDetails, SortCodeCheck}
 import models.bars.BarsResponse
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.{CorrelationId, ResponseWrapper}
@@ -152,14 +153,14 @@ class BarsHttpHandlerSpec extends SpecBase {
         result mustBe a[Right[_, _]]
 
         val expectedBarsResponse: BarsResponse = BarsResponse(
-          accountNumberIsWellFormatted = "indeterminate",
-          accountExists = "no",
-          nameMatches = "indeterminate",
+          accountNumberIsWellFormatted = AccountNumberWellFormatted.Indeterminate,
+          accountExists = AccountExists.No,
+          nameMatches = NameMatches.No,
           accountName = Some("Taxwell Payer"),
-          nonStandardAccountDetailsRequiredForBacs = "no",
-          sortCodeIsPresentOnEISCD = "yes",
-          sortCodeSupportsDirectDebit = "yes",
-          sortCodeSupportsDirectCredit = "yes",
+          nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
+          sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
+          sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
+          sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
           sortCodeBankName = Some("Test"),
           iban = Some("test-iban")
         )

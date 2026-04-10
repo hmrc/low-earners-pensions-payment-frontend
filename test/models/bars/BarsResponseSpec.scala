@@ -17,6 +17,7 @@
 package models.bars
 
 import base.SpecBase
+import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, NameMatches, NonStandardAccountDetails, SortCodeCheck}
 import play.api.libs.json.*
 
 class BarsResponseSpec extends SpecBase {
@@ -37,14 +38,14 @@ class BarsResponseSpec extends SpecBase {
     """.stripMargin)
 
   private val testModel: BarsResponse = BarsResponse(
-    accountNumberIsWellFormatted = "indeterminate",
-    accountExists = "no",
-    nameMatches = "indeterminate",
+    accountNumberIsWellFormatted = AccountNumberWellFormatted.Indeterminate,
+    accountExists = AccountExists.No,
+    nameMatches = NameMatches.Indeterminate,
     accountName = Some("Taxwell Payer"),
-    nonStandardAccountDetailsRequiredForBacs = "no",
-    sortCodeIsPresentOnEISCD = "yes",
-    sortCodeSupportsDirectDebit = "yes",
-    sortCodeSupportsDirectCredit = "yes",
+    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
+    sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
+    sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
+    sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
     sortCodeBankName = Some("Test"),
     iban = Some("test-iban")
   )
@@ -52,10 +53,9 @@ class BarsResponseSpec extends SpecBase {
   "BarsResponse" - {
     "when read from JSON" - {
       "should return a JsSuccess for valid JSON" in {
-        val fillerModel = BarsResponse("N/A", "N/A", "N/A", None, "N/A", "N/A", "N/A", "N/A", None, None)
         val jsResult: JsResult[BarsResponse] = testJson.validate[BarsResponse]
         jsResult mustBe a[JsSuccess[_]]
-        jsResult.getOrElse(fillerModel) mustBe testModel
+        jsResult.getOrElse(dummyBarsResponse) mustBe testModel
       }
 
       "should return a JsError for invalid JSON" in {
@@ -66,13 +66,6 @@ class BarsResponseSpec extends SpecBase {
             |}
           """.stripMargin).validate[BarsResponse]
         jsResult mustBe a[JsError]
-      }
-    }
-
-    "when written to JSON" - {
-      "should return expected JSON" in {
-        val json: JsValue = Json.toJson(testModel)
-        json mustBe testJson
       }
     }
   }

@@ -23,7 +23,7 @@ case class BankAccountDetails(name: String,
                               accountNumber: String,
                               sortCode: String,
                               rollNumber: Option[String]) {
-  def toValidatedBarsRequest = BarsRequest(
+  def toBarsRequest = BarsRequest(
     account = BarsAccount(accountNumber, sortCode, rollNumber),
     subject = BarsSubject(name = Some(name))
   )

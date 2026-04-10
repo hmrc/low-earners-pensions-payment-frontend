@@ -38,7 +38,7 @@ class BarsRequestSpec extends SpecBase {
   "BarsRequest" - {
     "when written to JSON" - {
       "should return expected JSON" in {
-        val json: JsValue = Json.toJson(testValidatedBarsRequest)
+        val json: JsValue = Json.toJson(testBarsRequest)
         json mustBe testJson
       }
     }

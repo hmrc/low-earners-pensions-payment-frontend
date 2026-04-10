@@ -48,7 +48,7 @@ class BarsConnectorSpec extends SpecBase {
       httpClient = mockHttpClient
     )
     
-    val testRequest: BarsRequest = testValidatedBarsRequest
+    val testRequest: BarsRequest = testBarsRequest
     
     lazy val connectorResponse: Future[BarsResult] = Future.successful(
       Right(SuccessWrapper(testBarsResponse, testCorrelationId))

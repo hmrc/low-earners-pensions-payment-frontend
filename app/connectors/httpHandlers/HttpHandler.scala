@@ -26,7 +26,7 @@ import models.{CorrelationId, ResponseWrapper}
 import play.api.libs.json.*
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-trait HttpHandler[Resp: OFormat] {
+trait HttpHandler[Resp: Reads] {
   type HttpResult = Either[ErrorWrapper, HttpResponseWrapper]
 
   def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult
