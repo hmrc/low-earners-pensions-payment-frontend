@@ -82,7 +82,7 @@ trait FormSpecBase extends SpecBase {
                                 validValues: Seq[String],
                                 regex: String): Unit = {
     s"for optional field- $key" - {
-      "should return None error when field is missing" in {
+      "should return None when field is missing" in {
         val result: Form[A] = form.bind(Map.empty)
         result.error(key) mustBe None
         result.data.get(key) mustBe None
@@ -107,7 +107,7 @@ trait FormSpecBase extends SpecBase {
         }
       }
 
-      "should return None a field containing only whitespace" in {
+      "should return None for a field containing only whitespace" in {
         val result: Form[A] = form.bind(Map(key -> "     "))
         result.error(key) mustBe None
       }

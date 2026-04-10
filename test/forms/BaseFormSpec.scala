@@ -21,17 +21,27 @@ import play.api.data.Forms.mapping
 
 class BaseFormSpec extends FormSpecBase {
 
-  private case class FormData(data: String, dataOpt: Option[String])
+  private case class FormData(data: String,
+                              dataWithFixedLength: String,
+                              dataOpt: Option[String],
+                              dataOptWithFixedLength: Option[String])
 
   private object FormData {
-    def unapply(formData: FormData): Option[(String, Option[String])] = Some(formData.data, formData.dataOpt)
+    def unapply(formData: FormData): Option[(String, String, Option[String], Option[String])] = Some(
+      formData.data,
+      formData.dataWithFixedLength,
+      formData.dataOpt,
+      formData.dataOptWithFixedLength
+    )
   }
 
   private class TestFormProvider extends BaseForm {
     def apply(): Form[FormData] = Form[FormData](
       mapping(
         mandatoryTextField("data", 3, 6, "[A-Z]{3,6}"),
-        optionalTextField("dataOpt", 3, 6, "[A-Z]{3,6}")
+        mandatoryTextField("dataWithFixedLength", 3, 3, "[A-Z]{3}"),
+        optionalTextField("dataOpt", 3, 6, "[A-Z]{3,6}"),
+        optionalTextField("dataOptWithFixedLength", 3, 3, "[A-Z]{3}")
       )(FormData.apply)(FormData.unapply)
     )
   }
@@ -56,11 +66,13 @@ class BaseFormSpec extends FormSpecBase {
     "mandatoryTextField" - {
       val form: Form[FormData] = (new TestFormProvider())()
       handleForMandatoryField(form)("data", 3, 6, Seq("1234"), Seq("ABCD"), "[A-Z]{3,6}")
+      handleForMandatoryField(form)("dataWithFixedLength", 3, 3, Seq("123"), Seq("ABC"), "[A-Z]{3}")
     }
 
     "optionalTextField" - {
       val form: Form[FormData] = (new TestFormProvider())()
       handleForOptionalField(form)("dataOpt", 3, 6, Seq("1234"), Seq("ABCD"), "[A-Z]{3,6}")
+      handleForOptionalField(form)("dataOptWithFixedLength", 3, 3, Seq("123"), Seq("ABC"), "[A-Z]{3}")
     }
   }
 }

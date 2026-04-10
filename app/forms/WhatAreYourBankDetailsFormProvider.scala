@@ -21,7 +21,7 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 
 class WhatAreYourBankDetailsFormProvider extends BaseForm {
-  private[forms] def stripSortCode(str: String): String = str.strip().replaceAll("(?<=[0-9])-(?=[0-9])", "")
+  private[forms] def stripSortCode(str: String): String = str.strip().replaceAll("(?<=[0-9]{2})-(?=[0-9]{2})", "")
   private[forms] def formatSortCode(str: String): String = s"${str.take(2)}-${str.slice(2, 4)}-${str.drop(4)}"
   private[forms] def formatAccountName(str: String): String = str.toLowerCase.split(" ").map(_.capitalize).mkString(" ")
 

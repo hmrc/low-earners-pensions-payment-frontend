@@ -28,7 +28,7 @@ whatYouWillNeed.h2.p1 = Before you continue
 whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
 # Bank account details page
-bankDetails.title = What are your bank details?
+bankDetails.title = Bank details
 bankDetails.heading = What are your bank details?
 bankDetails.securityInset = For your security, we do not save your bank details.
 bankDetails.accountName = Name on the account
@@ -65,3 +65,4 @@ sessionTimeout.signIn = Sign in
 common.signOut = Sign out
 site.start = Start now
 site.continue = Continue
+error.title.prefix = Error:

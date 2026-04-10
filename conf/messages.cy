@@ -63,4 +63,5 @@ sessionTimeout.signIn = Sign in
 common.signOut = Sign out
 site.start = Start now
 site.continue = Continue
+error.title.prefix = Error:
 
