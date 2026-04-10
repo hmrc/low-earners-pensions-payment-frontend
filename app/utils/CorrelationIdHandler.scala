@@ -17,13 +17,13 @@
 package utils
 
  import com.google.inject.Singleton
-import models.CorrelationId
-import models.errors.ErrorResult.ServiceErrorResult
-import play.api.http.Status.BAD_REQUEST
-import play.api.mvc.{Request, Result}
+ import models.CorrelationId
+ import models.errors.ErrorResult.ServiceErrorResult
+ import play.api.http.Status.BAD_REQUEST
+ import play.api.mvc.{Request, Result}
 
-import java.util.UUID
-import scala.concurrent.Future
+ import java.util.UUID
+ import scala.concurrent.Future
 
 sealed class CorrelationIdHandler(correlationIdMandatory: Boolean) {
   protected[utils] def generateCorrelationId: CorrelationId = CorrelationId(UUID.randomUUID().toString)

@@ -20,9 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{BarsConnector, ConnectorResponse}
 import models.CorrelationId
 import models.ResponseWrapper.ErrorWrapper
-import models.bars.MatchResult.Match
-import models.bars.{BarsRequest, BarsResponse, MatchResult}
-import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
+import models.bars.{BarsRequest, BarsResponse}
+import models.errors.ErrorResult.BarsErrorResult
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
 

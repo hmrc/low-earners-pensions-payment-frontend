@@ -17,8 +17,6 @@
 package navigation
 
 import controllers.routes
-import models.*
-import models.userAnswers.UserAnswers
 import pages.*
 import play.api.mvc.Call
 import viewmodels.{CheckMode, Mode, NormalMode}

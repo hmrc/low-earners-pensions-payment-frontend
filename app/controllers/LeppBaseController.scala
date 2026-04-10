@@ -18,13 +18,12 @@ package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
-import pages.WhatAreYourBankDetailsPage
+import pages.{Page, WhatAreYourBankDetailsPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.Mode
 import viewmodels.formPages.FormPageViewModel
-import pages.Page
 
 import javax.inject.Inject
 import scala.concurrent.Future

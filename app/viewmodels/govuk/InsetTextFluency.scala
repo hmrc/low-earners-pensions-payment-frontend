@@ -16,8 +16,8 @@
 
 package viewmodels.govuk
 
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
 import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
 
 trait InsetTextFluency {
   object InsetTextViewModel {

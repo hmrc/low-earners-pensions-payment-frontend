@@ -17,7 +17,7 @@
 package models.bars
 
 import base.SpecBase
-import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, NameMatches, NonStandardAccountDetails, SortCodeCheck}
+import models.bars.statuses.*
 import play.api.libs.json.*
 
 class BarsResponseSpec extends SpecBase {

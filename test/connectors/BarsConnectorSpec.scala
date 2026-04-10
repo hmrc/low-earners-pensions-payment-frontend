@@ -20,7 +20,7 @@ import base.SpecBase
 import config.AppConfig
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.bars.{BarsResponse, BarsRequest}
+import models.bars.{BarsRequest, BarsResponse}
 import models.errors.ErrorResult.BarsErrorResult
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when

@@ -17,7 +17,6 @@
 package models
 
 import models.errors.ErrorResult
-import play.api.libs.json.OWrites
 import uk.gov.hmrc.http.HttpResponse
 
 enum ResponseWrapper[T] {

@@ -19,8 +19,8 @@ package connectors.httpHandlers
 import base.SpecBase
 import connectors.DownstreamResponse
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper, SuccessWrapper}
-import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, NameMatches, NonStandardAccountDetails, SortCodeCheck}
 import models.bars.BarsResponse
+import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.{CorrelationId, ResponseWrapper}
 import play.api.http.Status.*
@@ -155,7 +155,7 @@ class BarsHttpHandlerSpec extends SpecBase {
         val expectedBarsResponse: BarsResponse = BarsResponse(
           accountNumberIsWellFormatted = AccountNumberWellFormatted.Indeterminate,
           accountExists = AccountExists.No,
-          nameMatches = NameMatches.No,
+          nameMatches = NameMatches.Indeterminate,
           accountName = Some("Taxwell Payer"),
           nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
           sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,

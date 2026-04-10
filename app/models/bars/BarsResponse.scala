@@ -16,8 +16,7 @@
 
 package models.bars
 
-import models.bars.MatchResult.Match
-import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, NameMatches, NonStandardAccountDetails, SortCodeCheck}
+import models.bars.statuses.*
 import play.api.libs.json.{Json, Reads}
 
 case class BarsResponse(accountNumberIsWellFormatted: AccountNumberWellFormatted,

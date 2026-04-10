@@ -17,7 +17,6 @@
 package forms.mappings
 
 import base.SpecBase
-import org.scalatest.freespec.AnyFreeSpec
 import play.api.data.FormError
 import play.api.data.format.Formatter
 

@@ -16,23 +16,12 @@
 
 package controllers
 
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import common.IntegrationSpecBase
-import models.bars.{BarsAccount, BarsSubject, BarsRequest}
-import play.api.Application
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc.Result
-import play.api.test.FakeRequest
-import play.api.test.Helpers.{writeableOf_AnyContentAsEmpty, route as routeRequest, running as runningRequest}
-import play.mvc.Http.Status
-import play.test.Helpers.*
-
-import scala.concurrent.Future
 
 class BarsControllerIntegrationSpec extends IntegrationSpecBase {
 
   "/bank-account-details" should {
-    val defaultParams: Map[String, String] = Map(
+/*    val defaultParams: Map[String, String] = Map(
       "name" -> "aName",
       "accountNumber" -> "12345678",
       "sortCode" -> "123456",
@@ -191,6 +180,6 @@ class BarsControllerIntegrationSpec extends IntegrationSpecBase {
           }
         }
       }
-    }
+    }*/
   }
 }

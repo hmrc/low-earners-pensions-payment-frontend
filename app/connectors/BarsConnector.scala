@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpHandlers.BarsHttpHandler
 import models.CorrelationId
-import models.bars.{BarsResponse, BarsRequest}
+import models.bars.{BarsRequest, BarsResponse}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HeaderCarrier

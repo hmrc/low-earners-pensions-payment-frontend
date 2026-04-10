@@ -20,7 +20,7 @@
 @import viewmodels.formPages._
 @import viewmodels.govuk._
 @import viewmodels._
-@import models.bars.BarsRequestWithMandatory
+@import models.userAnswers.BankAccountDetails
 
 @this(
     layout: templates.Layout,
@@ -32,7 +32,7 @@
     insetText: GovukInsetText
 )
 
-@(form: Form[BarsRequestWithMandatory], viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[BankAccountDetails], viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, s"${messages("bankDetails.title")}"), backLinkUrl = viewModel.backLinkUrl) {
 
