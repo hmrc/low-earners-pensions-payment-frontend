@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+import cats.data.EitherT
+import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 
-object Constants {
+import scala.concurrent.Future
 
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
+package object connectors {
+  type DownstreamResponse[R] = Either[ErrorWrapper, SuccessWrapper[R]]
+  type ConnectorResponse[R] = EitherT[Future, ErrorWrapper, SuccessWrapper[R]]
 }

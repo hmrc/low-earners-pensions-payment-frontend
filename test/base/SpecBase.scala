@@ -35,6 +35,10 @@ package base
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import controllers.actions.*
+import models.{CorrelationId, ResponseWrapper}
+import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.bars.*
+import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -43,12 +47,13 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues, TryVa
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
+import play.api.http.{HeaderNames, Status}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.BodyParsers
-import play.api.test.FakeRequest
 import play.api.test.Helpers.running
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
 import java.net.URLEncoder
@@ -66,7 +71,12 @@ trait SpecBase
     with WireMockSupport
     with HttpClientV2Support
     with GuiceOneServerPerSuite
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
+    with FutureAwaits
+    with DefaultAwaitTimeout
+    with HeaderNames
+    with Status
+    with ResultExtractors {
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
@@ -76,9 +86,7 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
-
-  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(parsers)
+  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction()
 
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
@@ -100,6 +108,92 @@ trait SpecBase
   val servicesConfig: Map[String, Any] = Map(
     "microservice.services.lepp-backend.host"           -> wireMockHost,
     "microservice.services.lepp-backend.port"           -> wireMockPort
+  )
+
+  val testCorrelationId: CorrelationId = CorrelationId("some-id")
+  implicit val dummyHeaderCarrier: HeaderCarrier = HeaderCarrier()
+
+  val dummyErrorWrapper: ErrorWrapper = ErrorWrapper(
+    value = ServiceErrorResult(IM_A_TEAPOT, "FOOBAR"),
+    correlationId = testCorrelationId
+  )
+
+  val testServiceErrorWrapper: ErrorWrapper = ErrorWrapper(
+    value = ServiceErrorResult(IM_A_TEAPOT, "TEST_ERROR"),
+    correlationId = testCorrelationId
+  )
+
+  val testDownstreamErrorWrapper: ErrorWrapper = ErrorWrapper(
+    value = BarsErrorResult(IM_A_TEAPOT, "TEST_ERROR"),
+    correlationId = testCorrelationId
+  )
+
+  val testBarsAccount: BarsAccount = BarsAccount(
+    sortCode = "112233",
+    accountNumber = "12345678",
+    rollNumber = Some("rollNumber")
+  )
+
+  val testBarsSubject: BarsSubject = BarsSubject(
+    title = Some("Mr"),
+    name = Some("Taxwell Payer"),
+    firstName = Some("Taxwell"),
+    lastName = Some("Payer")
+  )
+
+  val dummyValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+    account = BarsAccount(
+      sortCode = "N/A",
+      accountNumber = "N/A",
+      rollNumber = None
+    ),
+    subject = BarsSubject(
+      title = None,
+      name = Some("N/A"),
+      firstName = None,
+      lastName = None
+    )
+  )
+
+  val testValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+    account = testBarsAccount,
+    subject = BarsSubject(name = Some("Taxwell Payer"))
+  )
+
+  val testBarsResponse: BarsResponse = BarsResponse(
+    accountNumberIsWellFormatted = "yes",
+    accountExists = "yes",
+    nameMatches = "yes",
+    accountName = Some("Taxwell Payer"),
+    nonStandardAccountDetailsRequiredForBacs = "no",
+    sortCodeIsPresentOnEISCD = "yes",
+    sortCodeSupportsDirectDebit = "yes",
+    sortCodeSupportsDirectCredit = "yes",
+    sortCodeBankName = Some("banky bank"),
+    iban = Some("iban")
+  )
+
+  val testSuccessResponse: SuccessWrapper[BarsResponse] = SuccessWrapper[BarsResponse](
+    value = testBarsResponse,
+    correlationId = testCorrelationId
+  )
+
+  val dummyBarsResponse: BarsResponse = BarsResponse(
+    accountNumberIsWellFormatted = "N/A",
+    accountExists = "N/A",
+    nameMatches = "N/A",
+    accountName = Some("N/A"),
+    nonStandardAccountDetailsRequiredForBacs = "N/A",
+    sortCodeIsPresentOnEISCD = "N/A",
+    sortCodeSupportsDirectDebit = "N/A",
+    sortCodeSupportsDirectCredit = "N/A",
+    sortCodeBankName = Some("N/A"),
+    iban = Some("N/A")
+  )
+
+  val dummySuccessResponse: ResponseWrapper[BarsResponse] = SuccessWrapper(
+    value = dummyBarsResponse,
+    correlationId = testCorrelationId
   )
 
 }

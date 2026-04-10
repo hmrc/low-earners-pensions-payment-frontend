@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package utils
+package models.bars
 
-object Constants {
+import play.api.libs.json.{Json, Reads}
 
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
+case class RawBarsRequest(name: Option[String],
+                          sortCode: Option[String],
+                          accountNumber: Option[String],
+                          rollNumber: Option[String])
+
+object RawBarsRequest {
+  implicit val reads: Reads[RawBarsRequest] = Json.reads[RawBarsRequest]
 }

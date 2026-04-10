@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package utils
+package models.bars
 
-object Constants {
+import play.api.libs.json.{Format, Json}
 
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
+case class BarsSubject(title: Option[String] = None,
+                       name: Option[String] = None,
+                       firstName: Option[String] = None,
+                       lastName: Option[String] = None)
+
+object BarsSubject {
+  implicit val format: Format[BarsSubject] = Json.format[BarsSubject]
 }

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package utils
+package models.bars
 
-object Constants {
-
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
-}
+case class BarsRequestWithMandatory(name: String,
+                                    sortCode: String,
+                                    accountNumber: String,
+                                    rollNumber: Option[String])

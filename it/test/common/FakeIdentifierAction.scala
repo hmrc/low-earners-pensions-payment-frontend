@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package common
 
+import controllers.actions.IdentifierAction
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
-import play.api.test.Helpers.stubBodyParser
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction extends IdentifierAction:
+class FakeIdentifierAction @Inject()(bodyParsers: BodyParsers.Default) extends IdentifierAction {
+  override def invokeBlock[A](request: Request[A],
+                              block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+      block(
+        IdentifierRequest(
+          request = request,
+          user = AuthUser(userId = "userId", nino = "AA111111A")
+        )
+      )
+  }
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, AuthUser.apply("1", "AA123456C")))
 
-  override def parser: BodyParser[AnyContent] = stubBodyParser()
+  override def parser: BodyParser[AnyContent] = bodyParsers
 
-  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.global
+}

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+package models
 
-object Constants {
+import scala.language.implicitConversions
 
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
+case class CorrelationId(value: String)
+
+object CorrelationId {
+  implicit def toString(correlationId: CorrelationId): String = correlationId.value
 }

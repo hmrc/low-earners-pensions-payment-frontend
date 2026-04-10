@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package utils
+package models
 
-object Constants {
+import models.errors.ErrorResult
+import play.api.libs.json.OWrites
+import uk.gov.hmrc.http.HttpResponse
 
-  val ptaEnrolmentKey: String = "HMRC-PI"
-  val correlationIdKey: String = "correlationId"
+enum ResponseWrapper[T] {
+  val value: T
+  val correlationId: CorrelationId
+  
+  case HttpResponseWrapper(value: HttpResponse, correlationId: CorrelationId) extends ResponseWrapper[HttpResponse]
+  case SuccessWrapper[S: OWrites](value: S, correlationId: CorrelationId) extends ResponseWrapper[S]
+  case ErrorWrapper(value: ErrorResult, correlationId: CorrelationId) extends ResponseWrapper[ErrorResult]
 }
