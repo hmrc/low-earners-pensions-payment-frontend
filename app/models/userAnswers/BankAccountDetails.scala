@@ -30,7 +30,7 @@ case class BankAccountDetails(name: String,
 }
 
 object BankAccountDetails {
-  def unapply(req: BankAccountDetails) = Some(req.name, req.sortCode, req.accountNumber, req.rollNumber)
+  def unapply(req: BankAccountDetails) = Some(req.name, req.accountNumber, req.sortCode, req.rollNumber)
 
   implicit val format: OFormat[BankAccountDetails] = Json.format[BankAccountDetails]
 }
