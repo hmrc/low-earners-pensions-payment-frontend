@@ -40,7 +40,7 @@ class WhatYouWillNeedController @Inject()(
   }
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
-    Future.successful(Ok(whatYouWillNeedView(navigator.nextPage(WhatYouWillNeedPage, NormalMode).url)))
+    Future.successful(Ok(whatYouWillNeedView(None, navigator.nextPage(WhatYouWillNeedPage, NormalMode).url)))
   }
 }
 

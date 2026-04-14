@@ -109,5 +109,6 @@
         displayHmrcBanner = showHmrcBanner,
         phaseBanner = if (appConfig.feedbackBannerEnabled) Some(standardBetaBanner()) else None
     ),
-    backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get)) else None
+    backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get))
+                else Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
 ))(content)
