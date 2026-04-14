@@ -18,12 +18,14 @@ ivUpliftFailure.li3 = we could not match your details to our system
 # What you will need page
 whatYouWillNeed.title = Accept your low earner''s pension payment
 whatYouWillNeed.heading = Accept your low earner''s pension payment
-whatYouWillNeed.p1 = This service gives an annual payment to people who earned below the standard Personal Allowance of £12,570 and paid into a pension through their employer.
-whatYouWillNeed.p2 = The payment is made once per tax year, directly into your bank account, once you have provided us with your bank details.
-whatYouWillNeed.h2.p1 = If you are on benefits
-whatYouWillNeed.p3 = This payment is not classed as income and it will not affect any benefits that you receive, your national insurance position or your taxable income.
-whatYouWillNeed.h2.p2 = Before you start
-whatYouWillNeed.p4 = To use this service, you'll need your bank details.
+whatYouWillNeed.p1 = The low income pension payment is an annual payment to people who:
+whatYouWillNeed.u1.l1 = had taxable earnings below or close to their Personal Allowance
+whatYouWillNeed.u1.l2 = paid into a net pay workplace pension scheme
+whatYouWillNeed.u1.l3 = did not get tax relief on some or all of their pension contributions
+whatYouWillNeed.p2 = The payment will be sent directly to your bank account, once you have provided us with your bank details.
+whatYouWillNeed.t1 = This payment is not classed as income. It will not affect any benefits that you receive, your National Insurance position, or your taxable income.
+whatYouWillNeed.h2.p1 = Before you continue
+whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
 # Timeout dialogue
 timeout.title = You''re about to be signed out
@@ -38,3 +40,4 @@ sessionTimeout.signIn = Sign in
 # Common content
 common.signOut = Sign out
 site.start = Start now
+site.continue = Continue
