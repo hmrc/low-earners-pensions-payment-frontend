@@ -35,6 +35,12 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
         formProvider.stripSortCode("     11--22--33    ") mustBe "11--22--33"
       }
     }
+    
+    "stripRollNumberOpt" - {
+      "should remove any listed characters" in {
+        formProvider.stripRollNumberOpt(Some(" 123-abc./ ")) mustBe Some("123abc")
+      }
+    }
 
     "formatSortCode" - {
       "should format correctly" in {
@@ -56,7 +62,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
       ).foreach(handleForMandatoryField(form))
 
       handleForOptionalField(form)(
-        s"$prefix.rollNumber", 1, 18, Seq("!!!"), Seq("ABCDEF"), "^[A-Z0-9]{1,18}$"
+        s"$prefix.rollNumber", 1, 18, Seq("!!!"), Seq("ABCDEF"), "^[A-Z0-9- /.]{1,18}$"
       )
 
       "should strip any leading, trailing, or excess whitespace from fields" in {
@@ -73,7 +79,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           s"$prefix.accountName" -> "name    nameson",
           s"$prefix.accountNumber" -> "12345678",
           s"$prefix.sortCode" -> "11-22-33",
-          s"$prefix.rollNumber" -> "ABCDEF"
+          s"$prefix.rollNumber" -> "ABC/DEF"
         )).get mustBe BankAccountDetails("name nameson", "112233", "12345678", Some("ABCDEF"))
       }
     }
