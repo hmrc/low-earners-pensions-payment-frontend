@@ -30,8 +30,8 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
   def apply(): Form[BankAccountDetails] = Form[BankAccountDetails](
     mapping(
       mandatoryTextField(s"$prefix.accountName", 1, 18, "^[A-Za-z'&,\\\\=()\\/ -]+$"),
-      mandatoryTextField(s"$prefix.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
       mandatoryTextField(s"$prefix.sortCode", 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
+      mandatoryTextField(s"$prefix.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
       optionalTextField(s"$prefix.rollNumber", 1, 18, "^[A-Z0-9]{1,18}$")
     )(BankAccountDetails.apply)(BankAccountDetails.unapply)
   )
