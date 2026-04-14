@@ -27,6 +27,30 @@ whatYouWillNeed.t1 = This payment is not classed as income. It will not affect a
 whatYouWillNeed.h2.p1 = Before you continue
 whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
+# Bank account details page
+bankDetails.title = Bank details
+bankDetails.heading = What are your bank details?
+bankDetails.securityInset = For your security, we do not save your bank details.
+bankDetails.accountName = Name on the account
+bankDetails.accountName.hint = Exactly as it appears on your bank statement
+bankDetails.sortCode = Sort code
+bankDetails.sortCode.hint = Must be 6 digits long
+bankDetails.accountNumber = Account number
+bankDetails.accountNumber.hint = Must be between 6 and 8 digits long
+bankDetails.rollNumber = Building society roll number (if you have one)
+bankDetails.rollNumber.hint = You can find it on your card, statement or passbook
+bankDetails.accountName.formError.required = Enter the name on the account
+bankDetails.sortCode.formError.required = Enter a sort code
+bankDetails.accountNumber.formError.required = Enter an account number
+bankDetails.accountName.formError.length = Account name must be between 1 and 18 characters
+bankDetails.sortCode.formError.length = Enter a valid sort code like 309430
+bankDetails.accountNumber.formError.length = Account number must be between 6 and 8 digits
+bankDetails.rollNumber.formError.length = Building society roll number must be between 1 and 18 characters
+bankDetails.accountName.formError.format = Account name must only include letters a to z, hyphens, spaces, or apostrophes
+bankDetails.sortCode.formError.format = Enter a valid sort code like 309430
+bankDetails.accountNumber.formError.format = Enter a valid account number like 00733445
+bankDetails.rollNumber.formError.format = Building society roll number must only include letters a to z, numbers, hyphens, spaces, forward slashes and full stops
+
 # Timeout dialogue
 timeout.title = You''re about to be signed out
 timeout.message = For your security, we will sign you out in
@@ -41,3 +65,11 @@ sessionTimeout.signIn = Sign in
 common.signOut = Sign out
 site.start = Start now
 site.continue = Continue
+error.title.prefix = Error:
+
+# Temp content
+temp.title = Temporary placeholder page
+temp.heading = Temporary placeholder page
+temp.p1 = This is temporary placeholder page to emulate the navigation flow
+temp.Breakdown = Pretend this is the Breakdown page
+temp.CheckYourAnswers = Pretend this is the Check your answers page

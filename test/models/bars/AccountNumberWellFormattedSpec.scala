@@ -16,13 +16,22 @@
 
 package models.bars
 
-import play.api.libs.json.{Json, Reads}
+import base.SpecBase
+import models.bars.statuses.AccountNumberWellFormatted
+import play.api.libs.json.{JsError, JsString}
 
-case class RawBarsRequest(name: Option[String],
-                          sortCode: Option[String],
-                          accountNumber: Option[String],
-                          rollNumber: Option[String])
-
-object RawBarsRequest {
-  implicit val reads: Reads[RawBarsRequest] = Json.reads[RawBarsRequest]
+class AccountNumberWellFormattedSpec extends SpecBase {
+  "BarsResponseAccountNumberWellFormatted" - {
+    "reads" - {
+      Seq(
+        ("yes", AccountNumberWellFormatted.Yes),
+        ("no", AccountNumberWellFormatted.No),
+        ("indeterminate", AccountNumberWellFormatted.Indeterminate)
+      ).foreach((s, m) => enumReadsTest(s, m))
+      
+      "should not read for an invalid value" in {
+        JsString("nope").validate[AccountNumberWellFormatted] mustBe a[JsError]
+      }
+    }
+  }
 }

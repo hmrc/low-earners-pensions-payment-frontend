@@ -31,13 +31,17 @@ trait InputFluency {
         name = field.name,
         value = field.value,
         label = label,
-        errorMessage = errorMessage(field)
+        errorMessage = errorMessage(field),
+        spellcheck = Some(false)
       )
   }
 
   implicit class FluentInput(input: Input) {
     def withHint(hint: Hint): Input =
       input.copy(hint = Some(hint))
+
+    def withInputMode(mode: String): Input =
+      input.copy(inputmode = Some(mode))
 
     def withCssClass(newClass: String): Input =
       input.copy(classes = s"${input.classes.strip()} $newClass")
@@ -47,5 +51,8 @@ trait InputFluency {
 
     def withWidth(inputWidth: InputWidth): Input =
       input.withCssClass(inputWidth.toString)
+
+    def withSpellcheck(withSpellCheck: Boolean): Input =
+      input.copy(spellcheck = Some(withSpellCheck))
   }
 }

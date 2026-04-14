@@ -27,4 +27,5 @@ package object govuk {
       with InputFluency
       with LabelFluency
       with SummaryListFluency
+      with InsetTextFluency
 }

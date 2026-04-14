@@ -1,16 +1,27 @@
 # microservice specific routes
 
-->      /hmrc-frontend                      hmrcfrontend.Routes
+->     /hmrc-frontend                       hmrcfrontend.Routes
 
-GET     /assets/*file                       controllers.Assets.versioned(path = "/public", file: Asset)
-GET     /language/:lang                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET    /assets/*file                        controllers.Assets.versioned(path = "/public", file: Asset)
+GET    /language/:lang                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
 # Start page
-GET     /                                   controllers.WhatYouWillNeedController.start
-GET     /start                              controllers.WhatYouWillNeedController.onPageLoad()
+GET    /                                    controllers.WhatYouWillNeedController.start
+GET    /start                               controllers.WhatYouWillNeedController.onPageLoad()
+
+# Check your answers page
+GET    /breakdown                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Breakdown)
+POST   /breakdown                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Breakdown)
 
 # Bank account details page
-GET    /check-bank-account-details          controllers.WhatAreYourBankDetailsController.checkBankAccountDetails(name: Option[String], accountNumber: Option[String], sortCode: Option[String], rollNumber: Option[String])
+GET    /bank-details                        controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST   /bank-details                        controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = NormalMode)
+GET    /change-bank-details                 controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST   /change-bank-details                 controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
+
+# Check your answers page
+GET    /check-your-answers                  controllers.TempLeppController.onPageLoad(tempPage: TempPage = CheckYourAnswers)
+POST   /check-your-answers                  controllers.TempLeppController.onSubmit(tempPage: TempPage = CheckYourAnswers)
 
 # Auth actions
 GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()

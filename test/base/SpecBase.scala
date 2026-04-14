@@ -35,11 +35,12 @@ package base
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import controllers.actions.*
-import models.{CorrelationId, ResponseWrapper}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
+import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.userAnswers.UserAnswers
+import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -51,6 +52,7 @@ import play.api.http.{HeaderNames, Status}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsString, JsSuccess, Reads}
 import play.api.test.Helpers.running
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -141,7 +143,7 @@ trait SpecBase
     lastName = Some("Payer")
   )
 
-  val dummyValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+  val dummyValidatedBarsRequest: BarsRequest = BarsRequest(
     account = BarsAccount(
       sortCode = "N/A",
       accountNumber = "N/A",
@@ -155,20 +157,20 @@ trait SpecBase
     )
   )
 
-  val testValidatedBarsRequest: ValidatedBarsRequest = ValidatedBarsRequest(
+  val testBarsRequest: BarsRequest = BarsRequest(
     account = testBarsAccount,
     subject = BarsSubject(name = Some("Taxwell Payer"))
   )
 
   val testBarsResponse: BarsResponse = BarsResponse(
-    accountNumberIsWellFormatted = "yes",
-    accountExists = "yes",
-    nameMatches = "yes",
+    accountNumberIsWellFormatted = AccountNumberWellFormatted.Yes,
+    accountExists = AccountExists.Yes,
+    nameMatches = NameMatches.Yes,
     accountName = Some("Taxwell Payer"),
-    nonStandardAccountDetailsRequiredForBacs = "no",
-    sortCodeIsPresentOnEISCD = "yes",
-    sortCodeSupportsDirectDebit = "yes",
-    sortCodeSupportsDirectCredit = "yes",
+    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+    sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
+    sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
+    sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
     sortCodeBankName = Some("banky bank"),
     iban = Some("iban")
   )
@@ -179,14 +181,14 @@ trait SpecBase
   )
 
   val dummyBarsResponse: BarsResponse = BarsResponse(
-    accountNumberIsWellFormatted = "N/A",
-    accountExists = "N/A",
-    nameMatches = "N/A",
+    accountNumberIsWellFormatted = AccountNumberWellFormatted.No,
+    accountExists = AccountExists.No,
+    nameMatches = NameMatches.No,
     accountName = Some("N/A"),
-    nonStandardAccountDetailsRequiredForBacs = "N/A",
-    sortCodeIsPresentOnEISCD = "N/A",
-    sortCodeSupportsDirectDebit = "N/A",
-    sortCodeSupportsDirectCredit = "N/A",
+    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
+    sortCodeIsPresentOnEISCD = SortCodeCheck.No,
+    sortCodeSupportsDirectDebit = SortCodeCheck.No,
+    sortCodeSupportsDirectCredit = SortCodeCheck.No,
     sortCodeBankName = Some("N/A"),
     iban = Some("N/A")
   )
@@ -195,5 +197,12 @@ trait SpecBase
     value = dummyBarsResponse,
     correlationId = testCorrelationId
   )
+  
+  def enumReadsTest[E: Reads](jsonValue: String, modelValue: E): Unit =
+    s"should read correctly for a value of: $jsonValue" in {
+      val json: JsString = JsString(jsonValue)
+      json.validate[E] mustBe a[JsSuccess[_]]
+      json.as[E] mustBe modelValue
+    }
 
 }

@@ -19,51 +19,83 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import controllers.validators.BarsRequestValidator
-import models.bars.RawBarsRequest
-import models.{CorrelationId, ResponseWrapper}
+import forms.WhatAreYourBankDetailsFormProvider
+import models.ResponseWrapper.SuccessWrapper
+import models.bars.BarsResponse
+import models.bars.statuses.*
+import models.userAnswers.BankAccountDetails
+import navigation.Navigator
+import pages.WhatAreYourBankDetailsPage
+import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.BarsService
-import utils.{Constants, CorrelationIdOptional}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionCacheService
+import utils.CorrelationIdOptional
+import viewmodels.Mode
+import views.html.WhatAreYourBankDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  getData: DataRetrievalAction,
-                                                 validator: BarsRequestValidator,
-                                                 service: BarsService,
                                                  correlationIdHandler: CorrelationIdOptional,
+                                                 formProvider: WhatAreYourBankDetailsFormProvider,
+                                                 view: WhatAreYourBankDetailsView,
+                                                 //barsService: BarsService,
+                                                 sessionService: SessionCacheService,
+                                                 navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
-  def checkBankAccountDetails(name: Option[String],
-                              accountNumber: Option[String],
-                              sortCode: Option[String],
-                              rollNumber: Option[String]): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request)(correlationId =>
-      def result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
-        barsRequest <- EitherT.fromEither[Future](validator.validate(
-          request = RawBarsRequest(name, accountNumber, sortCode, rollNumber),
-          correlationId = correlationId
-        ))
-        barsResult <- service.checkBankAccountDetails(barsRequest, correlationId)
-      } yield {
-        Ok(Json.toJson(barsResult.value)).withHeaders(
-          Constants.correlationIdKey -> barsResult.correlationId
-        )
-      }
+  private val form: Form[BankAccountDetails] = formProvider()
 
-      result.leftMap(errorResult => {
-        errorResult
-          .value.toResult
-          .withHeaders(
-            Constants.correlationIdKey -> errorResult.correlationId
-          )
-      }).merge
+  def onPageLoad(mode: Mode): Action[AnyContent] = handle { implicit request =>
+    request.userAnswers.get(WhatAreYourBankDetailsPage) match {
+      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
+      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+    }
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit request =>
+    correlationIdHandler.handleCorrelationId(request)(correlationId =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(
+            view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
+          )),
+          answer => {
+            /*service.checkBankAccountDetails(
+              barsRequest = answer.toBarsRequest,
+              correlationId = CorrelationId(request.correlationId.getOrElse(""))
+            )*/
+          EitherT(Future.successful(Right(
+            SuccessWrapper(
+              value = BarsResponse(
+                accountNumberIsWellFormatted = AccountNumberWellFormatted.Yes,
+                accountExists = AccountExists.Yes,
+                nameMatches = NameMatches.Yes,
+                accountName = Some("Taxwell Payer"),
+                nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+                sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
+                sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
+                sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
+                sortCodeBankName = Some("banky bank"),
+                iban = Some("iban")
+              ),
+              correlationId = correlationId
+            )
+          ))).biSemiflatMap(
+              err => Future.successful(InternalServerError("An Error")),
+              _ => for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+                _ <- sessionService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
+            ).merge
+          }
+        )
     )
   }
 }

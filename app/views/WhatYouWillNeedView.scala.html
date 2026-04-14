@@ -23,7 +23,7 @@
     heading2: h2
 )
 
-@(implicit request: Request[_], messages: Messages)
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("whatYouWillNeed.title"))
@@ -48,7 +48,7 @@
     @heading2("whatYouWillNeed.h2.p1")
     <p class="govuk-body govuk-!-margin-bottom-7">@messages("whatYouWillNeed.h2.p2")</p>
 
-    <a href="@controllers.routes.WhatAreYourBankDetailsController.checkBankAccountDetails"
+    <a href="@continueUrl"
        role="button"
        draggable="false"
        class="govuk-button govuk-button--continue"

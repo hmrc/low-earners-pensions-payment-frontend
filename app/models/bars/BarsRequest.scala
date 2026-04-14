@@ -16,31 +16,10 @@
 
 package models.bars
 
-import base.SpecBase
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{Json, OWrites}
 
-class ValidatedBarsRequestSpec extends SpecBase {
+case class BarsRequest(account: BarsAccount, subject: BarsSubject)
 
-  private val testJson: JsValue = Json.parse(
-    """
-      |{
-      | "subject": {
-      |   "name": "Taxwell Payer"
-      | },
-      | "account": {
-      |   "sortCode": "112233",
-      |   "accountNumber": "12345678",
-      |   "rollNumber": "rollNumber"
-      | }
-      |}
-    """.stripMargin)
-
-  "BarsRequest" - {
-    "when written to JSON" - {
-      "should return expected JSON" in {
-        val json: JsValue = Json.toJson(testValidatedBarsRequest)
-        json mustBe testJson
-      }
-    }
-  }
+object BarsRequest {
+  implicit val format: OWrites[BarsRequest] = Json.writes[BarsRequest]
 }

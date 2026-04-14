@@ -47,7 +47,6 @@ class WhatYouWillNeedViewSpec extends SpecBase {
       view.text.contains(messages(app)("whatYouWillNeed.t1"))
       view.text.contains(messages(app)("whatYouWillNeed.h2.p1"))
       view.text.contains(messages(app)("whatYouWillNeed.h2.p2"))
-
     }
   }
 
@@ -57,8 +56,9 @@ class WhatYouWillNeedViewSpec extends SpecBase {
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    val view: Document =
-      Jsoup.parse(app.injector.instanceOf[WhatYouWillNeedView].apply().body)
+    val view: Document = Jsoup.parse(
+      app.injector.instanceOf[WhatYouWillNeedView].apply("some-url").body
+    )
   }
 
 }

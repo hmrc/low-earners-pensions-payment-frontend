@@ -23,30 +23,19 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.{ErrorLink, Error
 
 trait ErrorSummaryFluency {
   object ErrorSummaryViewModel {
-    def apply(form: Form[_], formId: String = "", errorLinkOverrides: Map[String, String] = Map.empty)
-             (implicit messages: Messages): ErrorSummary = {
+    def apply(form: Form[_])(implicit messages: Messages): ErrorSummary = {
 
-      val errors: Seq[ErrorLink] = form.errors.foldLeft(Seq.empty[ErrorLink])((errorLinks, error) => {
-          if(error.message.contains("missing")) {
-            errorLinks match {
-              case Nil =>
-                errorLinks ++ Seq(ErrorLink(
-                  href = if (error.key == formId) Some(s"#${formId}.day") else Some(s"#${error.key}"),
-                  content = Text(messages(error.message, error.args: _*))))
-              case _ => errorLinks
-            }
-          }
-        else{
-          errorLinks :+ ErrorLink(
-            href = if (error.key == formId) Some(s"#${formId}.day") else Some(s"#${error.key}"),
-            content = Text(messages(error.message, error.args: _*))
-          )
-        }
-        })
+      val errors: Seq[ErrorLink] = form.errors.map(error =>
+        val formId: String = error.key.replace('.', '_').replace('[', '_').replace("]", "")
+        ErrorLink(
+          href = Some(s"#$formId"),
+          content = Text(messages(error.message, error.args: _*))
+        )
+      )
 
       ErrorSummary(
         errorList = errors,
-        title     = Text(messages("error.summary.title"))
+        title = Text(messages("error.summary.title"))
       )
     }
   }

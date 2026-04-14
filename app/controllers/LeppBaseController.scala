@@ -18,15 +18,42 @@ package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
+import pages.TempPage.{Breakdown, CheckYourAnswers}
+import pages.{BreakdownPage, CheckYourAnswersPage, Page, WhatAreYourBankDetailsPage, WhatYouWillNeedPage}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, Call, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.{CheckMode, Mode}
+import viewmodels.formPages.FormPageViewModel
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
 abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
-                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport :
+                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport:
+
+  protected def viewModel(mode: Mode, page: Page): FormPageViewModel =
+    FormPageViewModel(
+      onSubmit = submitUrl(mode, page),
+      backLinkUrl = Some(backLinkUrl(mode, page).url)
+    )
+
+  protected def submitUrl(mode: Mode, page: Page): Call = page match {
+    case BreakdownPage => routes.TempLeppController.onSubmit(Breakdown)
+    case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
+    case CheckYourAnswersPage => routes.TempLeppController.onSubmit(CheckYourAnswers)
+    case _ => routes.WhatYouWillNeedController.onPageLoad() //Placeholder to avoid warnings
+  }
+
+  private def backLinkUrl(mode: Mode, page: Page): Call = {
+    val backPage: Page = (mode, page) match {
+      case (CheckMode, _ ) => CheckYourAnswersPage
+      case (_, WhatAreYourBankDetailsPage) => BreakdownPage
+      case (_, BreakdownPage) => WhatYouWillNeedPage
+      case _ => WhatYouWillNeedPage
+    }
+    backPage.route(mode)
+  }
 
   def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (identify andThen getData).async :
     implicit request => f(request)

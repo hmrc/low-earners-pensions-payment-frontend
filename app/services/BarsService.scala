@@ -19,16 +19,30 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.{BarsConnector, ConnectorResponse}
 import models.CorrelationId
-import models.bars.{BarsResponse, ValidatedBarsRequest}
+import models.ResponseWrapper.ErrorWrapper
+import models.bars.{BarsRequest, BarsResponse}
+import models.errors.ErrorResult.BarsErrorResult
+import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class BarsService @Inject()(connector: BarsConnector) {
-  def checkBankAccountDetails(barsRequest: ValidatedBarsRequest, correlationId: CorrelationId)
+  def checkBankAccountDetails(barsRequest: BarsRequest, correlationId: CorrelationId)
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): ConnectorResponse[BarsResponse] = {
-    // If we want to do any mapping/ auditing of the BARS request I imagine we will do it here
-    connector.checkBankAccountDetails(barsRequest, correlationId)
+    connector
+      .checkBankAccountDetails(request = barsRequest, correlationId = correlationId)
+      .subflatMap(response => response.value.toErrorResultOpt match {
+        case None =>
+          //Any auditing here
+          Right(response)
+        case Some(error) =>
+          //Any auditing here
+          Left(ErrorWrapper(
+            value = BarsErrorResult(BAD_REQUEST, "BARS_RESPONSE_ERROR"),
+            correlationId = response.correlationId
+          ))
+      })
   }
 }

@@ -16,19 +16,22 @@
 
 package models.bars
 
-import play.api.libs.json.{Json, OFormat}
+import models.bars.statuses.*
+import play.api.libs.json.{Json, Reads}
 
-case class BarsResponse(accountNumberIsWellFormatted: String,
-                        accountExists: String,
-                        nameMatches: String,
+case class BarsResponse(accountNumberIsWellFormatted: AccountNumberWellFormatted,
+                        accountExists: AccountExists,
+                        nameMatches: NameMatches,
                         accountName: Option[String],
-                        nonStandardAccountDetailsRequiredForBacs: String,
-                        sortCodeIsPresentOnEISCD: String,
-                        sortCodeSupportsDirectDebit: String,
-                        sortCodeSupportsDirectCredit: String,
+                        nonStandardAccountDetailsRequiredForBacs: NonStandardAccountDetails,
+                        sortCodeIsPresentOnEISCD: SortCodeCheck,
+                        sortCodeSupportsDirectDebit: SortCodeCheck,
+                        sortCodeSupportsDirectCredit: SortCodeCheck, //
                         sortCodeBankName: Option[String],
-                        iban: Option[String])
+                        iban: Option[String]) {
+  def toErrorResultOpt: Option[BarsError] = None //TODO - Implement
+}
 
 object BarsResponse {
-  implicit val format: OFormat[BarsResponse] = Json.format[BarsResponse]
+  implicit val reads: Reads[BarsResponse] = Json.reads[BarsResponse]
 }

@@ -20,7 +20,7 @@ import base.SpecBase
 import config.AppConfig
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.bars.{BarsResponse, ValidatedBarsRequest}
+import models.bars.{BarsRequest, BarsResponse}
 import models.errors.ErrorResult.BarsErrorResult
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
@@ -48,7 +48,7 @@ class BarsConnectorSpec extends SpecBase {
       httpClient = mockHttpClient
     )
     
-    val testRequest: ValidatedBarsRequest = testValidatedBarsRequest
+    val testRequest: BarsRequest = testBarsRequest
     
     lazy val connectorResponse: Future[BarsResult] = Future.successful(
       Right(SuccessWrapper(testBarsResponse, testCorrelationId))
