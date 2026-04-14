@@ -27,6 +27,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import viewmodels.NormalMode
 import viewmodels.formPages.FormPageViewModel
 import views.html.WhatAreYourBankDetailsView
 
@@ -41,8 +42,8 @@ class WhatAreYourBankDetailsViewSpec extends SpecBase {
 
     private val formProvider = new WhatAreYourBankDetailsFormProvider()
     private val form: Form[BankAccountDetails] = formProvider()
-    private val onSubmit = routes.WhatAreYourBankDetailsController.onSubmit()
-    private val backLinkUrl = routes.WhatAreYourBankDetailsController.onSubmit().url
+    private val onSubmit = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode)
+    private val backLinkUrl = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode).url
     private val viewModel: FormPageViewModel = FormPageViewModel(onSubmit = onSubmit, backLinkUrl = Some(backLinkUrl))
 
     val view: Document =

@@ -17,13 +17,9 @@
 package pages
 
 import controllers.routes
-import viewmodels.Mode
-import models.userAnswers.BankAccountDetails
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import viewmodels.Mode
 
-object WhatAreYourBankDetailsPage extends QuestionPage[BankAccountDetails] {
-  override def route(mode: Mode): Call = routes.WhatAreYourBankDetailsController.onPageLoad(mode)
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "bankDetails"
+case object CheckYourAnswersPage extends Page {
+  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.CheckYourAnswers)
 }

@@ -19,29 +19,32 @@ package navigation
 import base.SpecBase
 import controllers.routes
 import pages.*
-import viewmodels.{CheckMode, NormalMode}
+import pages.TempPage.*
+import play.api.mvc.Call
+import viewmodels.{CheckMode, Mode, NormalMode}
 
 class NavigatorSpec extends SpecBase {
-
-  val navigator = new Navigator
+  val navigator: Navigator = new Navigator
 
   "Navigator" - {
+    case object UnknownPage extends Page {
+      override def route(mode: Mode): Call = Call("GET", "/")
+    }
+    
     "nextPage" - {
       "should go to the correct location when in NormalMode for a known page" in {
-        navigator.nextPage(WhatAreYourBankDetailsPage, NormalMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
+        navigator.nextPage(WhatYouWillNeedPage, NormalMode) mustBe routes.TempLeppController.onPageLoad(Breakdown)
       }
 
       "should go to the correct location when in NormalMode for an unknown page" in {
-        case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
       }
 
       "should go to the correct location when in CheckMode for a known page" in {
-        navigator.nextPage(WhatAreYourBankDetailsPage, CheckMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
+        navigator.nextPage(WhatAreYourBankDetailsPage, CheckMode) mustBe routes.TempLeppController.onPageLoad(CheckYourAnswers)
       }
 
       "should go to the correct location when in CheckMode for an unknown page" in {
-        case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
       }
     }

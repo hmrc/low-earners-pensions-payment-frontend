@@ -16,7 +16,6 @@
 
 package navigation
 
-import controllers.routes
 import pages.*
 import play.api.mvc.Call
 import viewmodels.{CheckMode, Mode, NormalMode}
@@ -25,11 +24,20 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() {
-  private val normalRoutes: Page => Call = _ => routes.WhatYouWillNeedController.onPageLoad()
-  private val checkRouteMap: Page => Call = _ => routes.WhatYouWillNeedController.onPageLoad()
+  private val normalRoutes: Page => Page = {
+    case WhatYouWillNeedPage => BreakdownPage
+    case BreakdownPage => WhatAreYourBankDetailsPage
+    case WhatAreYourBankDetailsPage => CheckYourAnswersPage
+    case _ => WhatYouWillNeedPage
+  }
+
+  private val checkRouteMap: Page => Page = {
+    case WhatAreYourBankDetailsPage => CheckYourAnswersPage
+    case _ => WhatYouWillNeedPage
+  } 
 
   def nextPage(page: Page, mode: Mode): Call = mode match {
-    case NormalMode => normalRoutes(page)
-    case CheckMode => checkRouteMap(page)
+    case NormalMode => normalRoutes(page).route(mode)
+    case CheckMode => checkRouteMap(page).route(mode)
   }
 }
