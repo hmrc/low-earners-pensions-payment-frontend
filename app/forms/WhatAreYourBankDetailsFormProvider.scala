@@ -25,14 +25,14 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
   private[forms] def formatSortCode(str: String): String = s"${str.take(2)}-${str.slice(2, 4)}-${str.drop(4)}"
   private[forms] def formatAccountName(str: String): String = str.toLowerCase.split(" ").map(_.capitalize).mkString(" ")
 
-  private val bankDetails = "bankDetails"
+  private val prefix = "bankDetails"
 
   def apply(): Form[BankAccountDetails] = Form[BankAccountDetails](
     mapping(
-      mandatoryTextField(s"$bankDetails.accountName", 1, 18, "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
-      mandatoryTextField(s"$bankDetails.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
-      mandatoryTextField(s"$bankDetails.sortCode", 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
-      optionalTextField(s"$bankDetails.rollNumber", 1, 18, "^[A-Z0-9]{1,18}$")
+      mandatoryTextField(s"$prefix.accountName", 1, 18, "^[A-Za-z'&,\\\\=()\\/ -]+$"),
+      mandatoryTextField(s"$prefix.accountNumber", 6, 8, "^[0-9]{6,8}$", unbindMap = formatAccountName),
+      mandatoryTextField(s"$prefix.sortCode", 6, 6, "^[0-9]{6}$", stripSortCode, formatSortCode),
+      optionalTextField(s"$prefix.rollNumber", 1, 18, "^[A-Z0-9]{1,18}$")
     )(BankAccountDetails.apply)(BankAccountDetails.unapply)
   )
 }

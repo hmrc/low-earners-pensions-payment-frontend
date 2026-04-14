@@ -23,6 +23,8 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
   "WhatAreYourBankDetailsFormProvider" - {
     val formProvider: WhatAreYourBankDetailsFormProvider = WhatAreYourBankDetailsFormProvider()
     val form: Form[BankAccountDetails] = formProvider()
+    
+    val prefix: String = "bankDetails"
 
     "stripSortCode" - {
       "should remove any trailing whitespace, leading whitespace, and single dashes from sort-code" in {
@@ -48,30 +50,30 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
 
     "bind" - {
       Seq(
-        ("bankDetails.accountName", 1, 18, Seq("!!!!!"), Seq("Mr Taxwell Payer", "Aa03'&,/\\ -"), "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
-        ("bankDetails.accountNumber", 6, 8, Seq("abcdefgj"), Seq("123456", "1234567", "12345678"), "^[0-9]{6,8}$"),
-        ("bankDetails.sortCode", 6, 6, Seq("ABCDEF"), Seq("11-22-33", "112233"), "^[0-9]{6}$")
+        (s"$prefix.accountName", 1, 18, Seq("!!!!!"), Seq("Mr Taxwell Payer", "Aa'&,/\\ -"), "^[A-Za-z'&,\\\\=()\\/ -]+$"),
+        (s"$prefix.accountNumber", 6, 8, Seq("abcdefgj"), Seq("123456", "1234567", "12345678"), "^[0-9]{6,8}$"),
+        (s"$prefix.sortCode", 6, 6, Seq("ABCDEF"), Seq("11-22-33", "112233"), "^[0-9]{6}$")
       ).foreach(handleForMandatoryField(form))
 
       handleForOptionalField(form)(
-        "bankDetails.rollNumber", 1, 18, Seq("!!!"), Seq("ABCDEF"), "^[A-Z0-9]{1,18}$"
+        s"$prefix.rollNumber", 1, 18, Seq("!!!"), Seq("ABCDEF"), "^[A-Z0-9]{1,18}$"
       )
 
       "should strip any leading, trailing, or excess whitespace from fields" in {
         form.bind(Map(
-          "bankDetails.accountName" -> " name    nameson   ",
-          "bankDetails.accountNumber" -> "  12345678  ",
-          "bankDetails.sortCode" -> "  112233  ",
-          "bankDetails.rollNumber" -> "      "
+          s"$prefix.accountName" -> " name    nameson   ",
+          s"$prefix.accountNumber" -> "  12345678  ",
+          s"$prefix.sortCode" -> "  112233  ",
+          s"$prefix.rollNumber" -> "      "
         )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", None)
       }
 
       "should strip dashes from sort code field" in {
         form.bind(Map(
-          "bankDetails.accountName" -> "name    nameson",
-          "bankDetails.accountNumber" -> "12345678",
-          "bankDetails.sortCode" -> "11-22-33",
-          "bankDetails.rollNumber" -> "ABCDEF"
+          s"$prefix.accountName" -> "name    nameson",
+          s"$prefix.accountNumber" -> "12345678",
+          s"$prefix.sortCode" -> "11-22-33",
+          s"$prefix.rollNumber" -> "ABCDEF"
         )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", Some("ABCDEF"))
       }
     }
