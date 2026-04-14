@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import viewmodels.govuk._
 
 @this(
     layout: templates.Layout,
@@ -32,24 +33,26 @@
 
     <p class="govuk-body">@messages("whatYouWillNeed.p1")</p>
 
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("whatYouWillNeed.u1.l1")</li>
+        <li>@messages("whatYouWillNeed.u1.l2")</li>
+        <li>@messages("whatYouWillNeed.u1.l3")</li>
+    </ul>
+
     <p class="govuk-body">@messages("whatYouWillNeed.p2")</p>
 
+    <div class="govuk-inset-text">
+        @messages("whatYouWillNeed.t1")
+    </div>
+
     @heading2("whatYouWillNeed.h2.p1")
+    <p class="govuk-body govuk-!-margin-bottom-7">@messages("whatYouWillNeed.h2.p2")</p>
 
-    <p class="govuk-body">@messages("whatYouWillNeed.p3")</p>
-
-    @heading2("whatYouWillNeed.h2.p2")
-
-    <p class="govuk-body govuk-!-margin-bottom-7">@messages("whatYouWillNeed.p4")</p>
-
-    <a href=""
+    <a href="@controllers.routes.WhatAreYourBankDetailsController.checkBankAccountDetails"
        role="button"
        draggable="false"
-       class="govuk-button govuk-button--start"
+       class="govuk-button govuk-button--continue"
        data-module="govuk-button">
-        @messages("site.start")
-        <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
-        </svg>
+        @messages("site.continue")
     </a>
 }
