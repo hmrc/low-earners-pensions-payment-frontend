@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package pages
 
 import play.api.mvc.JavascriptLiteral
 
-sealed trait Mode
+enum TempPage {
+  case Breakdown, CheckYourAnswers
+}
 
-case object CheckMode extends Mode
-case object NormalMode extends Mode
-
-object Mode {
-  implicit val jsLiteral: JavascriptLiteral[Mode] = {
-    case NormalMode => "NormalMode"
-    case CheckMode => "CheckMode"
+object TempPage {
+  implicit val jsLiteral: JavascriptLiteral[TempPage] = {
+    case Breakdown => "Breakdown"
+    case CheckYourAnswers => "CheckYourAnswers"
   }
 }

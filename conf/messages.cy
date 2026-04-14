@@ -65,3 +65,9 @@ site.start = Start now
 site.continue = Continue
 error.title.prefix = Error:
 
+# Temp content
+temp.title = Temporary placeholder page
+temp.heading = Temporary placeholder page
+temp.p1 = This is temporary placeholder page to emulate the navigation flow
+temp.Breakdown = Pretend this is the Breakdown page
+temp.CheckYourAnswers = Pretend this is the Check your answers page

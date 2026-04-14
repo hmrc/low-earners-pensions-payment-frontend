@@ -18,7 +18,10 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
       "uk.gov.hmrc.domain._",
       "viewmodels.Mode",
-      "viewmodels.NormalMode"
+      "viewmodels.NormalMode",
+      "viewmodels.CheckMode",
+      "pages.TempPage",
+      "pages.TempPage._"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
