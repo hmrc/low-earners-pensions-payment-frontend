@@ -16,16 +16,16 @@
 
 package models.bars
 
-sealed abstract class BarsError(reason: String)
-sealed abstract class FailedCheckError(reason: String) extends BarsError(reason)
-sealed abstract class RequestError(reason: String) extends BarsError(reason)
+sealed abstract class BarsError(val reason: String)
+sealed abstract class BarsFailedCheckError(override val reason: String) extends BarsError(reason)
+sealed abstract class BarsRequestError(override val reason: String) extends BarsError(reason)
 
-case object SortCodeNotFoundError extends RequestError("SORT_CODE_NOT_FOUND")
-case object AccountNotFoundError extends RequestError("ACCOUNT_NOT_FOUND")
-case object NameMismatchError extends RequestError("SUPPLIED_NAME_NOT_MATCHED")
-case object FailedModulusCheckError extends RequestError("FAILED_MODULUS_CHECK")
-case object AdditionalInfoRequiredError extends RequestError("ADDITIONAL_INFORMATION_REQUIRED")
-case object DirectCreditUnsupportedError extends RequestError("DIRECT_CREDIT_UNSUPPORTED")
+case object SortCodeNotFoundError extends BarsRequestError("SORT_CODE_NOT_FOUND")
+case object AccountNotFoundError extends BarsRequestError("ACCOUNT_NOT_FOUND")
+case object NameMismatchError extends BarsRequestError("SUPPLIED_NAME_NOT_MATCHED")
+case object FailedModulusCheckError extends BarsRequestError("FAILED_MODULUS_CHECK")
+case object AdditionalInfoRequiredError extends BarsRequestError("ADDITIONAL_INFORMATION_REQUIRED")
+case object DirectCreditUnsupportedError extends BarsRequestError("DIRECT_CREDIT_UNSUPPORTED")
 
-case object BarsCheckFailedError extends FailedCheckError("ERRORS_IN_BARS_RESPONSE")
-case object IndeterminateResultError extends FailedCheckError("COULD_NOT_DETERMINE_RESULT")
+case class ErrorsInResponseError(field: String) extends BarsFailedCheckError(field + "_ERROR")
+case class IndeterminateResultError(field: String) extends BarsFailedCheckError(field + "_INDETERMINATE")

@@ -167,7 +167,7 @@ trait SpecBase
     accountExists = AccountExists.Yes,
     nameMatches = NameMatches.Yes,
     accountName = Some("Taxwell Payer"),
-    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
     sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
     sortCodeSupportsDirectDebit = "yes",
     sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,

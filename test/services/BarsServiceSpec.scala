@@ -21,6 +21,8 @@ import cats.data.EitherT
 import connectors.{BarsConnector, ConnectorResponse}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.BarsResponse
+import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, DirectCreditSupported, NameMatches, NonStandardAccountDetails, SortCodeExists}
+import models.errors.ErrorResult
 import models.errors.ErrorResult.BarsErrorResult
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
@@ -62,47 +64,84 @@ class BarsServiceSpec extends SpecBase {
         serviceResult.getOrElse(dummySuccessResponse).value mustBe testBarsResponse
       }
       
-/*      "should handle for negative BARS response" in new Test {
-        val negativeBarsResponse: BarsResponse = BarsResponse(
+      "should handle for a successful BARS response with request errors" in new Test {
+        val resp: BarsResponse = BarsResponse(
           accountNumberIsWellFormatted = AccountNumberWellFormatted.No,
-          accountExists = AccountExists.No,
-          nameMatches = NameMatches.No,
+          accountExists = AccountExists.Inapplicable,
+          nameMatches = NameMatches.Inapplicable,
           accountName = Some("Taxwell Payer"),
-          nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
-          sortCodeIsPresentOnEISCD = SortCodeCheck.No,
-          sortCodeSupportsDirectDebit = SortCodeCheck.No,
-          sortCodeSupportsDirectCredit = SortCodeCheck.No,
-          sortCodeBankName = Some("Test"),
-          iban = Some("test-iban")
+          nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+          sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
+          sortCodeSupportsDirectDebit = "yes",
+          sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
+          sortCodeBankName = Some("banky bank"),
+          iban = Some("iban")
         )
         
-        mockBarsResponse(Future.successful(Right(SuccessWrapper(negativeBarsResponse, testCorrelationId))))
+        mockBarsResponse(Future.successful(Right(SuccessWrapper(resp, testCorrelationId))))
         val serviceResult: Either[ErrorWrapper, SuccessWrapper[BarsResponse]] = await(result.value)
         serviceResult mustBe a[Left[_, _]]
-        serviceResult.swap.getOrElse(dummyErrorWrapper).value mustBe
-          BarsErrorResult(INTERNAL_SERVER_ERROR, "BARS_RESPONSE_NEGATIVE")
+        
+        val err: ErrorResult = serviceResult.swap.getOrElse(dummyErrorWrapper).value
+        err.status mustBe BAD_REQUEST
+        err.code mustBe "BARS_REQUEST_ERRORS"
+        val expectedCodes: Seq[String] = Seq("FAILED_MODULUS_CHECK", "ADDITIONAL_INFORMATION_REQUIRED")
+        err.errorsOpt.getOrElse(Nil).map(_.code) mustBe expectedCodes
       }
       
-      "should handle for error BARS response" in new Test {
-        val errorsBarsResponse: BarsResponse = BarsResponse(
-          accountNumberIsWellFormatted = AccountNumberWellFormatted.Indeterminate,
-          accountExists = AccountExists.Error,
+      "should handle for a successful BARS response with failed check errors" in new Test {
+        val resp: BarsResponse = BarsResponse(
+          accountNumberIsWellFormatted = AccountNumberWellFormatted.Yes,
+          accountExists = AccountExists.Yes,
           nameMatches = NameMatches.Error,
           accountName = Some("Taxwell Payer"),
           nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
-          sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
-          sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
-          sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
-          sortCodeBankName = Some("Test"),
-          iban = Some("test-iban")
+          sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
+          sortCodeSupportsDirectDebit = "yes",
+          sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
+          sortCodeBankName = Some("banky bank"),
+          iban = Some("iban")
         )
-        
-        mockBarsResponse(Future.successful(Right(SuccessWrapper(errorsBarsResponse, testCorrelationId))))
+
+        mockBarsResponse(Future.successful(Right(SuccessWrapper(resp, testCorrelationId))))
         val serviceResult: Either[ErrorWrapper, SuccessWrapper[BarsResponse]] = await(result.value)
         serviceResult mustBe a[Left[_, _]]
-        serviceResult.swap.getOrElse(dummyErrorWrapper).value mustBe
-          BarsErrorResult(INTERNAL_SERVER_ERROR, "ERRORS_IN_BARS_RESPONSE")
-      }*/
+        
+        val err: ErrorResult = serviceResult.swap.getOrElse(dummyErrorWrapper).value
+        err mustBe BarsErrorResult(INTERNAL_SERVER_ERROR, "NAME_MATCHES_ERROR")
+      }
+      
+      "should handle for successful BARS response with both error types" in new Test {
+        val resp: BarsResponse = BarsResponse(
+          accountNumberIsWellFormatted = AccountNumberWellFormatted.No,
+          accountExists = AccountExists.Indeterminate,
+          nameMatches = NameMatches.Indeterminate,
+          accountName = Some("Taxwell Payer"),
+          nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+          sortCodeIsPresentOnEISCD = SortCodeExists.Error,
+          sortCodeSupportsDirectDebit = "yes",
+          sortCodeSupportsDirectCredit = DirectCreditSupported.No,
+          sortCodeBankName = Some("banky bank"),
+          iban = Some("iban")
+        )
+
+        mockBarsResponse(Future.successful(Right(SuccessWrapper(resp, testCorrelationId))))
+        val serviceResult: Either[ErrorWrapper, SuccessWrapper[BarsResponse]] = await(result.value)
+        serviceResult mustBe a[Left[_, _]]
+        
+        val err: ErrorResult = serviceResult.swap.getOrElse(dummyErrorWrapper).value
+        err.status mustBe INTERNAL_SERVER_ERROR
+        err.code mustBe "BARS_CHECK_FAILED"
+        val expectedCodes: Seq[String] = Seq(
+          "FAILED_MODULUS_CHECK",
+          "ACCOUNT_EXISTS_INDETERMINATE",
+          "NAME_MATCHES_INDETERMINATE",
+          "ADDITIONAL_INFORMATION_REQUIRED",
+          "SORT_CODE_EXISTS_ERROR",
+          "DIRECT_CREDIT_UNSUPPORTED"
+        )
+        err.errorsOpt.getOrElse(Nil).map(_.code) mustBe expectedCodes
+      }
       
       "should handle for failed BARS response" in new Test {
         mockBarsResponse(Future.successful(Left(ErrorWrapper(

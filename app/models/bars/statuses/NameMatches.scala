@@ -23,8 +23,8 @@ enum NameMatches(override val errorOpt: Option[BarsError] = None) extends BarsSt
   case Yes, Partial
   case No extends NameMatches(Some(NameMismatchError))
   case Inapplicable extends NameMatches(Some(FailedModulusCheckError))
-  case Indeterminate extends NameMatches(Some(IndeterminateResultError))
-  case Error extends NameMatches(Some(BarsCheckFailedError))
+  case Indeterminate extends NameMatches(Some(IndeterminateResultError("NAME_MATCHES")))
+  case Error extends NameMatches(Some(ErrorsInResponseError("NAME_MATCHES")))
 }
 
 object NameMatches {

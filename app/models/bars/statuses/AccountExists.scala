@@ -23,8 +23,8 @@ enum AccountExists(override val errorOpt: Option[BarsError] = None) extends Bars
   case Yes
   case No extends AccountExists(Some(AccountNotFoundError))
   case Inapplicable extends AccountExists(Some(FailedModulusCheckError))
-  case Indeterminate extends AccountExists(Some(IndeterminateResultError))
-  case Error extends AccountExists(Some(BarsCheckFailedError))
+  case Indeterminate extends AccountExists(Some(IndeterminateResultError("ACCOUNT_EXISTS")))
+  case Error extends AccountExists(Some(ErrorsInResponseError("ACCOUNT_EXISTS")))
 }
 
 object AccountExists {

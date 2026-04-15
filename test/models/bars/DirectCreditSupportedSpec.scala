@@ -17,7 +17,7 @@
 package models.bars
 
 import base.SpecBase
-import models.bars.statuses.{DirectCreditSupported, SortCodeExists}
+import models.bars.statuses.DirectCreditSupported
 import play.api.libs.json.{JsError, JsString}
 
 class DirectCreditSupportedSpec extends SpecBase {

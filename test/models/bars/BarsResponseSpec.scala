@@ -68,7 +68,8 @@ class BarsResponseSpec extends SpecBase {
         
         errors mustBe Seq(
           FailedModulusCheckError,
-          IndeterminateResultError,
+          IndeterminateResultError("ACCOUNT_EXISTS"),
+          IndeterminateResultError("NAME_MATCHES"),
           AdditionalInfoRequiredError,
           SortCodeNotFoundError,
           DirectCreditUnsupportedError
