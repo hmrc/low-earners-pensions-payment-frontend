@@ -16,19 +16,20 @@
 
 package models.bars.statuses
 
-import models.bars.{BarsError, FailedModulusCheckError}
+import models.bars.{BarsCheckFailedError, BarsError, DirectCreditUnsupportedError}
 import play.api.libs.json.*
 
-enum AccountNumberWellFormatted(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
-  case Yes, Indeterminate
-  case No extends AccountNumberWellFormatted(Some(FailedModulusCheckError))
+enum DirectCreditSupported(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
+  case Yes
+  case No extends DirectCreditSupported(Some(DirectCreditUnsupportedError))
+  case Error extends DirectCreditSupported(Some(BarsCheckFailedError))
 }
 
-object AccountNumberWellFormatted {
-  implicit val reads: Reads[AccountNumberWellFormatted] = Reads{
+object DirectCreditSupported {
+  implicit val reads: Reads[DirectCreditSupported] = Reads{
     case JsString("yes") => JsSuccess(Yes)
     case JsString("no") => JsSuccess(No)
-    case JsString("indeterminate") => JsSuccess(Indeterminate)
-    case _ => JsError("error.accountNumberIsWellFormatted.invalid")
+    case JsString("error") => JsSuccess(Error)
+    case _ => JsError("error.directCreditSupported.invalid")
   }
 }

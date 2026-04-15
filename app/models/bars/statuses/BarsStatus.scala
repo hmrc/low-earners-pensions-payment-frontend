@@ -16,7 +16,8 @@
 
 package models.bars.statuses
 
+import models.bars.BarsError
+
 trait BarsStatus {
- val errorScenario: BarsStatus
- def isErrorScenario(status: BarsStatus): Boolean = status == errorScenario
+ val errorOpt: Option[BarsError]
 }

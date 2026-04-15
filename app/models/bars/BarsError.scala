@@ -17,12 +17,15 @@
 package models.bars
 
 sealed abstract class BarsError(reason: String)
+sealed abstract class FailedCheckError(reason: String) extends BarsError(reason)
+sealed abstract class RequestError(reason: String) extends BarsError(reason)
 
-case object BarsCheckFailedError extends BarsError("ERRORS_IN_BARS_RESPONSE")
-case object SortCodeNotFoundError extends BarsError("SORT_CODE_NOT_FOUND")
+case object SortCodeNotFoundError extends RequestError("SORT_CODE_NOT_FOUND")
+case object AccountNotFoundError extends RequestError("ACCOUNT_NOT_FOUND")
+case object NameMismatchError extends RequestError("SUPPLIED_NAME_NOT_MATCHED")
+case object FailedModulusCheckError extends RequestError("FAILED_MODULUS_CHECK")
+case object AdditionalInfoRequiredError extends RequestError("ADDITIONAL_INFORMATION_REQUIRED")
+case object DirectCreditUnsupportedError extends RequestError("DIRECT_CREDIT_UNSUPPORTED")
 
-case object DirectCreditUnsupportedError extends BarsError("DIRECT_CREDIT_UNSUPPORTED")
-case object AdditionalInfoRequiredError extends BarsError("ADDITIONAL_INFORMATION_REQUIRED")
-case object NameMismatchError extends BarsError("SUPPLIED_NAME_NOT_MATCHED")
-case object AccountNotFoundError extends BarsError("ACCOUNT_NOT_FOUND")
-case object FailedModulusCheckError extends BarsError("FAILED_MODULUS_CHECK")
+case object BarsCheckFailedError extends FailedCheckError("ERRORS_IN_BARS_RESPONSE")
+case object IndeterminateResultError extends FailedCheckError("COULD_NOT_DETERMINE_RESULT")

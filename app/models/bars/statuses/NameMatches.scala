@@ -16,10 +16,15 @@
 
 package models.bars.statuses
 
+import models.bars.*
 import play.api.libs.json.*
 
-enum NameMatches {
-  case Yes, No, Partial, Inapplicable, Indeterminate, Error
+enum NameMatches(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
+  case Yes, Partial
+  case No extends NameMatches(Some(NameMismatchError))
+  case Inapplicable extends NameMatches(Some(FailedModulusCheckError))
+  case Indeterminate extends NameMatches(Some(IndeterminateResultError))
+  case Error extends NameMatches(Some(BarsCheckFailedError))
 }
 
 object NameMatches {

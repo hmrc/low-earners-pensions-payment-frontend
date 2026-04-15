@@ -16,10 +16,15 @@
 
 package models.bars.statuses
 
+import models.bars.*
 import play.api.libs.json.*
 
-enum AccountExists {
-  case Yes, No, Inapplicable, Indeterminate, Error
+enum AccountExists(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
+  case Yes
+  case No extends AccountExists(Some(AccountNotFoundError))
+  case Inapplicable extends AccountExists(Some(FailedModulusCheckError))
+  case Indeterminate extends AccountExists(Some(IndeterminateResultError))
+  case Error extends AccountExists(Some(BarsCheckFailedError))
 }
 
 object AccountExists {

@@ -21,7 +21,7 @@ import models.bars.statuses.NameMatches
 import play.api.libs.json.{JsError, JsString}
 
 class NameMatchesSpec extends SpecBase {
-  "BarsResponseNameMatches" - {
+  "NameMatches" - {
     "reads" - {
       Seq(
         ("yes", NameMatches.Yes),

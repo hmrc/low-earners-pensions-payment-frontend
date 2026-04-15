@@ -17,22 +17,20 @@
 package models.bars
 
 import base.SpecBase
-import models.bars.statuses.{AccountExists, NonStandardAccountDetails}
+import models.bars.statuses.SortCodeExists
 import play.api.libs.json.{JsError, JsString}
 
-class AccountExistsSpec extends SpecBase {
-  "AccountExists" - {
+class SortCodeExistsSpec extends SpecBase {
+  "SortCodeExists" - {
     "reads" - {
       Seq(
-        ("yes", AccountExists.Yes),
-        ("no", AccountExists.No),
-        ("inapplicable", AccountExists.Inapplicable),
-        ("indeterminate", AccountExists.Indeterminate),
-        ("error", AccountExists.Error)
+        ("yes", SortCodeExists.Yes),
+        ("no", SortCodeExists.No),
+        ("error", SortCodeExists.Error)
       ).foreach((s, m) => enumReadsTest(s, m))
       
       "should not read for an invalid value" in {
-        JsString("nope").validate[NonStandardAccountDetails] mustBe a[JsError]
+        JsString("nope").validate[SortCodeExists] mustBe a[JsError]
       }
     }
   }
