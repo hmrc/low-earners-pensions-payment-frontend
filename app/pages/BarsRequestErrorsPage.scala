@@ -19,12 +19,6 @@ package pages
 import play.api.mvc.Call
 import viewmodels.Mode
 
-import scala.language.implicitConversions
-
-trait Page {
-  def route(mode: Mode): Call
-}
-
-object Page {
-  implicit def toString(page: Page): String = page.toString
+case object BarsRequestErrorsPage extends Page {
+  override def route(mode: Mode): Call = controllers.errors.routes.BarsRequestErrorsController.onPageLoad()
 }

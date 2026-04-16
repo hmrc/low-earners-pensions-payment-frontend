@@ -16,20 +16,16 @@
 
 package controllers
 
-import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import forms.WhatAreYourBankDetailsFormProvider
-import models.ResponseWrapper.SuccessWrapper
-import models.bars.BarsResponse
-import models.bars.statuses.*
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
 import pages.WhatAreYourBankDetailsPage
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SessionCacheService
+import services.*
 import utils.CorrelationIdOptional
 import viewmodels.Mode
 import views.html.WhatAreYourBankDetailsView
@@ -42,7 +38,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
-                                                 //barsService: BarsService,
+                                                 barsService: BarsService,
                                                  sessionService: SessionCacheService,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
@@ -67,28 +63,15 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
             view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
           )),
           answer => {
-            /*service.checkBankAccountDetails(
+            barsService.checkBankAccountDetails(
               barsRequest = answer.toBarsRequest,
-              correlationId = CorrelationId(request.correlationId.getOrElse(""))
-            )*/
-          EitherT(Future.successful(Right(
-            SuccessWrapper(
-              value = BarsResponse(
-                accountNumberIsWellFormatted = AccountNumberWellFormatted.Yes,
-                accountExists = AccountExists.Yes,
-                nameMatches = NameMatches.Yes,
-                accountName = Some("Taxwell Payer"),
-                nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
-                sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
-                sortCodeSupportsDirectDebit = "yes",
-                sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
-                sortCodeBankName = Some("banky bank"),
-                iban = Some("iban")
-              ),
               correlationId = correlationId
-            )
-          ))).biSemiflatMap(
-              err => Future.successful(InternalServerError("An Error")),
+            ).biSemiflatMap(
+              err => if(err.value.status == INTERNAL_SERVER_ERROR) {
+                Future.successful(Redirect(controllers.errors.routes.BarsCheckFailedController.onPageLoad()))
+              } else {
+                Future.successful(Redirect(controllers.errors.routes.BarsRequestErrorsController.onPageLoad()))
+              },
               _ => for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))
                 _ <- sessionService.save(updatedAnswers)

@@ -23,7 +23,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.IvUpliftFailureView
+import views.html.auth.IvUpliftFailureView
 
 class IvUpliftFailureViewSpec extends SpecBase {
 

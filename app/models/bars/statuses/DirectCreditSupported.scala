@@ -16,7 +16,7 @@
 
 package models.bars.statuses
 
-import models.bars.{ErrorsInResponseError, BarsError, DirectCreditUnsupportedError}
+import models.bars.{BarsError, DirectCreditUnsupportedError, ErrorsInResponseError}
 import play.api.libs.json.*
 
 enum DirectCreditSupported(override val errorOpt: Option[BarsError] = None) extends BarsStatus {

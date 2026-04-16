@@ -17,8 +17,8 @@
 package pages
 
 import controllers.routes
-import viewmodels.Mode
 import play.api.mvc.Call
+import viewmodels.Mode
 
 case object WhatYouWillNeedPage extends Page {
   override def route(mode: Mode): Call = routes.WhatYouWillNeedController.onPageLoad()

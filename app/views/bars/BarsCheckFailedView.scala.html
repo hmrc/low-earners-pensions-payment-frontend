@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package pages
+@import views.html.components._
+@import viewmodels.govuk._
+@import viewmodels.formPages._
 
-import play.api.mvc.Call
-import viewmodels.Mode
+@this(
+    layout: templates.Layout,
+    heading: h1
+)
 
-import scala.language.implicitConversions
+@(implicit request: Request[_], messages: Messages)
 
-trait Page {
-  def route(mode: Mode): Call
-}
+@layout(
+    pageTitle = titleNoForm(messages("barsCheckFailed.title"))
+) {
+    @heading("barsCheckFailed.heading", headerSize = "l")
 
-object Page {
-  implicit def toString(page: Page): String = page.toString
+    <p class="govuk-body">@messages("barsCheckFailed.p1")</p>
+    <p class="govuk-body">@messages("barsCheckFailed.p2")</p>
 }

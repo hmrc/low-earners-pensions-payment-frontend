@@ -16,7 +16,7 @@
 
 package models.bars.statuses
 
-import models.bars.{ErrorsInResponseError, BarsError, SortCodeNotFoundError}
+import models.bars.{BarsError, ErrorsInResponseError, SortCodeNotFoundError}
 import play.api.libs.json.*
 
 enum SortCodeExists(override val errorOpt: Option[BarsError] = None) extends BarsStatus {

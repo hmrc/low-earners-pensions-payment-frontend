@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package controllers.errors
 
 import com.google.inject.{Inject, Singleton}
+import controllers.LeppBaseController
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.Logging
-import views.html.auth.IvUpliftFailureView
+import views.html.bars.BarsCheckFailedView
+
+import scala.concurrent.Future
 
 @Singleton
-class IvUpliftFailureController @Inject()(val controllerComponents: MessagesControllerComponents,
-                                          view: IvUpliftFailureView) extends FrontendBaseController with I18nSupport with Logging:
-  def onPageLoad(journeyId: Option[String]): Action[AnyContent] = Action:
-    implicit * =>
-      logger.info("onPageLoad", s"IV uplift journey failed for user with journeyId: ${journeyId.getOrElse("N/A")}")
-      Ok(view())
+class BarsCheckFailedController @Inject()(identify: IdentifierAction,
+                                          getData: DataRetrievalAction,
+                                          view: BarsCheckFailedView,
+                                          val controllerComponents: MessagesControllerComponents)
+  extends LeppBaseController(identify, getData) with I18nSupport {
+  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+    Future.successful(InternalServerError(view()))
+  }
+}
