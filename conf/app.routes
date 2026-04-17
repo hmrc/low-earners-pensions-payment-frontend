@@ -20,8 +20,8 @@ GET    /change-bank-details                 controllers.WhatAreYourBankDetailsCo
 POST   /change-bank-details                 controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
 
 # Bars error pages
-GET    /bank-details-check-failed           controllers.errors.BarsCheckFailedController.onPageLoad()
-GET    /bank-details-check-errors           controllers.errors.BarsRequestErrorsController.onPageLoad()
+GET    /bank-details-check-failed           controllers.bars.BarsCheckFailedController.onPageLoad()
+GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsController.onPageLoad()
 
 
 # Check your answers page

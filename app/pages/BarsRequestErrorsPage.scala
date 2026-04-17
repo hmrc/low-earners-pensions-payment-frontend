@@ -20,5 +20,5 @@ import play.api.mvc.Call
 import viewmodels.Mode
 
 case object BarsRequestErrorsPage extends Page {
-  override def route(mode: Mode): Call = controllers.errors.routes.BarsRequestErrorsController.onPageLoad()
+  override def route(mode: Mode): Call = controllers.bars.routes.BarsRequestErrorsController.onPageLoad()
 }

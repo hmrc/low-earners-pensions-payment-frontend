@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package controllers.errors
+package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
 import controllers.LeppBaseController
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import pages.BarsRequestErrorsPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.NormalMode
-import views.html.bars.BarsRequestErrorsView
+import views.html.bars.BarsCheckFailedView
 
 import scala.concurrent.Future
 
 @Singleton
-class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            view: BarsRequestErrorsView,
-                                            val controllerComponents: MessagesControllerComponents)
+class BarsCheckFailedController @Inject()(identify: IdentifierAction,
+                                          getData: DataRetrievalAction,
+                                          view: BarsCheckFailedView,
+                                          val controllerComponents: MessagesControllerComponents)
   extends LeppBaseController(identify, getData) with I18nSupport {
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
-    Future.successful(InternalServerError(view(viewModel(NormalMode, BarsRequestErrorsPage))))
+    Future.successful(InternalServerError(view()))
   }
 }
