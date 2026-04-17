@@ -31,6 +31,8 @@ import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
+import scala.util.Random
+
 class IntegrationSpecBase extends AnyWordSpec
   with Matchers
   with ScalaFutures
@@ -47,13 +49,12 @@ class IntegrationSpecBase extends AnyWordSpec
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
-      .overrides(
-        inject.bind[IdentifierAction].toInstance(new FakeIdentifierAction(parsers))
-      )
       .configure(
         "microservice.services.bars.port" -> wireMockPort,
         "microservice.services.bars.host" -> wireMockHost,
-        "microservice.services.bars.env" -> "local"
+        "microservice.services.bars.env"  -> "local",
+        "microservice.services.auth.port" -> wireMockPort,
+        "microservice.services.auth.host" -> wireMockHost
       )
       .build()
   }
@@ -66,4 +67,11 @@ class IntegrationSpecBase extends AnyWordSpec
         .willReturn(response)
     )
 
+  def validNino(prefix: String = "AA"): String = {
+    val num = Random.nextInt(1000000)
+    val suffix = "A"
+    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
+
+    prefix + f"$str$num%06d$suffix".drop(prefix.length)
+  }
 }
