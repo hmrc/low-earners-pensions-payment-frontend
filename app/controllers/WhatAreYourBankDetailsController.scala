@@ -70,7 +70,6 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
               err => if(err.value.status == BAD_REQUEST) {
                 Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
               } else {
-                println(err.value)
                 Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
               },
               _ => for {

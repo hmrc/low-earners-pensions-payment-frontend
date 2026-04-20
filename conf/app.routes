@@ -23,7 +23,6 @@ POST   /change-bank-details                 controllers.WhatAreYourBankDetailsCo
 GET    /bank-details-check-failed           controllers.bars.BarsCheckFailedController.onPageLoad()
 GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsController.onPageLoad()
 
-
 # Check your answers page
 GET    /check-your-answers                  controllers.TempLeppController.onPageLoad(tempPage: TempPage = CheckYourAnswers)
 POST   /check-your-answers                  controllers.TempLeppController.onSubmit(tempPage: TempPage = CheckYourAnswers)
