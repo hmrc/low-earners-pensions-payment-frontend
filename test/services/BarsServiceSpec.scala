@@ -137,7 +137,7 @@ class BarsServiceSpec extends SpecBase {
           "ACCOUNT_EXISTS_INDETERMINATE",
           "NAME_MATCHES_INDETERMINATE",
           "ADDITIONAL_INFORMATION_REQUIRED",
-          "SORT_CODE_EXISTS_ERROR",
+          "EISCD_CHECK_ERROR",
           "DIRECT_CREDIT_UNSUPPORTED"
         )
         err.errorsOpt.getOrElse(Nil).map(_.code) mustBe expectedCodes

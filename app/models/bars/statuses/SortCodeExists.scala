@@ -22,7 +22,7 @@ import play.api.libs.json.*
 enum SortCodeExists(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
   case Yes
   case No extends SortCodeExists(Some(SortCodeNotFoundError))
-  case Error extends SortCodeExists(Some(ErrorsInResponseError("SORT_CODE_EXISTS")))
+  case Error extends SortCodeExists(Some(ErrorsInResponseError("EISCD_CHECK")))
 }
 
 object SortCodeExists {

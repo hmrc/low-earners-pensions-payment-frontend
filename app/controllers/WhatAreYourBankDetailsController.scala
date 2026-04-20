@@ -67,10 +67,11 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
               barsRequest = answer.toBarsRequest,
               correlationId = correlationId
             ).biSemiflatMap(
-              err => if(err.value.status == INTERNAL_SERVER_ERROR) {
-                Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
-              } else {
+              err => if(err.value.status == BAD_REQUEST) {
                 Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
+              } else {
+                println(err.value)
+                Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
               },
               _ => for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))

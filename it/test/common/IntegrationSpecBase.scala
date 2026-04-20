@@ -19,12 +19,14 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import controllers.actions.IdentifierAction
+import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, IdentifierAction}
+import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.http.{HeaderNames, Status}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.BodyParsers
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
@@ -55,6 +57,21 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.bars.env"  -> "local",
         "microservice.services.auth.port" -> wireMockPort,
         "microservice.services.auth.host" -> wireMockHost
+      )
+      .build()
+  }
+
+  def applicationWithUserAnswers(answers: UserAnswers): Application = {
+    GuiceApplicationBuilder()
+      .configure(
+        "microservice.services.bars.port" -> wireMockPort,
+        "microservice.services.bars.host" -> wireMockHost,
+        "microservice.services.bars.env" -> "local",
+        "microservice.services.auth.port" -> wireMockPort,
+        "microservice.services.auth.host" -> wireMockHost
+      )
+      .overrides(
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
       )
       .build()
   }
