@@ -16,16 +16,14 @@
 
 package pages
 
-import play.api.mvc.JavascriptLiteral
+import controllers.routes
+import models.userAnswers.ClaimsSummary
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import viewmodels.Mode
 
-enum TempPage {
-  case Breakdown, Confirmation, Dashboard
-}
-
-object TempPage {
-  implicit val jsLiteral: JavascriptLiteral[TempPage] = {
-    case Breakdown => "Breakdown"
-    case Confirmation => "Confirmation"
-    case Dashboard => "Dashboard"
-  }
+object DashboardPage extends QuestionPage[ClaimsSummary] {
+  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.Dashboard)
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "detailsSummary"
 }
