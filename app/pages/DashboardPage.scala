@@ -16,18 +16,14 @@
 
 package pages
 
-import play.api.mvc.Results.Redirect
-import viewmodels.{Mode, NormalMode}
-import play.api.mvc.{Call, Result}
+import controllers.routes
+import models.userAnswers.ClaimsSummary
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import viewmodels.Mode
 
-import scala.concurrent.Future
-import scala.language.implicitConversions
-
-trait Page {
-  def route(mode: Mode): Call
-  def asRedirect: Future[Result] = Future.successful(Redirect(route(NormalMode)))
-}
-
-object Page {
-  implicit def toString(page: Page): String = page.toString
+object DashboardPage extends QuestionPage[ClaimsSummary] {
+  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.Dashboard)
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "claimsSummary"
 }

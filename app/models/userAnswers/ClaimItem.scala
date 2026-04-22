@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package models.userAnswers
 
-import play.api.mvc.Results.Redirect
-import viewmodels.{Mode, NormalMode}
-import play.api.mvc.{Call, Result}
+import play.api.libs.json.{Json, OFormat}
 
-import scala.concurrent.Future
-import scala.language.implicitConversions
+case class ClaimItem(taxYear: Int,
+                     contributions: BigDecimal,
+                     taxRate: BigDecimal,
+                     entitlement: BigDecimal,
+                     claimed: Boolean)
 
-trait Page {
-  def route(mode: Mode): Call
-  def asRedirect: Future[Result] = Future.successful(Redirect(route(NormalMode)))
-}
-
-object Page {
-  implicit def toString(page: Page): String = page.toString
+object ClaimItem {
+  implicit val format: OFormat[ClaimItem] = Json.format[ClaimItem]
 }
