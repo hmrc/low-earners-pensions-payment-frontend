@@ -29,7 +29,8 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 trait HttpHandler[Resp: Reads] {
   type HttpResult = Either[ErrorWrapper, HttpResponseWrapper]
 
-  def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult
+  def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult =
+    Right(HttpResponseWrapper(httpResponse, CorrelationId(noCorrelationIdString)))
   def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult
 
   val noCorrelationIdString: String = "NO_CORRELATION_ID_IN_RESPONSE"

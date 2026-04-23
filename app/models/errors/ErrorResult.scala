@@ -34,7 +34,8 @@ enum ErrorResult(val source: String) {
                           override val pathsOpt: Option[Set[String]] = None,
                           override val errorsOpt: Option[Seq[ServiceErrorResult]] = None) extends ErrorResult("SERVICE")
 
-  case BarsErrorResult(status: Int, code: String) extends ErrorResult("BARS - Verify Personal")
+  case 
+  BarsErrorResult(status: Int, code: String) extends ErrorResult("BARS - Verify Personal")
 }
 
 object ErrorResult {

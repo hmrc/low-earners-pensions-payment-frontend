@@ -17,29 +17,28 @@
 package connectors.httpHandlers
 
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper}
-import models.bars.BarsResponse
 import models.errors.ErrorResult
-import models.errors.ErrorResult.BarsErrorResult
+import models.errors.ErrorResult.ServiceErrorResult
+import models.nps.RetrieveClaimsResponse
 import play.api.http.Status.*
+import utils.ErrorCodes
+import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 
-trait BarsHttpHandler extends HttpHandler[BarsResponse]{
+trait LeppHttpHandler extends HttpHandler[RetrieveClaimsResponse]{
   
-  override val errorMap: ErrorResult => ErrorResult = err => BarsErrorResult(err.status, err.code)
+  override val errorMap: ErrorResult => ErrorResult = err => ServiceErrorResult(err.status, err.code)
 
   override def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult = {
-    def errorResponse(code: String): HttpResult = Left(ErrorWrapper(
-      value = BarsErrorResult(INTERNAL_SERVER_ERROR, code),
+    def errorResponse(status: Int, code: String): HttpResult = Left(ErrorWrapper(
+      value = ServiceErrorResult(status, code),
       correlationId = response.correlationId
     ))
 
     response.value.status match {
       case OK => Right(response)
-      //TODO - As of right now the redirects are just followed by default so this line does nothing
-      case MOVED_PERMANENTLY | SEE_OTHER | TEMPORARY_REDIRECT => errorResponse("BARS_RETURNED_REDIRECT")
-      case BAD_REQUEST => errorResponse("ERROR_IN_BARS_REQUEST")
-      case FORBIDDEN | NOT_FOUND => errorResponse("COULD_NOT_ACCESS_BARS_RESOURCE")
-      case INTERNAL_SERVER_ERROR => errorResponse("BARS_INTERNAL_SERVER_ERROR")
-      case _ => errorResponse("BARS_RETURNED_UNEXPECTED_STATUS")
+      case BAD_REQUEST => errorResponse(BAD_REQUEST, BAD_REQUEST_ERROR)
+      case NOT_FOUND => errorResponse(NOT_FOUND, NOT_FOUND_ERROR)
+      case _ => errorResponse(INTERNAL_SERVER_ERROR, INTERNAL_ERROR)
     }
   }
 }
