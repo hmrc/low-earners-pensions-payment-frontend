@@ -16,10 +16,13 @@
 
 package models.bars.statuses
 
+import models.bars.*
 import play.api.libs.json.*
 
-enum NonStandardAccountDetails {
-  case Yes, No, InApplicable
+enum NonStandardAccountDetails(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
+  case Yes extends NonStandardAccountDetails(Some(AdditionalInfoRequiredError))
+  case No
+  case InApplicable extends NonStandardAccountDetails(Some(FailedModulusCheckError))
 }
 
 object NonStandardAccountDetails {

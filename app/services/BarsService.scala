@@ -20,7 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{BarsConnector, ConnectorResponse}
 import models.CorrelationId
 import models.ResponseWrapper.ErrorWrapper
-import models.bars.{BarsRequest, BarsResponse}
+import models.bars.{BarsFailedCheckError, BarsRequest, BarsRequestError, BarsResponse}
+import models.errors.ErrorResult
 import models.errors.ErrorResult.BarsErrorResult
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,16 +34,26 @@ class BarsService @Inject()(connector: BarsConnector) {
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): ConnectorResponse[BarsResponse] = {
     connector
       .checkBankAccountDetails(request = barsRequest, correlationId = correlationId)
-      .subflatMap(response => response.value.toErrorResultOpt match {
-        case None =>
+      .subflatMap(response => response.value.toBarsErrors match {
+        case Nil =>
           //Any auditing here
           Right(response)
-        case Some(error) =>
+        case errors =>
+          val errorResults: Seq[BarsErrorResult] = errors.map {
+            case error: BarsFailedCheckError => BarsErrorResult(INTERNAL_SERVER_ERROR, error.reason)
+            case error: BarsRequestError => BarsErrorResult(BAD_REQUEST, error.reason)
+          } 
+          
+          val errorResult: BarsErrorResult = errorResults match {
+            case err :: Nil => err
+            case errs if errs.exists(_.status == INTERNAL_SERVER_ERROR) =>
+              BarsErrorResult(INTERNAL_SERVER_ERROR, "BARS_CHECK_FAILED", Some(errs))
+            case errs =>
+              BarsErrorResult(BAD_REQUEST, "BARS_REQUEST_ERRORS", Some(errs))
+          }
+          
           //Any auditing here
-          Left(ErrorWrapper(
-            value = BarsErrorResult(BAD_REQUEST, "BARS_RESPONSE_ERROR"),
-            correlationId = response.correlationId
-          ))
+          Left(ErrorWrapper(value = errorResult, correlationId = response.correlationId))
       })
   }
 }

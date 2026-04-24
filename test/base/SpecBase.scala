@@ -167,10 +167,10 @@ trait SpecBase
     accountExists = AccountExists.Yes,
     nameMatches = NameMatches.Yes,
     accountName = Some("Taxwell Payer"),
-    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
-    sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
-    sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
-    sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
+    nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
+    sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
+    sortCodeSupportsDirectDebit = "yes",
+    sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
     sortCodeBankName = Some("banky bank"),
     iban = Some("iban")
   )
@@ -186,9 +186,9 @@ trait SpecBase
     nameMatches = NameMatches.No,
     accountName = Some("N/A"),
     nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
-    sortCodeIsPresentOnEISCD = SortCodeCheck.No,
-    sortCodeSupportsDirectDebit = SortCodeCheck.No,
-    sortCodeSupportsDirectCredit = SortCodeCheck.No,
+    sortCodeIsPresentOnEISCD = SortCodeExists.No,
+    sortCodeSupportsDirectDebit = "no",
+    sortCodeSupportsDirectCredit = DirectCreditSupported.No,
     sortCodeBankName = Some("N/A"),
     iban = Some("N/A")
   )

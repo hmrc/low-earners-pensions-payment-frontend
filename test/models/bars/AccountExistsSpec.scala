@@ -21,7 +21,7 @@ import models.bars.statuses.{AccountExists, NonStandardAccountDetails}
 import play.api.libs.json.{JsError, JsString}
 
 class AccountExistsSpec extends SpecBase {
-  "BarsResponseAccountExists" - {
+  "AccountExists" - {
     "reads" - {
       Seq(
         ("yes", AccountExists.Yes),

@@ -24,7 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.contentAsString
 import play.api.test.{DefaultAwaitTimeout, FakeRequest}
-import views.html.IvUpliftFailureView
+import views.html.auth.IvUpliftFailureView
 
 class IvUpliftFailureControllerSpec extends SpecBase with DefaultAwaitTimeout {
   private trait Test {

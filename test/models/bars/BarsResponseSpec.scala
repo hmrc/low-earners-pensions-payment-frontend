@@ -43,14 +43,40 @@ class BarsResponseSpec extends SpecBase {
     nameMatches = NameMatches.Indeterminate,
     accountName = Some("Taxwell Payer"),
     nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
-    sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
-    sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
-    sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
+    sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
+    sortCodeSupportsDirectDebit = "yes",
+    sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
     sortCodeBankName = Some("Test"),
     iban = Some("test-iban")
   )
   
   "BarsResponse" - {
+    "toBarsErrors" - {
+      "should return a list of any errors related to status response values" in {
+        val errors: Seq[BarsError] = BarsResponse(
+          accountNumberIsWellFormatted = AccountNumberWellFormatted.No,
+          accountExists = AccountExists.Indeterminate,
+          nameMatches = NameMatches.Indeterminate,
+          accountName = Some("Taxwell Payer"),
+          nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.Yes,
+          sortCodeIsPresentOnEISCD = SortCodeExists.No,
+          sortCodeSupportsDirectDebit = "yes",
+          sortCodeSupportsDirectCredit = DirectCreditSupported.No,
+          sortCodeBankName = Some("Test"),
+          iban = Some("test-iban")
+        ).toBarsErrors 
+        
+        errors mustBe Seq(
+          FailedModulusCheckError,
+          IndeterminateResultError("ACCOUNT_EXISTS"),
+          IndeterminateResultError("NAME_MATCHES"),
+          AdditionalInfoRequiredError,
+          SortCodeNotFoundError,
+          DirectCreditUnsupportedError
+        )
+      }
+    }
+    
     "when read from JSON" - {
       "should return a JsSuccess for valid JSON" in {
         val jsResult: JsResult[BarsResponse] = testJson.validate[BarsResponse]

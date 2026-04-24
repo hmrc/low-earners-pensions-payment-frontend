@@ -21,7 +21,7 @@ import models.bars.statuses.AccountNumberWellFormatted
 import play.api.libs.json.{JsError, JsString}
 
 class AccountNumberWellFormattedSpec extends SpecBase {
-  "BarsResponseAccountNumberWellFormatted" - {
+  "AccountNumberWellFormatted" - {
     "reads" - {
       Seq(
         ("yes", AccountNumberWellFormatted.Yes),

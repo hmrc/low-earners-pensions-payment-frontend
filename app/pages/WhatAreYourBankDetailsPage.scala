@@ -17,10 +17,10 @@
 package pages
 
 import controllers.routes
-import viewmodels.Mode
 import models.userAnswers.BankAccountDetails
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import viewmodels.Mode
 
 object WhatAreYourBankDetailsPage extends QuestionPage[BankAccountDetails] {
   override def route(mode: Mode): Call = routes.WhatAreYourBankDetailsController.onPageLoad(mode)

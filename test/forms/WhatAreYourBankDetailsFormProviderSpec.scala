@@ -71,7 +71,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           s"$prefix.accountNumber" -> "  12345678  ",
           s"$prefix.sortCode" -> "  112233  ",
           s"$prefix.rollNumber" -> "      "
-        )).get mustBe BankAccountDetails("name nameson", "112233", "12345678", None)
+        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", None)
       }
 
       "should strip dashes from sort code field" in {
@@ -80,7 +80,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           s"$prefix.accountNumber" -> "12345678",
           s"$prefix.sortCode" -> "11-22-33",
           s"$prefix.rollNumber" -> "ABC/DEF"
-        )).get mustBe BankAccountDetails("name nameson", "112233", "12345678", Some("ABCDEF"))
+        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", Some("ABCDEF"))
       }
     }
   }

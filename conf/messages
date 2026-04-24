@@ -51,6 +51,22 @@ bankDetails.sortCode.formError.format = Enter a valid sort code like 309430
 bankDetails.accountNumber.formError.format = Enter a valid account number like 00733445
 bankDetails.rollNumber.formError.format = Building society roll number must only include letters a to z, numbers, hyphens, spaces, forward slashes and full stops
 
+# Bars check failure page
+barsCheckFailed.title = We could not verify your bank account details
+barsCheckFailed.heading = We could not verify your bank account details
+barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
+barsCheckFailed.p2 = Please try again later
+
+# Bars request errors page
+barsRequestErrors.title = We could not verify your bank account details
+barsRequestErrors.heading = We could not verify your bank account details
+barsRequestErrors.p1 = An error occurred while attempting to verify your bank account details. This could be because:
+barsRequestErrors.u1.l1 = a bank account roll number was not supplied for a building society account
+barsRequestErrors.u1.l2 = the supplied account does not support direct credit
+barsRequestErrors.u1.l3 = no account with the supplied details could be found
+barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
+barsRequestErrors.p2 = If this issue persists you may have to contact HMRC
+
 # Timeout dialogue
 timeout.title = You''re about to be signed out
 timeout.message = For your security, we will sign you out in
@@ -65,6 +81,7 @@ sessionTimeout.signIn = Sign in
 common.signOut = Sign out
 site.start = Start now
 site.continue = Continue
+site.tryAgain = Try again
 error.title.prefix = Error:
 
 # Temp content

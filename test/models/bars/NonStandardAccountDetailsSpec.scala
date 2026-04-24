@@ -21,7 +21,7 @@ import models.bars.statuses.NonStandardAccountDetails
 import play.api.libs.json.{JsError, JsString}
 
 class NonStandardAccountDetailsSpec extends SpecBase {
-  "BarsResponseNonStandardAccountDetails" - {
+  "NonStandardAccountDetails" - {
     "reads" - {
       Seq(
         ("yes", NonStandardAccountDetails.Yes),

@@ -16,13 +16,16 @@
 
 package models.bars
 
-sealed abstract class BarsError(reason: String)
+sealed abstract class BarsError(val reason: String)
+sealed abstract class BarsFailedCheckError(override val reason: String) extends BarsError(reason)
+sealed abstract class BarsRequestError(override val reason: String) extends BarsError(reason)
 
-case object BarsCheckFailedError extends BarsError("ERRORS_IN_BARS_RESPONSE")
-case object SortCodeNotFoundError extends BarsError("SORT_CODE_NOT_FOUND")
+case object SortCodeNotFoundError extends BarsRequestError("SORT_CODE_NOT_FOUND")
+case object AccountNotFoundError extends BarsRequestError("ACCOUNT_NOT_FOUND")
+case object NameMismatchError extends BarsRequestError("SUPPLIED_NAME_NOT_MATCHED")
+case object FailedModulusCheckError extends BarsRequestError("FAILED_MODULUS_CHECK")
+case object AdditionalInfoRequiredError extends BarsRequestError("ADDITIONAL_INFORMATION_REQUIRED")
+case object DirectCreditUnsupportedError extends BarsRequestError("DIRECT_CREDIT_UNSUPPORTED")
 
-case object DirectCreditUnsupportedError extends BarsError("DIRECT_CREDIT_UNSUPPORTED")
-case object AdditionalInfoRequiredError extends BarsError("ADDITIONAL_INFORMATION_REQUIRED")
-case object NameMismatchError extends BarsError("SUPPLIED_NAME_NOT_MATCHED")
-case object AccountNotFoundError extends BarsError("ACCOUNT_NOT_FOUND")
-case object FailedModulusCheckError extends BarsError("FAILED_MODULUS_CHECK")
+case class ErrorsInResponseError(field: String) extends BarsFailedCheckError(field + "_ERROR")
+case class IndeterminateResultError(field: String) extends BarsFailedCheckError(field + "_INDETERMINATE")

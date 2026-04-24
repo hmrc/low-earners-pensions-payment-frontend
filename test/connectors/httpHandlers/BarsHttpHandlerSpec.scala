@@ -158,9 +158,9 @@ class BarsHttpHandlerSpec extends SpecBase {
           nameMatches = NameMatches.Indeterminate,
           accountName = Some("Taxwell Payer"),
           nonStandardAccountDetailsRequiredForBacs = NonStandardAccountDetails.No,
-          sortCodeIsPresentOnEISCD = SortCodeCheck.Yes,
-          sortCodeSupportsDirectDebit = SortCodeCheck.Yes,
-          sortCodeSupportsDirectCredit = SortCodeCheck.Yes,
+          sortCodeIsPresentOnEISCD = SortCodeExists.Yes,
+          sortCodeSupportsDirectDebit = "yes",
+          sortCodeSupportsDirectCredit = DirectCreditSupported.Yes,
           sortCodeBankName = Some("Test"),
           iban = Some("test-iban")
         )
