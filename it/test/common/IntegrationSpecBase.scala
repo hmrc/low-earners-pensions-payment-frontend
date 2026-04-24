@@ -19,7 +19,7 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers

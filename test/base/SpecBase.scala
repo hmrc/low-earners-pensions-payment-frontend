@@ -39,6 +39,7 @@ import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
+import models.nps.{LowEarnersCalculation, LowEarnersClaimDetails, LowEarnersDataDetails, LowEarnersDetails, RetrieveClaimsResponse}
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -197,7 +198,53 @@ trait SpecBase
     value = dummyBarsResponse,
     correlationId = testCorrelationId
   )
-  
+
+
+  private val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
+    responseTimestamp = Some("2023-06-27 09:12:28"),
+    calculationSequenceNumber = 123,
+    dataSourceMaster = "CESA",
+    netPayContributionsTotal = Some(10.56),
+    basicRatePercentage = Some(10.56),
+    totalAllowances = Some(10.56),
+    totalIncome = Some(10.56),
+    totalDeductions = Some(10.56),
+    totalTaxDue = Some(10.56)
+  )
+
+  private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+    claimSequenceNumber = 123,
+    entitlementAmount = Some(10.56),
+    claimStatus = "CANCELLED",
+    inSelfAssessment = true,
+    calculationDate = Some("2023-06-27"),
+    claimDate = Some("2023-06-27"),
+    reminderOutputSent = true,
+    reissueClaimOutput = true,
+    originalAmount = Some(10.56)
+  )
+
+  private val calculation: LowEarnersCalculation = LowEarnersCalculation(
+    lowEarnersClaimDetails = claimDetails,
+    lowEarnersDataDetails = dataDetails
+  )
+
+  private val details: LowEarnersDetails = LowEarnersDetails(
+    taxYear = 11,
+    lowEarnersCalculations = Seq(calculation)
+  )
+
+  val retrieveResponse: RetrieveClaimsResponse = RetrieveClaimsResponse(
+    currentLowEarnersOptimisticLock = 123,
+    identifier = "id",
+    lowEarnersDetailsList = Seq(details)
+  )
+
+  val leppResponse: ResponseWrapper[RetrieveClaimsResponse] = SuccessWrapper(
+    value = retrieveResponse,
+    correlationId = testCorrelationId
+  )
+
   def enumReadsTest[E: Reads](jsonValue: String, modelValue: E): Unit =
     s"should read correctly for a value of: $jsonValue" in {
       val json: JsString = JsString(jsonValue)

@@ -29,7 +29,6 @@ class AppConfig @Inject()(config: Configuration):
   private def loadConfig(key: String): String = config.get[String](key)
   private val servicesConfig = ServicesConfig(config)
 
-
   //Application config
   val host: String = loadConfig("host")
   val appName: String = loadConfig("appName")
@@ -73,6 +72,10 @@ class AppConfig @Inject()(config: Configuration):
   private val barsBaseUrl: String = servicesConfig.baseUrl("bars")
   private val barsEnv: String = config.get("microservice.services.bars.env")
   def barsUrl: String = barsBaseUrl + (if (barsEnv == "local") "" else "/bank-account-reputation")
+
+  //BARS config
+  private val backendUrl: String = servicesConfig.baseUrl("lepp-backend")
+  val getPaymentsUrl = s"$backendUrl/${loadConfig("urls.getPaymentsUrl")}"
 
   //Language config
   def languageMap: Map[String, Lang] =
