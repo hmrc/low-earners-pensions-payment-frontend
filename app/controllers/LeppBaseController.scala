@@ -19,12 +19,12 @@ package controllers
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import pages.TempPage.{Breakdown, CheckYourAnswers}
-import pages.{BreakdownPage, CheckYourAnswersPage, Page, WhatAreYourBankDetailsPage, WhatYouWillNeedPage}
+import pages.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{CheckMode, Mode}
 import viewmodels.formPages.FormPageViewModel
+import viewmodels.{CheckMode, Mode}
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -41,6 +41,7 @@ abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
   protected def submitUrl(mode: Mode, page: Page): Call = page match {
     case BreakdownPage => routes.TempLeppController.onSubmit(Breakdown)
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
+    case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case CheckYourAnswersPage => routes.TempLeppController.onSubmit(CheckYourAnswers)
     case _ => routes.WhatYouWillNeedController.onPageLoad() //Placeholder to avoid warnings
   }

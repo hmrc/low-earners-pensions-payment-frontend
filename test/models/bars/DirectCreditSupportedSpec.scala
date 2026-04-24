@@ -17,20 +17,20 @@
 package models.bars
 
 import base.SpecBase
-import models.bars.statuses.SortCodeCheck
+import models.bars.statuses.DirectCreditSupported
 import play.api.libs.json.{JsError, JsString}
 
-class SortCodeCheckSpec extends SpecBase {
-  "BarsResponseSortCodeCheckField" - {
+class DirectCreditSupportedSpec extends SpecBase {
+  "DirectCreditSupported" - {
     "reads" - {
       Seq(
-        ("yes", SortCodeCheck.Yes),
-        ("no", SortCodeCheck.No),
-        ("error", SortCodeCheck.Error)
+        ("yes", DirectCreditSupported.Yes),
+        ("no", DirectCreditSupported.No),
+        ("error", DirectCreditSupported.Error)
       ).foreach((s, m) => enumReadsTest(s, m))
       
       "should not read for an invalid value" in {
-        JsString("nope").validate[SortCodeCheck] mustBe a[JsError]
+        JsString("nope").validate[DirectCreditSupported] mustBe a[JsError]
       }
     }
   }

@@ -16,6 +16,7 @@
 
 package models.bars
 
+import models.bars
 import models.bars.statuses.*
 import play.api.libs.json.{Json, Reads}
 
@@ -24,12 +25,19 @@ case class BarsResponse(accountNumberIsWellFormatted: AccountNumberWellFormatted
                         nameMatches: NameMatches,
                         accountName: Option[String],
                         nonStandardAccountDetailsRequiredForBacs: NonStandardAccountDetails,
-                        sortCodeIsPresentOnEISCD: SortCodeCheck,
-                        sortCodeSupportsDirectDebit: SortCodeCheck,
-                        sortCodeSupportsDirectCredit: SortCodeCheck, //
+                        sortCodeIsPresentOnEISCD: SortCodeExists,
+                        sortCodeSupportsDirectDebit: String,
+                        sortCodeSupportsDirectCredit: DirectCreditSupported,
                         sortCodeBankName: Option[String],
                         iban: Option[String]) {
-  def toErrorResultOpt: Option[BarsError] = None //TODO - Implement
+  val toBarsErrors: Seq[BarsError] = Seq(
+    accountNumberIsWellFormatted,
+    accountExists,
+    nameMatches,
+    nonStandardAccountDetailsRequiredForBacs,
+    sortCodeIsPresentOnEISCD,
+    sortCodeSupportsDirectCredit
+  ).flatMap(_.errorOpt).distinct
 }
 
 object BarsResponse {

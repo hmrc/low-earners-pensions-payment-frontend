@@ -19,6 +19,10 @@ POST   /bank-details                        controllers.WhatAreYourBankDetailsCo
 GET    /change-bank-details                 controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST   /change-bank-details                 controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
 
+# Bars error pages
+GET    /bank-details-check-failed           controllers.bars.BarsCheckFailedController.onPageLoad()
+GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsController.onPageLoad()
+
 # Check your answers page
 GET    /check-your-answers                  controllers.TempLeppController.onPageLoad(tempPage: TempPage = CheckYourAnswers)
 POST   /check-your-answers                  controllers.TempLeppController.onSubmit(tempPage: TempPage = CheckYourAnswers)

@@ -16,17 +16,20 @@
 
 package models.bars.statuses
 
+import models.bars.{BarsError, ErrorsInResponseError, SortCodeNotFoundError}
 import play.api.libs.json.*
 
-enum SortCodeCheck {
-  case Yes, No, Error
+enum SortCodeExists(override val errorOpt: Option[BarsError] = None) extends BarsStatus {
+  case Yes
+  case No extends SortCodeExists(Some(SortCodeNotFoundError))
+  case Error extends SortCodeExists(Some(ErrorsInResponseError("EISCD_CHECK")))
 }
 
-object SortCodeCheck {
-  implicit val reads: Reads[SortCodeCheck] = Reads{
+object SortCodeExists {
+  implicit val reads: Reads[SortCodeExists] = Reads{
     case JsString("yes") => JsSuccess(Yes)
     case JsString("no") => JsSuccess(No)
     case JsString("error") => JsSuccess(Error)
-    case _ => JsError("error.sortCodeCheck.invalid")
+    case _ => JsError("error.SortCodeExists.invalid")
   }
 }

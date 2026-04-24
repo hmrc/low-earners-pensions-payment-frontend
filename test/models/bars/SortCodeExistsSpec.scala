@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package controllers
+package models.bars
 
 import base.SpecBase
+import models.bars.statuses.SortCodeExists
+import play.api.libs.json.{JsError, JsString}
 
-class WhatAreYourBankDetailsControllerSpec extends SpecBase {
-  "BarsController" - {
+class SortCodeExistsSpec extends SpecBase {
+  "SortCodeExists" - {
+    "reads" - {
+      Seq(
+        ("yes", SortCodeExists.Yes),
+        ("no", SortCodeExists.No),
+        ("error", SortCodeExists.Error)
+      ).foreach((s, m) => enumReadsTest(s, m))
+      
+      "should not read for an invalid value" in {
+        JsString("nope").validate[SortCodeExists] mustBe a[JsError]
+      }
+    }
   }
 }

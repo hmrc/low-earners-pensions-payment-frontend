@@ -17,12 +17,12 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import views.html.WhatYouWillNeedView
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.NormalMode
+import views.html.WhatYouWillNeedView
 
 import javax.inject.Inject
 import scala.concurrent.Future

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.bars
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -23,25 +23,37 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.auth.IvUpliftFailureView
+import views.html.bars.BarsCheckFailedView
 
-class IvUpliftFailureViewSpec extends SpecBase {
+class BarsCheckFailedViewSpec extends SpecBase {
 
-  "view" - {
-    "display correct error information" in new Setup {
-      view.getElementsByTag("h1").text() mustBe messages(app)("ivUpliftFailure.title")
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ivUpliftFailure.p1"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ivUpliftFailure.li1"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ivUpliftFailure.li2"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ivUpliftFailure.li3"))
+  "BarsCheckFailedView" - {
+    "display correct LEPP gov banner" in new Setup {
+      view.getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
+      view.getElementsByClass("govuk-link hmrc-sign-out-nav__link").attr("href") mustBe
+        "/low-earners-pensions-payment/account/sign-out-survey"
+    }
+
+    "should display correct page title" in new Setup {
+      view.title() must include("We could not verify your bank account details - Accept your low earner's pension payment")
+    }
+
+    "display correct heading and text" in new Setup {
+      view.getElementsByTag("h1").text() mustBe messages(app)("barsCheckFailed.heading")
+
+      view.html.contains(messages(app)("barsCheckFailed.p1"))
+      view.text.contains(messages(app)("barsCheckFailed.p2"))
     }
   }
-  
+
   trait Setup {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    val view: Document = Jsoup.parse(app.injector.instanceOf[IvUpliftFailureView].apply().body)
+    val view: Document = Jsoup.parse(
+      app.injector.instanceOf[BarsCheckFailedView].apply.body
+    )
   }
+
 }
