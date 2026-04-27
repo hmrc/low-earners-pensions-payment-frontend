@@ -21,5 +21,5 @@ import play.api.mvc.Call
 import viewmodels.Mode
 
 case object CheckYourAnswersPage extends Page {
-  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.CheckYourAnswers)
+  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
 }
