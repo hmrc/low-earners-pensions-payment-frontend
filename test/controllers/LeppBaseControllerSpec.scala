@@ -153,7 +153,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
         
         val detailsModel: BankAccountDetails = BankAccountDetails(
-          name = "name nameson",
+          accountName = "name nameson",
           accountNumber = "112233",
           sortCode = "12345678",
           rollNumber = None
