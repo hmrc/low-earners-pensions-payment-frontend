@@ -11,7 +11,6 @@ class SubmitClaimRequestSpec extends SpecBase {
       "should return the expected JSON" in {
         val model: SubmitClaimRequest = SubmitClaimRequest(
           currentLowEarnersOptimisticLock = 11,
-          nino = Nino("AA111111A"),
           taxYear = 2025,
           accountDetails = BankAccountDetails(
             accountName = "A",
@@ -25,7 +24,6 @@ class SubmitClaimRequestSpec extends SpecBase {
           """
             |{
             | "currentLowEarnersOptimisticLock": 11,
-            | "nino": "AA111111A",
             | "taxYear": 2025,
             | "accountDetails": {
             |   "accountName": "A",
