@@ -9,6 +9,10 @@ GET    /language/:lang                      controllers.LanguageSwitchController
 GET    /                                    controllers.WhatYouWillNeedController.start
 GET    /start                               controllers.WhatYouWillNeedController.onPageLoad()
 
+# Dashboard page
+GET    /dashboard                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Dashboard)
+POST   /dashboard                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Dashboard)
+
 # Check your answers page
 GET    /breakdown                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Breakdown)
 POST   /breakdown                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Breakdown)
@@ -24,8 +28,11 @@ GET    /bank-details-check-failed           controllers.bars.BarsCheckFailedCont
 GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsController.onPageLoad()
 
 # Check your answers page
-GET    /check-your-answers                  controllers.TempLeppController.onPageLoad(tempPage: TempPage = CheckYourAnswers)
-POST   /check-your-answers                  controllers.TempLeppController.onSubmit(tempPage: TempPage = CheckYourAnswers)
+GET    /check-your-answers                  controllers.CheckYourAnswersController.onPageLoad()
+POST   /check-your-answers                  controllers.CheckYourAnswersController.onSubmit()
+
+# Check your answers page
+GET    /confirmation                        controllers.TempLeppController.onPageLoad(tempPage: TempPage = Confirmation)
 
 # Submission page
 GET    /confirmation                        controllers.SubmitConfirmationController.onPageLoad()
