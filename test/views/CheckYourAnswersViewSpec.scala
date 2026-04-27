@@ -51,7 +51,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
 
     "not display roll number row when user has not submitted a value" in new Setup {
       override val accountDetails: BankAccountDetails = BankAccountDetails(
-        name = "Some Name",
+        accountName = "Some Name",
         accountNumber = "12345678",
         sortCode = "11-22-33",
         rollNumber = None
@@ -74,7 +74,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
     val accountDetails: BankAccountDetails = BankAccountDetails(
-      name = "Some Name",
+      accountName = "Some Name",
       accountNumber = "12345678",
       sortCode = "11-22-33",
       rollNumber = Some("12345/678")
