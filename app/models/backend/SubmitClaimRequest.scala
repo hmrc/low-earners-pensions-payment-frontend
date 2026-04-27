@@ -5,7 +5,6 @@ import play.api.libs.json.{Json, OWrites}
 import uk.gov.hmrc.domain.Nino
 
 case class SubmitClaimRequest(currentLowEarnersOptimisticLock: Int,
-                              nino: Nino,
                               taxYear: Int,
                               accountDetails: BankAccountDetails)
 

@@ -2,8 +2,14 @@ package models.backend
 
 import play.api.libs.json.{Json, Reads}
 
-case class SubmitClaimResponse(updatedLowEarnersOptimisticLock: Int)
-
-object SubmitClaimResponse {
-  implicit val reads: Reads[SubmitClaimResponse] = Json.reads[SubmitClaimResponse]
+sealed trait SubmitClaimResponse {
+  val updatedLowEarnersOptimisticLock: Int
 }
+
+case class SubmitClaimResponseSuccess(updatedLowEarnersOptimisticLock: Int) extends SubmitClaimResponse
+
+object SubmitClaimResponseSuccess {
+  implicit val reads: Reads[SubmitClaimResponseSuccess] = Json.reads[SubmitClaimResponseSuccess]
+}
+
+case class SubmitClaimResponseWithFailures(updatedLowEarnersOptimisticLock: Int) extends SubmitClaimResponse
