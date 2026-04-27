@@ -113,7 +113,7 @@ trait SpecBase
     "microservice.services.lepp-backend.port"           -> wireMockPort
   )
 
-  val testCorrelationId: CorrelationId = CorrelationId("some-id")
+  implicit val testCorrelationId: CorrelationId = CorrelationId("some-id")
   implicit val dummyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 
   val dummyErrorWrapper: ErrorWrapper = ErrorWrapper(

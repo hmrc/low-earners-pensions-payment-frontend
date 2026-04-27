@@ -41,17 +41,16 @@ class BarsServiceSpec extends SpecBase {
                           resp: Future[Either[ErrorWrapper, SuccessWrapper[BarsResponse]]]
                         ): OngoingStubbing[ConnectorResponse[BarsResponse]] = when(
       mockConnector.checkBankAccountDetails(
-        request = ArgumentMatchers.any(),
-        correlationId = ArgumentMatchers.any()
+        request = ArgumentMatchers.any()
       )(
         hc = ArgumentMatchers.any(),
-        ec = ArgumentMatchers.any()
+        ec = ArgumentMatchers.any(),
+        cid = ArgumentMatchers.any()
       )
     ).thenReturn(EitherT(resp))
     
     lazy val result: ConnectorResponse[BarsResponse] = testService.checkBankAccountDetails(
-      barsRequest = testBarsRequest,
-      correlationId = testCorrelationId
+      barsRequest = testBarsRequest
     )
   }
   
