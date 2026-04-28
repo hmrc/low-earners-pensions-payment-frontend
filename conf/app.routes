@@ -27,6 +27,9 @@ GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsCo
 GET    /check-your-answers                  controllers.TempLeppController.onPageLoad(tempPage: TempPage = CheckYourAnswers)
 POST   /check-your-answers                  controllers.TempLeppController.onSubmit(tempPage: TempPage = CheckYourAnswers)
 
+# Submission page
+GET    /confirmation                        controllers.SubmitConfirmationController.onPageLoad()
+
 # Auth actions
 GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()
 GET     /account/timeout                    controllers.auth.AuthController.sessionTimeout()

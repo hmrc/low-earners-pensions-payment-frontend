@@ -1,1 +1,25 @@
-@import "lib/govuk-frontend/dist/govuk/base";
+@import "_print-button.scss";
+@import "_print-hide.scss";
+
+$custom-blue-dark: #005ea5;
+$custom-blue-light: #2b8cc4;
+
+.js-visible {
+  display: none !important;
+}
+
+.js-enabled .js-visible {
+  display: inline-block !important;
+}
+
+.custom {
+  &-hr {
+    border: none;
+    &--light {
+      border-top: 4px solid $custom-blue-dark;
+    }
+    &--heavy {
+      border-top: 10px solid $custom-blue-dark;
+    }
+  }
+}
