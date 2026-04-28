@@ -110,5 +110,6 @@
         phaseBanner = if (appConfig.feedbackBannerEnabled) Some(standardBetaBanner()) else None
     ),
     backLink = if (showBackLink && backLinkUrl != None) Some(BackLink.withDefaultText(backLinkUrl.get))
-                else Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+                else if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+                else None
 ))(content)

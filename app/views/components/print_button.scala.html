@@ -21,8 +21,7 @@
 @(marginTop: Int = 40, marginBottom: Int = 40, classes: String = "", buttonId: Int = 1)(implicit request: Request[_], messages: Messages)
 
 <div class="js-visible govuk-!-margin-top-@{marginTop} govuk-!-margin-bottom-@{marginBottom} @classes">
- <button class="govuk-!-display-none-print govuk-body-s gem-c-print-link__button" id="print-button-@{buttonId}" style="block-size: 50px;">
-  <img src="https://www.tax.service.gov.uk/assets/4.9.0//images/icon-print.svg" alt="Print Icon">
+ <button class="govuk-link govuk-body-s gem-c-print-link__button" id="print-button-@{buttonId}">
   @messages("site.print")
  </button>
 </div>

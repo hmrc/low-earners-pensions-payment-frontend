@@ -25,7 +25,8 @@
 @(formattedTimestamp: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("temp.title"))
+    pageTitle = titleNoForm(messages("confirmation.title")),
+    showBackLink = false
 ) {
 
     <div class="govuk-panel govuk-panel--confirmation">
@@ -39,8 +40,8 @@
     @heading2("confirmation.what-next.heading")
 
     <ul class="govuk-list govuk-!-margin-bottom-6">
-        <li><a class="govuk-link govuk-link--no-visited-state" href="TempLeppView.scala.html">@messages("confirmation.what-next.opt1")</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="WhatYouWillNeedView.scala.html">@messages("confirmation.what-next.opt2.sec1")</a> @messages("confirmation.what-next.opt2.sec2")</li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="@routes.WhatYouWillNeedController.start">@messages("confirmation.what-next.opt1")</a></li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="#">@messages("confirmation.what-next.opt2.sec1")</a> @messages("confirmation.what-next.opt2.sec2")</li>
     </ul>
 
     @resultsFooter(formattedTimestamp)
