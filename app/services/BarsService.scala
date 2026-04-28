@@ -30,10 +30,12 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class BarsService @Inject()(connector: BarsConnector) {
-  def checkBankAccountDetails(barsRequest: BarsRequest, correlationId: CorrelationId)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): ConnectorResponse[BarsResponse] = {
+  def checkBankAccountDetails(barsRequest: BarsRequest)
+                             (implicit hc: HeaderCarrier,
+                              ec: ExecutionContext,
+                              cid: CorrelationId): ConnectorResponse[BarsResponse] = {
     connector
-      .checkBankAccountDetails(request = barsRequest, correlationId = correlationId)
+      .checkBankAccountDetails(request = barsRequest)
       .subflatMap(response => response.value.toBarsErrors match {
         case Nil =>
           //Any auditing here
@@ -42,8 +44,8 @@ class BarsService @Inject()(connector: BarsConnector) {
           val errorResults: Seq[BarsErrorResult] = errors.map {
             case error: BarsFailedCheckError => BarsErrorResult(INTERNAL_SERVER_ERROR, error.reason)
             case error: BarsRequestError => BarsErrorResult(BAD_REQUEST, error.reason)
-          } 
-          
+          }
+
           val errorResult: BarsErrorResult = errorResults match {
             case err :: Nil => err
             case errs if errs.exists(_.status == INTERNAL_SERVER_ERROR) =>
@@ -51,7 +53,7 @@ class BarsService @Inject()(connector: BarsConnector) {
             case errs =>
               BarsErrorResult(BAD_REQUEST, "BARS_REQUEST_ERRORS", Some(errs))
           }
-          
+
           //Any auditing here
           Left(ErrorWrapper(value = errorResult, correlationId = response.correlationId))
       })

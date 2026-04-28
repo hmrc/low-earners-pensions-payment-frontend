@@ -34,12 +34,19 @@ import scala.concurrent.ExecutionContext
 class BarsConnector @Inject()(config: AppConfig,
                               httpClient: HttpClientV2) extends BarsHttpHandler {
 
-  def checkBankAccountDetails(request: BarsRequest, correlationId: CorrelationId)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): ConnectorResponse[BarsResponse] =
+  def checkBankAccountDetails(request: BarsRequest)
+                             (implicit hc: HeaderCarrier,
+                              ec: ExecutionContext,
+                              cid: CorrelationId): ConnectorResponse[BarsResponse] =
     EitherT(
       httpClient
         .post(URI.create(s"${config.barsUrl}/verify/personal").toURL)
         .withBody(Json.toJson(request))
+        .setHeader(
+          "User-Agent" -> config.appName,
+          "X-Tracking-Id" -> cid
+        )
         .execute[DownstreamResponse[BarsResponse]]
+        .map(_.map(_.copy(correlationId = cid)))
     )
 }

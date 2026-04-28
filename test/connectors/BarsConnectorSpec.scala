@@ -84,8 +84,7 @@ class BarsConnectorSpec extends SpecBase {
     }
 
     lazy val requestOutcome: ConnectorResponse[BarsResponse] = testConnector.checkBankAccountDetails(
-      request = testRequest,
-      correlationId = testCorrelationId
+      request = testRequest
     )
   }
   

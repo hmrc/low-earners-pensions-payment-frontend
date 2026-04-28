@@ -55,7 +55,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request)(correlationId =>
+    correlationIdHandler.handleCorrelationId(request)(implicit correlationId =>
       form
         .bindFromRequest()
         .fold(
@@ -64,8 +64,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
           )),
           answer => {
             barsService.checkBankAccountDetails(
-              barsRequest = answer.toBarsRequest,
-              correlationId = correlationId
+              barsRequest = answer.toBarsRequest
             ).biSemiflatMap(
               err => if(err.value.status == BAD_REQUEST) {
                 Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
