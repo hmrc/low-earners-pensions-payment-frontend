@@ -94,6 +94,6 @@ confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
 confirmation.what-next.opt1 = View your payment history or accept another payment
 confirmation.what-next.opt2.sec1 = Tell us what you think of this service
-confirmation.what-next.opt2.sec2 = (takes 30 secs)
+confirmation.what-next.opt2.sec2 = (takes 30 seconds)
 confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 
