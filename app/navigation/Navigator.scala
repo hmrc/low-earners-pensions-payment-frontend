@@ -28,6 +28,7 @@ class Navigator @Inject() {
     case WhatYouWillNeedPage => BreakdownPage
     case BreakdownPage => WhatAreYourBankDetailsPage
     case WhatAreYourBankDetailsPage => CheckYourAnswersPage
+    case CheckYourAnswersPage => ConfirmationPage
     case _ => WhatYouWillNeedPage
   }
 
