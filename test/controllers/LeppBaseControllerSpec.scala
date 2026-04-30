@@ -2,6 +2,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
+import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
@@ -76,13 +77,13 @@ class LeppBaseControllerSpec extends SpecBase {
       "should evaluate block when all data is cached" in new Test {
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
-          claims = Seq(
+          items = Seq(
             LeppItem(
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              claimed = false
+              status = Available
             )
           )
         )
@@ -114,13 +115,13 @@ class LeppBaseControllerSpec extends SpecBase {
       "should redirect to bank details page when bank details aren't cached" in new Test {
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
-          claims = Seq(
+          items = Seq(
             LeppItem(
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              claimed = false
+              status = Available
             )
           )
         )
@@ -141,13 +142,13 @@ class LeppBaseControllerSpec extends SpecBase {
       "should evaluate block when all data is cached" in new Test {
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
-          claims = Seq(
+          items = Seq(
             LeppItem(
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              claimed = false
+              status = Available
             )
           )
         )

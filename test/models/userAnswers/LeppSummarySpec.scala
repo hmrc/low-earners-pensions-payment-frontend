@@ -1,41 +1,43 @@
 package models.userAnswers
 
 import base.SpecBase
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, JsObject}
+import models.userAnswers.LeppItemStatus.Available
+import play.api.libs.json.{JsError, JsObject, JsSuccess, JsValue, Json}
 
 class LeppSummarySpec extends SpecBase {
   "LeppSummary" - {
     val model: LeppSummary = LeppSummary(
       currentLock = 67,
-      claims = Seq(
+      items = Seq(
         LeppItem(
           taxYear = 2025,
           contributions = 1000,
           taxRate = 20,
           entitlement = 200,
-          claimed = false
+          status = Available
         )
       )
     )
     
-    val json: JsValue = Json.parse(
-      """
-        |{
-        | "currentLock": 67,
-        | "claims": [
-        |   {
-        |     "taxYear": 2025,
-        |     "contributions": 1000.00,
-        |     "taxRate": 20.00,
-        |     "entitlement": 200.00,
-        |     "claimed": false
-        |   }
-        | ]
-        |}
-      """.stripMargin
-    )
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
+        val json: JsValue = Json.parse(
+          """
+            |{
+            | "currentLock": 67,
+            | "items": [
+            |   {
+            |     "taxYear": 2025,
+            |     "contributions": 1000.00,
+            |     "taxRate": 20.00,
+            |     "entitlement": 200.00,
+            |     "status": "PENDING"
+            |   }
+            | ]
+            |}
+          """.stripMargin
+        )
+        
         json.validate[LeppSummary] mustBe a[JsSuccess[_]]
         json.as[LeppSummary] mustBe model
       }
@@ -47,6 +49,23 @@ class LeppSummarySpec extends SpecBase {
     
     "writes" - {
       "should return the expected JSON" in {
+        val json: JsValue = Json.parse(
+          """
+            |{
+            | "currentLock": 67,
+            | "items": [
+            |   {
+            |     "taxYear": 2025,
+            |     "contributions": 1000.00,
+            |     "taxRate": 20.00,
+            |     "entitlement": 200.00,
+            |     "status": "Available"
+            |   }
+            | ]
+            |}
+          """.stripMargin
+        )
+        
         Json.toJson(model) mustBe json
       }
     }

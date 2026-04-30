@@ -22,7 +22,7 @@ case class LeppItem(taxYear: Int,
                     contributions: BigDecimal,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
-                    claimed: Boolean)
+                    status: LeppItemStatus)
 
 object LeppItem {
   implicit val format: OFormat[LeppItem] = Json.format[LeppItem]
