@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
 import pages.TempPage.*
@@ -73,14 +74,14 @@ class TempLeppController @Inject()(identify: IdentifierAction,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              claimed = false
+              status = Available
             ),
             LeppItem(
               taxYear = 2026,
               contributions = 750,
               taxRate = 20,
               entitlement = 150,
-              claimed = false
+              status = Available
             )
           )
         )

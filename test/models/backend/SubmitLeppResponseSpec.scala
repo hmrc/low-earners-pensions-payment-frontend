@@ -15,14 +15,14 @@ class SubmitLeppResponseSpec extends SpecBase {
           """.stripMargin
         )
         
-        val model: SubmitLeppResponseSuccess = SubmitLeppResponseSuccess(1111)
+        val model: SubmitLeppResponse = SubmitLeppResponse(1111)
         
-        json.validate[SubmitLeppResponseSuccess] mustBe a[JsSuccess[_]]
-        json.as[SubmitLeppResponseSuccess] mustBe model
+        json.validate[SubmitLeppResponse] mustBe a[JsSuccess[_]]
+        json.as[SubmitLeppResponse] mustBe model
       }
       
       "should return a JsError for invalid JSON" in {
-        JsObject.empty.validate[SubmitLeppResponseSuccess] mustBe a[JsError]
+        JsObject.empty.validate[SubmitLeppResponse] mustBe a[JsError]
       }
     }
   }
