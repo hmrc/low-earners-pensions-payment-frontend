@@ -18,12 +18,8 @@ package models.userAnswers
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ClaimItem(taxYear: Int,
-                     contributions: BigDecimal,
-                     taxRate: BigDecimal,
-                     entitlement: BigDecimal,
-                     claimed: Boolean)
+case class LeppSummary(currentLock: Int, claims: Seq[LeppItem])
 
-object ClaimItem {
-  implicit val format: OFormat[ClaimItem] = Json.format[ClaimItem]
+object LeppSummary {
+  implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]
 }

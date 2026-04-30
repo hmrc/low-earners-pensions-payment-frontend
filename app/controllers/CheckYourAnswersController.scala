@@ -22,7 +22,7 @@ import navigation.Navigator
 import pages.{CheckYourAnswersPage, WhatAreYourBankDetailsPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{ClaimSubmissionService, SessionCacheService}
+import services.{LeppSubmissionService, SessionCacheService}
 import utils.CorrelationIdOptional
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
@@ -36,7 +36,7 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
-                                            claimSubmissionService: ClaimSubmissionService,
+                                            claimSubmissionService: LeppSubmissionService,
                                             sessionService: SessionCacheService,
                                             correlationIdHandler: CorrelationIdOptional,
                                             navigator: Navigator

@@ -5,11 +5,11 @@ import models.userAnswers.BankAccountDetails
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.domain.Nino
 
-class SubmitClaimRequestSpec extends SpecBase {
-  "SubmitClaimRequest" - {
+class SubmitLeppRequestSpec extends SpecBase {
+  "SubmitLeppRequest" - {
     "writes" - {
       "should return the expected JSON" in {
-        val model: SubmitClaimRequest = SubmitClaimRequest(
+        val model: SubmitLeppRequest = SubmitLeppRequest(
           currentLowEarnersOptimisticLock = 11,
           taxYear = 2025,
           accountDetails = BankAccountDetails(
