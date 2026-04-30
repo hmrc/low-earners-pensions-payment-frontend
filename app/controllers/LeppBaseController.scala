@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
+import models.userAnswers.{BankAccountDetails, LeppSummary}
 import pages.TempPage.{Breakdown, CheckYourAnswers}
 import pages.*
 import models.userAnswers.{BankAccountDetails, ClaimsSummary}
@@ -52,7 +53,7 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case CheckYourAnswersPage => routes.CheckYourAnswersController.onSubmit()
-    case _ => routes.WhatYouWillNeedController.onPageLoad() //Placeholder to avoid warnings
+    case _ => routes.TempLeppController.onPageLoad(Dashboard)
   }
 
   protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {
@@ -73,7 +74,7 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
     
   private type BlockFor[A] = DataRequest[AnyContent] => A => Future[Result]
   
-  def handleWithData(f: BlockFor[ClaimsSummary]): Action[AnyContent] = handle { implicit req =>
+  def handleWithData(f: BlockFor[LeppSummary]): Action[AnyContent] = handle { implicit req =>
     req.userAnswers.get(DashboardPage) match {
       case Some(claims) => f(req)(claims)
       case None => DashboardPage.asRedirect

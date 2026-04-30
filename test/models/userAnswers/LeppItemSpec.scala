@@ -3,8 +3,8 @@ package models.userAnswers
 import base.SpecBase
 import play.api.libs.json.{JsError, JsObject, JsSuccess, JsValue, Json}
 
-class ClaimItemSpec extends SpecBase {
-  "ClaimItem" - {
+class LeppItemSpec extends SpecBase {
+  "LeppItem" - {
     val json: JsValue = Json.parse(
       """
         |{
@@ -17,7 +17,7 @@ class ClaimItemSpec extends SpecBase {
        """.stripMargin
     )
     
-    val model: ClaimItem = ClaimItem(
+    val model: LeppItem = LeppItem(
       taxYear = 2024,
       contributions = 1000,
       taxRate = 20,
@@ -27,12 +27,12 @@ class ClaimItemSpec extends SpecBase {
     
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
-        json.validate[ClaimItem] mustBe a[JsSuccess[_]]
-        json.as[ClaimItem] mustBe model
+        json.validate[LeppItem] mustBe a[JsSuccess[_]]
+        json.as[LeppItem] mustBe model
       }
       
       "should return a JsError for invalid JSON" in {
-        JsObject.empty.validate[ClaimItem] mustBe a[JsError]
+        JsObject.empty.validate[LeppItem] mustBe a[JsError]
       }
     }
     

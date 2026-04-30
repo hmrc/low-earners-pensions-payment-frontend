@@ -3,12 +3,12 @@ package models.userAnswers
 import base.SpecBase
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, JsObject}
 
-class ClaimSummarySpec extends SpecBase {
-  "ClaimSummary" - {
-    val model: ClaimsSummary = ClaimsSummary(
+class LeppSummarySpec extends SpecBase {
+  "LeppSummary" - {
+    val model: LeppSummary = LeppSummary(
       currentLock = 67,
       claims = Seq(
-        ClaimItem(
+        LeppItem(
           taxYear = 2025,
           contributions = 1000,
           taxRate = 20,
@@ -36,12 +36,12 @@ class ClaimSummarySpec extends SpecBase {
     )
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
-        json.validate[ClaimsSummary] mustBe a[JsSuccess[_]]
-        json.as[ClaimsSummary] mustBe model
+        json.validate[LeppSummary] mustBe a[JsSuccess[_]]
+        json.as[LeppSummary] mustBe model
       }
       
       "should return a JsError for invalid Json" in {
-        JsObject.empty.validate[ClaimsSummary] mustBe a[JsError]
+        JsObject.empty.validate[LeppSummary] mustBe a[JsError]
       }
     }
     

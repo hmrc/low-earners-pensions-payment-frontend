@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import models.userAnswers.{ClaimItem, ClaimsSummary}
+import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
 import pages.TempPage.*
 import pages.{BreakdownPage, ConfirmationPage, DashboardPage, Page, TempPage, WhatAreYourBankDetailsPage}
@@ -65,17 +65,17 @@ class TempLeppController @Inject()(identify: IdentifierAction,
     tempPage match {
       case TempPage.Dashboard =>
         // placeholder for NPS integration
-        val tempData: ClaimsSummary = ClaimsSummary(
+        val tempData: LeppSummary = LeppSummary(
           currentLock = 67,
           Seq(
-            ClaimItem(
+            LeppItem(
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
               claimed = false
             ),
-            ClaimItem(
+            LeppItem(
               taxYear = 2026,
               contributions = 750,
               taxRate = 20,
