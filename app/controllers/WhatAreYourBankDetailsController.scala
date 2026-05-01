@@ -35,27 +35,27 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  getData: DataRetrievalAction,
+                                                 val sessionService: SessionCacheService,
                                                  correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
                                                  barsService: BarsService,
-                                                 sessionService: SessionCacheService,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
-                                                (implicit ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport {
+                                                (implicit val ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = handle { implicit request =>
-    request.userAnswers.get(WhatAreYourBankDetailsPage) match {
+  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
+    req.userAnswers.get(WhatAreYourBankDetailsPage) match {
       case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
       case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request)(implicit correlationId =>
+  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
+    correlationIdHandler.handleCorrelationId(req)(implicit cid =>
       form
         .bindFromRequest()
         .fold(
@@ -72,7 +72,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                 Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
               },
               _ => for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+                updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
                 _ <- sessionService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
             ).merge

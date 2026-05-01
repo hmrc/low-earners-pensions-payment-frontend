@@ -32,8 +32,6 @@ import viewmodels.checkYourAnswers.CheckYourAnswersSummary.*
 import viewmodels.formPages.FormPageViewModel
 import views.html.CheckYourAnswersView
 
-import java.time.LocalDate
-
 class CheckYourAnswersViewSpec extends SpecBase {
 
   "view" - {

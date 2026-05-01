@@ -19,7 +19,6 @@ package models.backend
 import base.SpecBase
 import models.userAnswers.BankAccountDetails
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.domain.Nino
 
 class SubmitLeppRequestSpec extends SpecBase {
   "SubmitLeppRequest" - {
