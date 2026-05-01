@@ -19,20 +19,13 @@ package controllers
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppSummary}
-import pages.TempPage.{Breakdown, CheckYourAnswers}
 import pages.*
-import models.userAnswers.{BankAccountDetails, ClaimsSummary}
-import pages.*
-import play.api.libs.json.Reads
-import services.SessionCacheService
 import pages.TempPage.{Breakdown, Dashboard}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
-import queries.Gettable
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, Mode}
-import viewmodels.{CheckMode, Mode, NormalMode}
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -76,7 +69,7 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
   
   def handleWithData(f: BlockFor[LeppSummary]): Action[AnyContent] = handle { implicit req =>
     req.userAnswers.get(DashboardPage) match {
-      case Some(claims) => f(req)(claims)
+      case Some(leppSummary) => f(req)(leppSummary)
       case None => DashboardPage.asRedirect
     }
   }
