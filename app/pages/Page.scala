@@ -17,8 +17,8 @@
 package pages
 
 import play.api.mvc.Results.Redirect
-import viewmodels.{Mode, NormalMode}
 import play.api.mvc.{Call, Result}
+import viewmodels.{Mode, NormalMode}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
