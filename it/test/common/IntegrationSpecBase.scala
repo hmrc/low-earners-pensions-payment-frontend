@@ -32,7 +32,9 @@ import play.api.mvc.BodyParsers
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import utils.DateTime
 
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
@@ -48,6 +50,10 @@ class IntegrationSpecBase extends AnyWordSpec
   with HttpClientV2Support {
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
+  
+  class FakeDateTime() extends DateTime {
+    override def now(zoneId: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(10000L), zoneId)
+  }
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
@@ -61,7 +67,7 @@ class IntegrationSpecBase extends AnyWordSpec
       .build()
   }
 
-  def applicationWithUserAnswers(answers: UserAnswers): Application = {
+  def applicationWithUserAnswers(answers: UserAnswers, time: ZonedDateTime = ZonedDateTime.now()): Application = {
     GuiceApplicationBuilder()
       .configure(
         "microservice.services.bars.port" -> wireMockPort,
@@ -71,7 +77,8 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.host" -> wireMockHost
       )
       .overrides(
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
+        bind[DateTime].toInstance(new FakeDateTime()),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers))
       )
       .build()
   }

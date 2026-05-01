@@ -27,7 +27,7 @@ import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
 import models.{CorrelationId, ResponseWrapper}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -77,8 +77,7 @@ class LeppSummarySpec extends SpecBase {
             |     "entitlement": 200.00,
             |     "status": "Available"
             |   }
-            | ],
-            | "submissionCompleted": false
+            | ]
             |}
           """.stripMargin
         )
