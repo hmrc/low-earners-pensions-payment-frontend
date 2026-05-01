@@ -25,5 +25,5 @@ import viewmodels.Mode
 object DashboardPage extends QuestionPage[LeppSummary] {
   override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.Dashboard)
   override def path: JsPath = JsPath \ toString
-  override def toString: String = "claimsSummary"
+  override def toString: String = "leppSummary"
 }

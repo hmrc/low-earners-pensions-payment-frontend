@@ -24,7 +24,7 @@ class BankAccountDetailsSpec extends SpecBase {
     val json: JsValue = Json.parse(
       """
         |{
-        | "name": "name",
+        | "accountName": "name",
         | "accountNumber": "number",
         | "sortCode": "sortcode",
         | "rollNumber": "rollNumber"
@@ -44,7 +44,7 @@ class BankAccountDetailsSpec extends SpecBase {
         Json.parse(
           """
             |{
-            | "name": true,
+            | "accountName": true,
             | "accountNumber": 1.1,
             | "sortCode": [],
             | "rollNumber": {}

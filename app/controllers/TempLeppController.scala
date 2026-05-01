@@ -20,8 +20,8 @@ import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
+import pages.*
 import pages.TempPage.*
-import pages.{BreakdownPage, ConfirmationPage, DashboardPage, Page, TempPage, WhatAreYourBankDetailsPage}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -31,7 +31,6 @@ import views.html.TempLeppView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class TempLeppController @Inject()(identify: IdentifierAction,
                                    getData: DataRetrievalAction,
@@ -45,7 +44,6 @@ class TempLeppController @Inject()(identify: IdentifierAction,
   private def toPageModel(tempPage: TempPage): Page = tempPage match {
     case Dashboard => DashboardPage
     case Breakdown => BreakdownPage
-    case Confirmation => ConfirmationPage
   }
 
   def onPageLoad(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>

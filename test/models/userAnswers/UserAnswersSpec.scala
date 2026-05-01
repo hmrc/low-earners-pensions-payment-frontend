@@ -17,12 +17,12 @@
 package models.userAnswers
 
 import base.SpecBase
-import viewmodels.Mode
 import pages.QuestionPage
 import play.api.libs.json.{JsObject, JsPath, JsString, Json}
 import play.api.mvc.Call
 import uk.gov.hmrc.crypto.EncryptedValue
 import utils.encryption.MockAesGcmAdCrypto
+import viewmodels.Mode
 
 import java.time.Instant
 import scala.util.{Failure, Success, Try}

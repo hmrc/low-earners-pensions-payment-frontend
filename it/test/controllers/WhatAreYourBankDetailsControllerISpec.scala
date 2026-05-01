@@ -19,11 +19,12 @@ package controllers
 import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.{BankAccountDetails, UserAnswers}
-import pages.TempPage.{Breakdown, CheckYourAnswers}
+import pages.TempPage.Breakdown
 import pages.WhatAreYourBankDetailsPage
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -31,7 +32,6 @@ import uk.gov.hmrc.http.SessionKeys
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, NormalMode}
 import views.html.WhatAreYourBankDetailsView
-import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
 
@@ -60,7 +60,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         mockAuthSuccess()
 
         val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-          name = "name",
+          accountName = "name",
           accountNumber = "number",
           sortCode = "sortcode",
           rollNumber = Some("rollNumber")
@@ -111,7 +111,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "loaded should include the correct back link" in {
-      val backUrl: String = routes.TempLeppController.onSubmit(CheckYourAnswers).url
+      val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
       mockAuthSuccess()
@@ -368,7 +368,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
-        val backUrl: String = routes.TempLeppController.onSubmit(CheckYourAnswers).url
+        val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
         val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
         val formViewModel: FormPageViewModel = FormPageViewModel(

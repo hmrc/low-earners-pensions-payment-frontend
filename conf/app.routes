@@ -31,9 +31,6 @@ GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsCo
 GET    /check-your-answers                  controllers.CheckYourAnswersController.onPageLoad()
 POST   /check-your-answers                  controllers.CheckYourAnswersController.onSubmit()
 
-# Check your answers page
-GET    /confirmation                        controllers.TempLeppController.onPageLoad(tempPage: TempPage = Confirmation)
-
 # Submission page
 GET    /confirmation                        controllers.SubmitConfirmationController.onPageLoad()
 

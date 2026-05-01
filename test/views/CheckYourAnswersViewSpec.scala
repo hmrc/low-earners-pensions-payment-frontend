@@ -22,7 +22,6 @@ import models.*
 import models.userAnswers.BankAccountDetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import pages.TempPage.Confirmation
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
@@ -85,7 +84,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
     val backLinkUrl: String = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode).url
 
     val viewModel: FormPageViewModel = FormPageViewModel(
-      onSubmit = routes.TempLeppController.onPageLoad(Confirmation),
+      onSubmit = routes.SubmitConfirmationController.onPageLoad(),
       backLinkUrl = Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
     )
 
