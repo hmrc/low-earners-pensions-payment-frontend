@@ -55,7 +55,7 @@ object CheckYourAnswersSummary {
   private def sortCodeRow(bankAccountDetails: BankAccountDetails)
                          (implicit messages: Messages): SummaryListRow = SummaryListRow(
     key = Key(content = Text(messages("bankDetails.sortCode"))),
-    value = Value(content = Text(bankAccountDetails.accountNumber)),
+    value = Value(content = Text(bankAccountDetails.sortCode)),
     actions = Some(Actions(
       items = Seq(ActionItem(
         href = routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url + "#bankDetails.sortCode",
@@ -86,7 +86,7 @@ object CheckYourAnswersSummary {
         )
       )
     )
-
+  
   def cyaSummaryList(accountDetails: BankAccountDetails)
                     (implicit messages: Messages): Seq[SummaryListRow] = Seq(
     accountNameRow(accountDetails),
