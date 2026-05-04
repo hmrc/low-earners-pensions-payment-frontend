@@ -91,7 +91,7 @@ object CheckYourAnswersSummary {
   def cyaSummaryList(accountDetails: BankAccountDetails)
                     (implicit messages: Messages): Seq[SummaryListRow] = Seq(
     accountNameRow(accountDetails),
-    accountNumberRow(accountDetails),
-    sortCodeRow(accountDetails)
+    sortCodeRow(accountDetails),
+    accountNumberRow(accountDetails)
   ) ++ Seq(rollNumberRow(accountDetails)).flatten
 }
