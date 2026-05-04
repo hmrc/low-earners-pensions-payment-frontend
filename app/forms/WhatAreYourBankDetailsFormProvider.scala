@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.WhatAreYourBankDetailsFormProvider.formatSortCode
 import models.userAnswers.BankAccountDetails
 import play.api.data.Form
 import play.api.data.Forms.mapping
@@ -23,7 +24,6 @@ import play.api.data.Forms.mapping
 class WhatAreYourBankDetailsFormProvider extends BaseForm {
   private[forms] def stripSortCode(str: String): String = str.strip().replaceAll("(?<=[0-9]{2})-(?=[0-9]{2})", "")
   private[forms] def stripRollNumberOpt(str: Option[String]): Option[String] = str.map(_.strip().replaceAll("[- /.]", ""))
-  private[forms] def formatSortCode(str: String): String = s"${str.take(2)}-${str.slice(2, 4)}-${str.drop(4)}"
   private[forms] def formatAccountName(str: String): String = str.toLowerCase.split(" ").map(_.capitalize).mkString(" ")
 
   private val prefix = "bankDetails"
@@ -36,4 +36,8 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
       optionalTextField(s"$prefix.rollNumber", 1, 18, "^[A-Z0-9- /.]{1,18}$", bindMap = stripRollNumberOpt)
     )(BankAccountDetails.apply)(BankAccountDetails.unapply)
   )
+}
+
+object WhatAreYourBankDetailsFormProvider {
+  def formatSortCode(str: String): String = s"${str.take(2)}-${str.slice(2, 4)}-${str.drop(4)}"
 }

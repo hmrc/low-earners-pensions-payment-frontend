@@ -17,6 +17,7 @@
 package viewmodels.checkYourAnswers
 
 import controllers.routes
+import forms.WhatAreYourBankDetailsFormProvider.formatSortCode
 import models.userAnswers.BankAccountDetails
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
@@ -55,7 +56,7 @@ object CheckYourAnswersSummary {
   private def sortCodeRow(bankAccountDetails: BankAccountDetails)
                          (implicit messages: Messages): SummaryListRow = SummaryListRow(
     key = Key(content = Text(messages("bankDetails.sortCode"))),
-    value = Value(content = Text(bankAccountDetails.sortCode)),
+    value = Value(content = Text(formatSortCode(bankAccountDetails.sortCode))),
     actions = Some(Actions(
       items = Seq(ActionItem(
         href = routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url + "#bankDetails.sortCode",
