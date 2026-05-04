@@ -19,11 +19,13 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import connectors.PlaceholderBackendConnector
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.http.{HeaderNames, Status}
 import play.api.inject.bind
@@ -51,9 +53,12 @@ class IntegrationSpecBase extends AnyWordSpec
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
   
-  class FakeDateTime() extends DateTime {
+  class FakeDateTime extends DateTime {
     override def now(zoneId: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(10000L), zoneId)
   }
+  
+  // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
+  val fakeConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
@@ -78,7 +83,8 @@ class IntegrationSpecBase extends AnyWordSpec
       )
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers))
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
+        bind[PlaceholderBackendConnector].toInstance(fakeConnector)
       )
       .build()
   }

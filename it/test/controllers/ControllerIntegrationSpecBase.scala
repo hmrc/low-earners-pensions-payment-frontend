@@ -35,6 +35,34 @@ import java.net.URLEncoder
 import scala.concurrent.Future
 
 trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
+  val summaryModel: LeppSummary = LeppSummary(
+    currentLock = 67,
+    items = Seq(
+      LeppItem(
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Available
+      )
+    )
+  )
+
+  val bankAccountDetails: BankAccountDetails = BankAccountDetails(
+    accountName = "name",
+    accountNumber = "number",
+    sortCode = "sortcode",
+    rollNumber = Some("rollNumber")
+  )
+
+  val userAnswers: UserAnswers = UserAnswers(
+    id = "1",
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel),
+      "bankDetails" -> Json.toJson(bankAccountDetails)
+    )
+  )
+  
   private val authoriseUri: String = "/auth/authorise"
 
   private val authRequestJson: JsValue = Json.parse(

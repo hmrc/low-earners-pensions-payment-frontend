@@ -19,45 +19,56 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import navigation.Navigator
-import pages.{CheckYourAnswersPage, WhatAreYourBankDetailsPage}
+import pages.CheckYourAnswersPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{LeppSubmissionService, SessionCacheService}
 import utils.CorrelationIdOptional
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
-import views.html.CheckYourAnswersView
+import views.html.{CheckYourAnswersView, ErrorTemplate}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CheckYourAnswersController @Inject()(
-                                            identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView,
-                                            claimSubmissionService: LeppSubmissionService,
-                                            sessionService: SessionCacheService,
-                                            correlationIdHandler: CorrelationIdOptional,
-                                            navigator: Navigator
-                                          ) extends LeppBaseController(identify, getData) with I18nSupport {
-  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
-    request.userAnswers.get(WhatAreYourBankDetailsPage) match {
-      case Some(accountDetails) =>
-        Future.successful(Ok(view(cyaSummaryList(accountDetails), viewModel(NormalMode, CheckYourAnswersPage))))
-      case None =>
-        Future.successful(Redirect(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode)))
-    }
+class CheckYourAnswersController @Inject()(identify: IdentifierAction,
+                                           getData: DataRetrievalAction,
+                                           val controllerComponents: MessagesControllerComponents,
+                                           view: CheckYourAnswersView,
+                                           leppSubmissionService: LeppSubmissionService,
+                                           val sessionService: SessionCacheService,
+                                           correlationIdHandler: CorrelationIdOptional,
+                                           navigator: Navigator,
+                                           errorView: ErrorTemplate)
+                                          (implicit val ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+
+  def onPageLoad(): Action[AnyContent] = handleForCyaPage { implicit req =>
+    (_, bankDetails) =>
+      Future.successful(Ok(
+        view(
+          summaryList = cyaSummaryList(bankDetails),
+          viewModel = viewModel(NormalMode, CheckYourAnswersPage)
+        )
+      ))
   }
-  
-  def onSubmit(): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request){implicit id => 
-      request.userAnswers.get(WhatAreYourBankDetailsPage) match {
-        case Some(_) =>
-          Future.successful(Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode)))
-        case None =>
-          Future.successful(Redirect(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode)))
-      } 
-    }
+
+  def onSubmit(): Action[AnyContent] = handleForCyaPage { implicit req =>
+    (leppData, bankDetails) =>
+      correlationIdHandler.handleCorrelationId(req) { implicit cid =>
+        leppSubmissionService.submitMultiple(leppData, bankDetails).biSemiflatMap(
+          err =>
+            for {
+              _ <- sessionService.clear(req.userAnswers)
+            } yield InternalServerError(errorView("title", "heading", "message")), 
+          //TODO - Need to write content for this page
+          //TODO - should probably implement ClearCacheController like in MPE
+          _ =>
+            for {
+              updatedAnswers <- Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true))
+              _ <- sessionService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
+        ).merge
+      }
   }
 }

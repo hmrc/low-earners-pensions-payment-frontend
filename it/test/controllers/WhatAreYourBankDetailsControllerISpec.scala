@@ -67,21 +67,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     )
   )
 
-  val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-    accountName = "name",
-    accountNumber = "number",
-    sortCode = "sortcode",
-    rollNumber = Some("rollNumber")
-  )
-
-  val userAnswers: UserAnswers = UserAnswers(
-    id = "1",
-    data = Json.obj(
-      "leppSummary" -> Json.toJson(summaryModel),
-      "bankDetails" -> Json.toJson(bankAccountDetails)
-    )
-  )
-
   "GET /bank-details" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
