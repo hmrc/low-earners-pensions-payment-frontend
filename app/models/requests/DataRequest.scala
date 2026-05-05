@@ -21,6 +21,5 @@ import play.api.mvc.{Request, WrappedRequest}
 
 case class DataRequest[A](request: Request[A],
                           user: AuthUser,
-                          userAnswers: UserAnswers,
-                          correlationId: Option[String] = None) extends WrappedRequest[A](request)
+                          userAnswers: UserAnswers) extends WrappedRequest[A](request)
 

@@ -17,6 +17,9 @@
 package controllers
 
 import base.SpecBase
+import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
+import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -24,8 +27,37 @@ import play.api.test.Helpers.*
 class SubmitConfirmationControllerSpec extends SpecBase {
 
   "Submit confirmation controller" - {
+    val summaryModel: LeppSummary = LeppSummary(
+      currentLock = 67,
+      items = Seq(
+        LeppItem(
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Available
+        )
+      )
+    )
+
+    val bankAccountDetails: BankAccountDetails = BankAccountDetails(
+      accountName = "name",
+      accountNumber = "number",
+      sortCode = "sortcode",
+      rollNumber = Some("rollNumber")
+    )
+
+    val userAnswers: UserAnswers = UserAnswers(
+      id = "1",
+      data = Json.obj(
+        "leppSummary" -> Json.toJson(summaryModel),
+        "bankDetails" -> Json.toJson(bankAccountDetails),
+        "isSubmitted" -> JsBoolean(true)
+      )
+    )
+    
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder().build()
+      val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =

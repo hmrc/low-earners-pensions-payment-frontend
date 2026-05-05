@@ -19,18 +19,18 @@ package models.userAnswers
 import models.bars.{BarsAccount, BarsRequest, BarsSubject}
 import play.api.libs.json.{Json, OFormat}
 
-case class BankAccountDetails(name: String,
+case class BankAccountDetails(accountName: String,
                               accountNumber: String,
                               sortCode: String,
                               rollNumber: Option[String]) {
   def toBarsRequest = BarsRequest(
     account = BarsAccount(accountNumber, sortCode, rollNumber),
-    subject = BarsSubject(name = Some(name))
+    subject = BarsSubject(name = Some(accountName))
   )
 }
 
 object BankAccountDetails {
-  def unapply(req: BankAccountDetails) = Some(req.name, req.accountNumber, req.sortCode, req.rollNumber)
+  def unapply(req: BankAccountDetails) = Some(req.accountName, req.accountNumber, req.sortCode, req.rollNumber)
 
   implicit val format: OFormat[BankAccountDetails] = Json.format[BankAccountDetails]
 }

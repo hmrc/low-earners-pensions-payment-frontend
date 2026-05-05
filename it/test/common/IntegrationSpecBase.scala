@@ -19,11 +19,13 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import connectors.PlaceholderBackendConnector
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.http.{HeaderNames, Status}
 import play.api.inject.bind
@@ -32,7 +34,9 @@ import play.api.mvc.BodyParsers
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import utils.DateTime
 
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
@@ -48,6 +52,13 @@ class IntegrationSpecBase extends AnyWordSpec
   with HttpClientV2Support {
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
+  
+  class FakeDateTime extends DateTime {
+    override def now(zoneId: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(10000L), zoneId)
+  }
+  
+  // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
+  val fakeConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
@@ -61,7 +72,7 @@ class IntegrationSpecBase extends AnyWordSpec
       .build()
   }
 
-  def applicationWithUserAnswers(answers: UserAnswers): Application = {
+  def applicationWithUserAnswers(answers: UserAnswers, time: ZonedDateTime = ZonedDateTime.now()): Application = {
     GuiceApplicationBuilder()
       .configure(
         "microservice.services.bars.port" -> wireMockPort,
@@ -71,7 +82,9 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.host" -> wireMockHost
       )
       .overrides(
+        bind[DateTime].toInstance(new FakeDateTime()),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
+        bind[PlaceholderBackendConnector].toInstance(fakeConnector)
       )
       .build()
   }

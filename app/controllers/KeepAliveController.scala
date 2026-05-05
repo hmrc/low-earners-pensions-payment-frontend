@@ -26,11 +26,11 @@ import scala.concurrent.ExecutionContext
 class KeepAliveController @Inject()(val controllerComponents: MessagesControllerComponents,
                                     identify: IdentifierAction,
                                     getData: DataRetrievalAction,
-                                    sessionRepository: SessionRepository)(implicit ec: ExecutionContext)
+                                    sessionRepository: SessionRepository)
+                                   (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) {
 
   def keepAlive(): Action[AnyContent] = handle { implicit request =>
-
     sessionRepository.keepAlive(request.userAnswers.id).map(_ => Ok)
   }
 }
