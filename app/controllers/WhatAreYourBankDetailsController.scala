@@ -17,7 +17,9 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import connectors.barsLockout.BarsVerifyStatusConnector
+import connectors.barsLockout.model.BarVerifyStatusId
+import controllers.actions.{Actions, DataRetrievalAction}
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -26,14 +28,14 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.*
-import utils.CorrelationIdOptional
+import utils.{CorrelationIdOptional, Logging}
 import viewmodels.Mode
 import views.html.WhatAreYourBankDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
+class WhatAreYourBankDetailsController @Inject()(actions: Actions,
                                                  getData: DataRetrievalAction,
                                                  correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
@@ -41,9 +43,10 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  barsService: BarsService,
                                                  sessionService: SessionCacheService,
                                                  navigator: Navigator,
+                                                 barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport {
+  extends LeppBaseController(actions, getData) with I18nSupport with Logging {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
@@ -66,11 +69,27 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
             barsService.checkBankAccountDetails(
               barsRequest = answer.toBarsRequest
             ).biSemiflatMap(
-              err => if(err.value.status == BAD_REQUEST) {
-                Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
-              } else {
-                Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
-              },
+              err =>
+                barsVerifyStatusConnector
+                  .update(BarVerifyStatusId.from(request.user.nino)).map { verifyStatus =>
+                    println("---------------------- STATUS VERIFY COUNT " + verifyStatus.attempts)
+                    println("---------------------- STATUS VERIFY TIME " + verifyStatus.lockoutExpiryDateTime)
+                    // here we catch a lockout BarsStatus condition and force a TooManyAttempts (BarsError) response
+//                                        verifyStatus.lockoutExpiryDateTime
+//                                          .map { expiry =>
+//                                            Redirect(controllers.bars.routes.BarsLockoutController.barsLockout)
+//                                          }
+                  } recover { case e =>
+                  logger.error("[WhatAreYourBankDetailsController][onSubmit] ",
+                    "updated failed for:" +
+                      s" ${request.user.nino.nino}", e
+                  )
+                }
+                if (err.value.status == BAD_REQUEST) {
+                  Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
+                } else {
+                  Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
+                },
               _ => for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))
                 _ <- sessionService.save(updatedAnswers)

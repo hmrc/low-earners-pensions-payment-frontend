@@ -43,6 +43,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     val logContext: String = "[AuthenticatedIdentifierAction][invokeBlock] - "
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    println(" -------------------------- YES YES "+hc.authorization.get.value)
 
     authorised(Enrolment(Constants.ptaEnrolmentKey))
       .retrieve(Retrievals.internalId and Retrievals.nino and Retrievals.confidenceLevel and Retrievals.authorisedEnrolments) {

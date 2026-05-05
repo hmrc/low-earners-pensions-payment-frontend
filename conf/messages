@@ -102,3 +102,21 @@ confirmation.what-next.opt2.sec1 = Tell us what you think of this service
 confirmation.what-next.opt2.sec2 = (takes 30 seconds)
 confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 
+# BARS lockout page
+bars.lockout.title = You’ve tried to confirm your bank details too many times
+bars.lockout.p2 = You can try again after {0} to confirm your bank details.
+bars.lockout.go-to-tax-account = Go to tax account
+
+# Months
+JANUARY = January
+FEBRUARY = February
+MARCH = March
+APRIL = April
+MAY = May
+JUNE = June
+JULY = July
+AUGUST = August
+SEPTEMBER = September
+OCTOBER = October
+NOVEMBER = November
+DECEMBER = December

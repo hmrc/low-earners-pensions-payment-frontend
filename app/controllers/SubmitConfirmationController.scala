@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{DateTime, DateTimeFormats}
@@ -25,12 +25,12 @@ import views.html.SubmitConfirmationView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SubmitConfirmationController @Inject()(identify: IdentifierAction,
+class SubmitConfirmationController @Inject()(actions: Actions,
                                              getData: DataRetrievalAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              confirmationView: SubmitConfirmationView,
                                              dateTime: DateTime)
-  extends LeppBaseController(identify, getData) with I18nSupport:
+  extends LeppBaseController(actions, getData) with I18nSupport:
   
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
     Future.successful(Ok(confirmationView(DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))))

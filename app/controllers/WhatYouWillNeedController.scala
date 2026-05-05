@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import play.api.i18n.I18nSupport
@@ -28,15 +28,15 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class WhatYouWillNeedController @Inject()(
-                                           identify: IdentifierAction,
+                                           actions: Actions,
                                            getData: DataRetrievalAction,
                                            val controllerComponents: MessagesControllerComponents,
                                            whatYouWillNeedView: WhatYouWillNeedView,
                                            navigator: Navigator
-                                         ) extends LeppBaseController(identify, getData) with I18nSupport {
+                                         ) extends LeppBaseController(actions, getData) with I18nSupport {
 
-  val start: Action[AnyContent] = Action { implicit request =>
-    Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad())
+  val start: Action[AnyContent] = handle { implicit request =>
+    Future.successful(Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad()))
   }
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>

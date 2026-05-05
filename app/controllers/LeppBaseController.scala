@@ -16,10 +16,10 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import models.requests.DataRequest
-import pages.TempPage.{Breakdown, CheckYourAnswers}
 import pages.*
+import pages.TempPage.{Breakdown, CheckYourAnswers}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,7 +29,7 @@ import viewmodels.{CheckMode, Mode}
 import javax.inject.Inject
 import scala.concurrent.Future
 
-abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
+abstract class LeppBaseController  @Inject()(actions: Actions,
                                              getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport:
 
   protected def viewModel(mode: Mode, page: Page): FormPageViewModel =
@@ -56,5 +56,5 @@ abstract class LeppBaseController  @Inject()(identify: IdentifierAction,
     backPage.route(mode)
   }
 
-  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (identify andThen getData).async :
+  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (actions.authenticatedAction andThen getData).async :
     implicit request => f(request)

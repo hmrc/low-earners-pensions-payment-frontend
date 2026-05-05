@@ -21,7 +21,8 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
       "viewmodels.NormalMode",
       "viewmodels.CheckMode",
       "pages.TempPage",
-      "pages.TempPage._"
+      "pages.TempPage._",
+      "java.time.Instant"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",

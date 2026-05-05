@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import navigation.Navigator
 import pages.{BreakdownPage, CheckYourAnswersPage, Page, TempPage}
 import play.api.i18n.I18nSupport
@@ -27,12 +27,12 @@ import views.html.TempLeppView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TempLeppController @Inject()(identify: IdentifierAction,
+class TempLeppController @Inject()(actions: Actions,
                                    getData: DataRetrievalAction,
                                    val controllerComponents: MessagesControllerComponents,
                                    tempView: TempLeppView,
                                    navigator: Navigator)
-  extends LeppBaseController(identify, getData) with I18nSupport:
+  extends LeppBaseController(actions, getData) with I18nSupport:
   
   def onPageLoad(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
     val page: Page = tempPage match {

@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 
@@ -24,10 +24,10 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class KeepAliveController @Inject()(val controllerComponents: MessagesControllerComponents,
-                                    identify: IdentifierAction,
+                                    actions: Actions,
                                     getData: DataRetrievalAction,
                                     sessionRepository: SessionRepository)(implicit ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) {
+  extends LeppBaseController(actions, getData) {
 
   def keepAlive(): Action[AnyContent] = handle { implicit request =>
 

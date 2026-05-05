@@ -18,7 +18,7 @@ package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
 import controllers.LeppBaseController
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{Actions, DataRetrievalAction}
 import pages.BarsRequestErrorsPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -28,11 +28,11 @@ import views.html.bars.BarsRequestErrorsView
 import scala.concurrent.Future
 
 @Singleton
-class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
+class BarsRequestErrorsController @Inject()(actions: Actions,
                                             getData: DataRetrievalAction,
                                             view: BarsRequestErrorsView,
                                             val controllerComponents: MessagesControllerComponents)
-  extends LeppBaseController(identify, getData) with I18nSupport {
+  extends LeppBaseController(actions, getData) with I18nSupport {
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
     Future.successful(BadRequest(view(viewModel(NormalMode, BarsRequestErrorsPage))))
   }
