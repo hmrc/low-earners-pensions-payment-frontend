@@ -26,9 +26,9 @@ import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.SessionKeys
 import viewmodels.NormalMode
