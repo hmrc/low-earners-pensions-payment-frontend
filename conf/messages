@@ -27,6 +27,30 @@ whatYouWillNeed.t1 = This payment is not classed as income. It will not affect a
 whatYouWillNeed.h2.p1 = Before you continue
 whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
+# Dashboard page
+dashboard.title = Your low earner''s pension payments
+dashboard.heading = Your low earner's pension payments
+dashboard.availablePayments.heading = Available payments
+dashboard.availablePayments.noneAvailable = You do not have any available payments.
+dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
+dashboard.paymentHistory.heading = Payment history
+dashboard.paymentHistory.paidHint = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
+dashboard.paymentHistory.noneAvailable = You do not have any previous payments.
+dashboard.table.headerRow.taxYear = Tax year
+dashboard.table.headerRow.amount = Amount
+dashboard.table.headerRow.availableUntil = Available until
+dashboard.table.headerRow.dateAccepted = Date accepted
+dashboard.table.headerRow.status = Status
+dashboard.table.headerRow.action = Action
+dashboard.table.link.checkCalculation = Check calculation
+dashboard.table.status.available = Available
+dashboard.table.status.paid = Paid
+dashboard.table.status.suspended = Suspended
+dashboard.table.status.cancelled = Cancelled
+
+
+
+
 # Bank account details page
 bankDetails.title = Bank details
 bankDetails.heading = What are your bank details?
