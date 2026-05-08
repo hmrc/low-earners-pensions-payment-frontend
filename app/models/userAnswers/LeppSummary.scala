@@ -18,7 +18,9 @@ package models.userAnswers
 
 import play.api.libs.json.{Json, OFormat}
 
-case class LeppSummary(currentLock: Int, items: Seq[LeppItem])
+case class LeppSummary(currentLock: Int, items: Seq[LeppItem]) {
+  def total = items.map(_.entitlement).sum
+}
 
 object LeppSummary {
   implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]

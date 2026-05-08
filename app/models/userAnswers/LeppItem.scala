@@ -22,7 +22,11 @@ case class LeppItem(taxYear: Int,
                     contributions: BigDecimal,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
-                    status: LeppItemStatus)
+                    status: LeppItemStatus){
+  
+  def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
+}
+
 
 object LeppItem {
   implicit val format: OFormat[LeppItem] = Json.format[LeppItem]

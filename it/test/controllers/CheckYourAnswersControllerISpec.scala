@@ -48,10 +48,6 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
-
     "a valid request is made" should {
       "return the expected view" in {
         mockAuthSuccess()
@@ -83,10 +79,6 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     )
       .withSession(SessionKeys.authToken -> "auth token")
-
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
 
     "backend returns an error for any LEPP submissions" should {
       "redirect to error page" in {

@@ -116,3 +116,15 @@ temp.heading = Temporary placeholder page
 temp.p1 = This is temporary placeholder page to emulate the navigation flow
 temp.Dashboard = Pretend this is the Dashboard page
 temp.Breakdown = Pretend this is the Breakdown page
+
+# Calculation Breakdown page
+breakdown.title = Payment calculation breakdown page
+breakdown.heading = You''re eligible for a total of £{0}
+breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
+breakdown.u1 = For the tax year {0}
+breakdown.l1 = Your net pay pension contributions: £{0}
+breakdown.l2 = Your relevant basic tax rate: {0}%
+breakdown.l3 = Your payment: £{0}
+
+breakdown.p2 = If you think the amounts are wrong, you can
+breakdown.p3 = To accept these payments, you need to provide us with your bank details.

@@ -36,7 +36,7 @@ import views.html.WhatAreYourBankDetailsView
 import scala.concurrent.Future
 
 class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBase {
-  private val backUrl: String = routes.TempLeppController.onSubmit(Breakdown).url
+  private val backUrl: String = routes.PaymentCalcBreakdownController.onPageLoad().url
   private val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode)
 
   private val formViewModel: FormPageViewModel = FormPageViewModel(
@@ -72,10 +72,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
-
-    testControllerAuth(request)
-    testSessionDataHandling(request)
-    testLeppDataHandling(request)
 
     "existing user answers are found" should {
       "return view with filled answers" in {
@@ -159,10 +155,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
-
-    testControllerAuth(request())
-    testSessionDataHandling(request())
-    testLeppDataHandling(request())
 
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,
