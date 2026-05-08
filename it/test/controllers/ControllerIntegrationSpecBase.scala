@@ -21,7 +21,6 @@ import common.{IntegrationSpecBase, WireMockMethods}
 import config.AppConfig
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
-import pages.TempPage.Dashboard
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
 import play.api.http.Writeable
@@ -226,7 +225,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
   }
@@ -248,7 +247,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
   }

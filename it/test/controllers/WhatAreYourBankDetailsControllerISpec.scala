@@ -20,7 +20,6 @@ import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.*
-import pages.TempPage.Breakdown
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
@@ -72,6 +71,10 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
+
+    testControllerAuth(request)
+    testSessionDataHandling(request)
+    testLeppDataHandling(request)
 
     "existing user answers are found" should {
       "return view with filled answers" in {
@@ -155,6 +158,10 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
+
+    testControllerAuth(request())
+    testSessionDataHandling(request())
+    testLeppDataHandling(request())
 
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,

@@ -40,6 +40,7 @@ import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
+import models.nps.ClaimStatus.Cancelled
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -215,7 +216,7 @@ trait SpecBase
   private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
     claimSequenceNumber = 123,
     entitlementAmount = Some(10.56),
-    claimStatus = "CANCELLED",
+    claimStatus = Cancelled,
     inSelfAssessment = true,
     calculationDate = Some("2023-06-27"),
     claimDate = Some("2023-06-27"),

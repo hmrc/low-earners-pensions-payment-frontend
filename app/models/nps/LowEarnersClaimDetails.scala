@@ -16,11 +16,11 @@
 
 package models.nps
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, Format}
 
 case class LowEarnersClaimDetails(claimSequenceNumber: BigInt,
                                   entitlementAmount: Option[BigDecimal],
-                                  claimStatus: String,
+                                  claimStatus: ClaimStatus,
                                   inSelfAssessment: Boolean,
                                   calculationDate: Option[String],
                                   claimDate: Option[String],
@@ -29,5 +29,5 @@ case class LowEarnersClaimDetails(claimSequenceNumber: BigInt,
                                   originalAmount: Option[BigDecimal])
 
 object LowEarnersClaimDetails {
-  implicit val format: OFormat[LowEarnersClaimDetails] = Json.format[LowEarnersClaimDetails]
+  implicit val format: Format[LowEarnersClaimDetails] = Json.format[LowEarnersClaimDetails]
 }

@@ -23,7 +23,7 @@ import play.api.mvc.Call
 import viewmodels.Mode
 
 object DashboardPage extends QuestionPage[LeppSummary] {
-  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad()
+  override def route(mode: Mode): Call = routes.DashboardController.onPageLoad()
   override def path: JsPath = JsPath \ toString
   override def toString: String = "leppSummary"
 }

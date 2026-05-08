@@ -61,7 +61,6 @@ class LeppBaseControllerSpec extends SpecBase {
         }
 
       Seq(
-        (NormalMode, DashboardPage, "/low-earners-pensions-payment/dashboard"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
@@ -164,7 +163,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should evaluate block when LEPP data is cached" in new Test {
@@ -228,7 +227,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
     
@@ -239,7 +238,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
@@ -342,7 +341,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
     
@@ -353,7 +352,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
