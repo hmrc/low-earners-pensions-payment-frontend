@@ -127,4 +127,5 @@ breakdown.l2 = Your relevant basic tax rate: {0}%
 breakdown.l3 = Your payment: £{0}
 
 breakdown.p2 = If you think the amounts are wrong, you can
+breakdown.p2.a1 = contact us (opens in new tab)
 breakdown.p3 = To accept these payments, you need to provide us with your bank details.
