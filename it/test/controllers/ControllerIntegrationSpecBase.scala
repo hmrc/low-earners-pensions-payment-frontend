@@ -226,7 +226,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
       }
     }
   }
@@ -248,7 +248,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
       }
     }
   }

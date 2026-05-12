@@ -20,7 +20,6 @@ import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.*
-import pages.TempPage.{Breakdown, Dashboard}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Call, Result}
@@ -30,8 +29,7 @@ import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, Mode}
 
 import javax.inject.Inject
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class LeppBaseController @Inject()(identify: IdentifierAction,
                                             getData: DataRetrievalAction)
@@ -45,20 +43,19 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
 
   protected[controllers] def submitUrl(mode: Mode, page: Page): Call = page match {
     case WhatYouWillNeedPage => routes.WhatYouWillNeedController.onPageLoad()
-    case DashboardPage => routes.TempLeppController.onSubmit(Dashboard)
-    case BreakdownPage => routes.TempLeppController.onSubmit(Breakdown)
+    case DashboardPage => routes.TempLeppController.onSubmit()
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case CheckYourAnswersPage => routes.CheckYourAnswersController.onSubmit()
-    case _ => routes.TempLeppController.onPageLoad(Dashboard)
+    case _ => routes.TempLeppController.onPageLoad()
   }
 
   protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {
     val backPage: Page = (mode, page) match {
       case (CheckMode, _) => CheckYourAnswersPage
       case (_, DashboardPage) => WhatYouWillNeedPage
-      case (_, BreakdownPage) => DashboardPage
-      case (_, WhatAreYourBankDetailsPage) => BreakdownPage
+      case (_, PaymentCalcBreakdownPage) => DashboardPage
+      case (_, WhatAreYourBankDetailsPage) => PaymentCalcBreakdownPage
       case (_, CheckYourAnswersPage) => WhatAreYourBankDetailsPage
       case (_, ConfirmationPage) => DashboardPage
       case _ => WhatYouWillNeedPage

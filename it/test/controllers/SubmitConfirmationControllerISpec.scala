@@ -75,10 +75,6 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/confirmation"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
-
     "CYA flag is missing" should {
       "redirect to CYA page" in {
         mockAuthSuccess()

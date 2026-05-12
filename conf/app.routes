@@ -13,9 +13,8 @@ GET    /start                               controllers.WhatYouWillNeedControlle
 GET    /dashboard                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Dashboard)
 POST   /dashboard                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Dashboard)
 
-# Check your answers page
-GET    /breakdown                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Breakdown)
-POST   /breakdown                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Breakdown)
+# Payment Calc Breakdown page
+GET    /breakdown                           controllers.PaymentCalcBreakdownController.onPageLoad()
 
 # Bank account details page
 GET    /bank-details                        controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = NormalMode)

@@ -23,7 +23,6 @@ import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswer
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import pages.*
-import pages.TempPage.Dashboard
 import play.api.libs.json.{JsBoolean, JsObject, JsString, Json}
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{MessagesControllerComponents, Result}
@@ -63,7 +62,6 @@ class LeppBaseControllerSpec extends SpecBase {
 
       Seq(
         (NormalMode, DashboardPage, "/low-earners-pensions-payment/dashboard"),
-        (NormalMode, BreakdownPage, "/low-earners-pensions-payment/breakdown"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
@@ -79,7 +77,7 @@ class LeppBaseControllerSpec extends SpecBase {
 
       Seq(
         (NormalMode, DashboardPage, "/low-earners-pensions-payment/start"),
-        (NormalMode, BreakdownPage, "/low-earners-pensions-payment/dashboard"),
+        (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/dashboard"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/breakdown"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/check-your-answers"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details"),
@@ -166,7 +164,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
       }
 
       "should evaluate block when LEPP data is cached" in new Test {
@@ -230,7 +228,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
       }
     }
     
@@ -241,7 +239,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
@@ -344,7 +342,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
       }
     }
     
@@ -355,7 +353,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad(Dashboard).url)
+        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {

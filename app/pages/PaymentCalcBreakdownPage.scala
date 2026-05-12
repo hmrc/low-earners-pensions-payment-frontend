@@ -20,6 +20,6 @@ import controllers.routes
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object BreakdownPage extends Page {
-  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.Breakdown)
+case object PaymentCalcBreakdownPage extends Page {
+  override def route(mode: Mode): Call = routes.PaymentCalcBreakdownController.onPageLoad()
 }

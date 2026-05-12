@@ -21,7 +21,6 @@ import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
 import pages.*
-import pages.TempPage.*
 import play.api.i18n.I18nSupport
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -41,29 +40,20 @@ class TempLeppController @Inject()(identify: IdentifierAction,
                                   (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
-  private def toPageModel(tempPage: TempPage): Page = tempPage match {
-    case Dashboard => DashboardPage
-    case Breakdown => BreakdownPage
-  }
-
   def onPageLoad(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
-    val result: Result = Ok(tempView(tempPage, viewModel(NormalMode, toPageModel(tempPage))))
+    val result: Result = Ok(tempView(tempPage, viewModel(NormalMode, DashboardPage)))
 
-    tempPage match {
-      case TempPage.Dashboard =>
-        for {
-          _ <- sessionService.save(request.userAnswers.copy(data = JsObject.empty))
-        } yield result
-      case _ => Future.successful(result)
-    }
+    for {
+      _ <- sessionService.save(request.userAnswers.copy(data = JsObject.empty))
+    } yield result
+    
+    Future.successful(result)
   }
 
   def onSubmit(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
-    val result: Result = Redirect(navigator.nextPage(toPageModel(tempPage), NormalMode))
-
-    tempPage match {
-      case TempPage.Dashboard =>
-        // placeholder for NPS integration
+    val result: Result = Redirect(navigator.nextPage(DashboardPage, NormalMode))
+    
+         // placeholder for NPS integration
         val tempData: LeppSummary = LeppSummary(
           currentLock = 67,
           Seq(
@@ -83,13 +73,12 @@ class TempLeppController @Inject()(identify: IdentifierAction,
             )
           )
         )
-
+    
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(DashboardPage, tempData))
           _ <- sessionService.save(updatedAnswers)
         } yield result
-      case _ => Future.successful(result)
-    }
+      Future.successful(result)
   }
 }
   
