@@ -129,14 +129,16 @@ class LeppSubmissionServiceSpec extends SpecBase {
             contributions = 100,
             taxRate = 20,
             entitlement = 20,
-            status = Available
+            status = Available,
+            claimDate = None
           ),
           LeppItem(
             taxYear = 2025,
             contributions = 200,
             taxRate = 20,
             entitlement = 40,
-            status = Available
+            status = Available,
+            claimDate = None
           )
         )
       )

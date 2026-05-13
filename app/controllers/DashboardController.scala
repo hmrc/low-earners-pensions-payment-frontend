@@ -17,12 +17,12 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.userAnswers.LeppItemStatus.*
+import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
-import pages.{DashboardPage, WhatYouWillNeedPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
-import viewmodels.NormalMode
 import views.html.DashboardView
 
 import javax.inject.Inject
@@ -38,11 +38,33 @@ class DashboardController @Inject()(identify: IdentifierAction,
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
   
   def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    Future.successful(Ok(view(None, navigator.nextPage(DashboardPage, NormalMode).url)))
+    val tempData: LeppSummary = LeppSummary(
+      currentLock = 67,
+      Seq(
+        LeppItem(
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Available,
+          claimDate = None
+        ),
+        LeppItem(
+          taxYear = 2026,
+          contributions = 750,
+          taxRate = 20,
+          entitlement = 150,
+          status = Available,
+          claimDate = None
+        )
+      )
+    )
+    
+    Future.successful(Ok(view(tempData.items, None)))
   }
 
   def onSubmit(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    Future.successful(Ok(view(None, navigator.nextPage(DashboardPage, NormalMode).url)))
+    Future.successful(Ok(""))
   }
 }
 

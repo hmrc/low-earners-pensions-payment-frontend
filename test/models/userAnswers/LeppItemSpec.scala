@@ -17,8 +17,10 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Paid}
 import play.api.libs.json.*
+
+import java.time.LocalDate
 
 class LeppItemSpec extends SpecBase {
   "LeppItem" - {
@@ -27,23 +29,25 @@ class LeppItemSpec extends SpecBase {
       contributions = 1000,
       taxRate = 20,
       entitlement = 200,
-      status = Available
+      status = Paid,
+      claimDate = Some(LocalDate.of(2025, 11, 30))
+    )
+
+    val json: JsValue = Json.parse(
+      """
+        |{
+        | "taxYear": 2024,
+        | "contributions": 1000.00,
+        | "taxRate": 20.00,
+        | "entitlement": 200.00,
+        | "status": "Paid",
+        | "claimDate": "2025-11-30"
+        |}
+       """.stripMargin
     )
     
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "taxYear": 2024,
-            | "contributions": 1000.00,
-            | "taxRate": 20.00,
-            | "entitlement": 200.00,
-            | "status": "Available"
-            |}
-           """.stripMargin
-        )
-        
         json.validate[LeppItem] mustBe a[JsSuccess[_]]
         json.as[LeppItem] mustBe model
       }
@@ -55,18 +59,6 @@ class LeppItemSpec extends SpecBase {
     
     "writes" - {
       "should produce the expected JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "taxYear": 2024,
-            | "contributions": 1000.00,
-            | "taxRate": 20.00,
-            | "entitlement": 200.00,
-            | "status": "Available"
-            |}
-           """.stripMargin
-        )
-        
         Json.toJson(model) mustBe json
       }
     }

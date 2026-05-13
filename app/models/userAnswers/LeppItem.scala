@@ -17,16 +17,20 @@
 package models.userAnswers
 
 import play.api.libs.json.{Json, OFormat}
+import utils.CurrencyFormats
+
+import java.time.LocalDate
 
 case class LeppItem(taxYear: Int,
                     contributions: BigDecimal,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
-                    status: LeppItemStatus){
-  
+                    status: LeppItemStatus,
+                    claimDate: Option[LocalDate]) {
   def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
+  val formattedAmount: String = CurrencyFormats.format(entitlement)
+  val statusKey: String = status.toString.toLowerCase
 }
-
 
 object LeppItem {
   implicit val format: OFormat[LeppItem] = Json.format[LeppItem]

@@ -30,7 +30,8 @@ class LeppSummarySpec extends SpecBase {
           contributions = 1000,
           taxRate = 20,
           entitlement = 200,
-          status = Available
+          status = Available,
+          claimDate = None
         )
       )
     )
