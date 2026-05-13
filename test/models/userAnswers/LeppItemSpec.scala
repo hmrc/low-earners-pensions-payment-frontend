@@ -17,7 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.{Available, Paid}
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.*
 
 import java.time.LocalDate
@@ -60,6 +60,34 @@ class LeppItemSpec extends SpecBase {
     "writes" - {
       "should produce the expected JSON" in {
         Json.toJson(model) mustBe json
+      }
+    }
+    
+    "formattedAmount" - {
+      "should return the expected value for a whole pounds number" in {
+        model.formattedAmount mustBe "£200"
+      }
+
+      "should return the expected value for a number with decimals" in {
+        model.copy(entitlement = 200.1).formattedAmount mustBe "£200.10"
+      }
+    }
+    
+    "statusKey" - {
+      "should return the expected string for an LEPP status of Paid" in {
+        model.statusKey mustBe "paid"
+      }
+
+      "should return the expected string for an LEPP status of Cancelled" in {
+        model.copy(status = Cancelled).statusKey mustBe "cancelled"
+      }
+
+      "should return the expected string for an LEPP status of Suspended" in {
+        model.copy(status = Suspended).statusKey mustBe "suspended"
+      }
+
+      "should return the expected string for an LEPP status of Available" in {
+        model.copy(status = Available).statusKey mustBe "available"
       }
     }
   }
