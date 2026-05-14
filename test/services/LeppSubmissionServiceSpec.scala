@@ -142,7 +142,8 @@ class LeppSubmissionServiceSpec extends SpecBase {
             status = Available,
             claimDate = None
           )
-        )
+        ),
+        paidItems = Nil
       )
       
       "handle as expected when all submissions complete successfully" in new Test {

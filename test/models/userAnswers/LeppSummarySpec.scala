@@ -17,7 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.*
 
 class LeppSummarySpec extends SpecBase {
@@ -34,29 +34,92 @@ class LeppSummarySpec extends SpecBase {
           status = Available,
           claimDate = None
         )
+      ),
+      paidItems = Seq(
+        LeppItem(
+          id = "P-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Paid,
+          claimDate = None
+        )
+      ),
+      suspendedItems = Seq(
+        LeppItem(
+          id = "S-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Suspended,
+          claimDate = None
+        )
+      ),
+      cancelledItems = Seq(
+        LeppItem(
+          id = "C-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Cancelled,
+          claimDate = None
+        )
       )
+    )
+    
+    val json: JsValue = Json.parse(
+      """
+        |{
+        | "currentLock": 67,
+        | "availableItems": [
+        |   {
+        |     "id": "A-25-1",
+        |     "taxYear": 2025,
+        |     "contributions": 1000.00,
+        |     "taxRate": 20.00,
+        |     "entitlement": 200.00,
+        |     "status": "Available"
+        |   }
+        | ],
+        | "suspendedItems": [
+        |   {
+        |     "id": "S-25-1",
+        |     "taxYear": 2025,
+        |     "contributions": 1000.00,
+        |     "taxRate": 20.00,
+        |     "entitlement": 200.00,
+        |     "status": "Suspended"
+        |   }
+        | ],
+        | "paidItems": [
+        |   {
+        |     "id": "P-25-1",
+        |     "taxYear": 2025,
+        |     "contributions": 1000.00,
+        |     "taxRate": 20.00,
+        |     "entitlement": 200.00,
+        |     "status": "Paid"
+        |   }
+        | ],
+        | "cancelledItems": [
+        |   {
+        |     "id": "C-25-1",
+        |     "taxYear": 2025,
+        |     "contributions": 1000.00,
+        |     "taxRate": 20.00,
+        |     "entitlement": 200.00,
+        |     "status": "Cancelled"
+        |   }
+        | ]
+        |}
+      """.stripMargin
     )
     
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "currentLock": 67,
-            | "items": [
-            |   {
-            |     "id": "A-25-1",
-            |     "taxYear": 2025,
-            |     "contributions": 1000.00,
-            |     "taxRate": 20.00,
-            |     "entitlement": 200.00,
-            |     "status": "Available"
-            |   }
-            | ]
-            |}
-          """.stripMargin
-        )
-        
         json.validate[LeppSummary] mustBe a[JsSuccess[_]]
         json.as[LeppSummary] mustBe model
       }
@@ -68,24 +131,6 @@ class LeppSummarySpec extends SpecBase {
     
     "writes" - {
       "should return the expected JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "currentLock": 67,
-            | "items": [
-            |   {
-            |     "id": "A-25-1",
-            |     "taxYear": 2025,
-            |     "contributions": 1000.00,
-            |     "taxRate": 20.00,
-            |     "entitlement": 200.00,
-            |     "status": "Available"
-            |   }
-            | ]
-            |}
-          """.stripMargin
-        )
-        
         Json.toJson(model) mustBe json
       }
     }

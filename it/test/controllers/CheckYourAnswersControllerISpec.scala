@@ -142,40 +142,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     "submission succeeds for a multiple available LEPP items" should {
       "redirect to confirmation page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          availableItems = Seq(
-            LeppItem(
-              id = "A-25-1",
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available,
-              claimDate = None
-            ),
-            LeppItem(
-              id = "A-26-1",
-              taxYear = 2026,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available,
-              claimDate = None
-            ),
-            LeppItem(
-              id = "P-24-1",
-              taxYear = 2024,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Paid,
-              claimDate = None
-            )
-          )
-        )
-
+        
         val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj(

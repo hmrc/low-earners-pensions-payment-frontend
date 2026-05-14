@@ -33,28 +33,6 @@ import scala.concurrent.Future
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
   
   "GET /confirmation" when {
-    val summaryModel: LeppSummary = LeppSummary(
-      currentLock = 67,
-      availableItems = Seq(
-        LeppItem(
-          id = "A-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      )
-    )
-
-    val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-      accountName = "name",
-      accountNumber = "number",
-      sortCode = "sortcode",
-      rollNumber = Some("rollNumber")
-    )
-
     val userAnswers: UserAnswers = UserAnswers(
       id = "1",
       data = Json.obj(

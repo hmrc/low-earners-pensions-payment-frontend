@@ -19,7 +19,10 @@ package models.userAnswers
 import play.api.libs.json.{Json, OFormat}
 
 case class LeppSummary(currentLock: Int,
-                       availableItems: Seq[LeppItem])
+                       availableItems: Seq[LeppItem],
+                       paidItems: Seq[LeppItem],
+                       suspendedItems: Seq[LeppItem] = Nil,
+                       cancelledItems: Seq[LeppItem] = Nil)
 
 object LeppSummary {
   implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]

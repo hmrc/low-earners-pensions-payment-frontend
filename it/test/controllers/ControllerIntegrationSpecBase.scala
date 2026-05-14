@@ -19,7 +19,7 @@ package controllers
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.{IntegrationSpecBase, WireMockMethods}
 import config.AppConfig
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
@@ -44,6 +44,39 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         taxRate = 20,
         entitlement = 200,
         status = Available,
+        claimDate = None
+      )
+    ),
+    paidItems = Seq(
+      LeppItem(
+        id = "P-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Paid,
+        claimDate = None
+      )
+    ),
+    suspendedItems = Seq(
+      LeppItem(
+        id = "S-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Suspended,
+        claimDate = None
+      )
+    ),
+    cancelledItems = Seq(
+      LeppItem(
+        id = "C-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Cancelled,
         claimDate = None
       )
     )
@@ -190,29 +223,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     "an LEPP submission has already been made for the current session" should {
       "wipe user answers and redirect to dashboard page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          availableItems = Seq(
-            LeppItem(
-              id = "A-25-1",
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available,
-              claimDate = None
-            )
-          )
-        )
-
-        val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-          accountName = "name",
-          accountNumber = "number",
-          sortCode = "sortcode",
-          rollNumber = Some("rollNumber")
-        )
-
+        
         val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj(
@@ -260,22 +271,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     "bank details cannot be found in the session" should {
       "redirect to dashboard page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          availableItems = Seq(
-            LeppItem(
-              id = "A-25-1",
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available,
-              claimDate = None
-            )
-          )
-        )
-
+        
         lazy val application: Application = applicationWithUserAnswers(
           UserAnswers(
             id = "1",
