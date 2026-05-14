@@ -24,21 +24,24 @@ case class LeppSummary(currentLock: BigInt,
                        availableItems: Option[Seq[LeppItem]] = None,
                        paidItems: Option[Seq[LeppItem]] = None,
                        suspendedItems: Option[Seq[LeppItem]] = None,
-                       cancelledItems: Option[Seq[LeppItem]] = None)
+                       cancelledItems: Option[Seq[LeppItem]] = None) {
+  val hasAvailablePayments: Boolean = Seq(availableItems, suspendedItems).flatten.flatten.nonEmpty
+  val hasPaymentHistory: Boolean = Seq(cancelledItems, paidItems).flatten.flatten.nonEmpty
+}
 
 object LeppSummary {
   def notEmptySeq[A](seq: Seq[A]): Option[Seq[A]] = if (seq.nonEmpty) Some(seq) else None
-  
+
   def apply(retrieveClaimsResponse: RetrieveClaimsResponse): LeppSummary = {
     import retrieveClaimsResponse.*
-    
-    val leppItems: Seq[LeppItem] = lowEarnersDetailsList.flatMap(details => 
+
+    val leppItems: Seq[LeppItem] = lowEarnersDetailsList.flatMap(details =>
       val taxYear = details.taxYear
       details.lowEarnersCalculations.zipWithIndex.map(
         (calc, index) => LeppItem(taxYear = taxYear, calculation = calc, index = index + 1)
       )
     )
-    
+
     LeppSummary(
       currentLock = currentLowEarnersOptimisticLock,
       availableItems = notEmptySeq(leppItems.filter(_.status == Available)),
@@ -47,6 +50,6 @@ object LeppSummary {
       cancelledItems = notEmptySeq(leppItems.filter(_.status == Cancelled))
     )
   }
-  
+
   implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]
 }

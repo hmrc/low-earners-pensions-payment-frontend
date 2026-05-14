@@ -303,5 +303,56 @@ class LeppSummarySpec extends SpecBase {
         )
       } 
     }
+    
+    "hasAvailablePayments" - {
+      "should return true when Available or Suspended items exist" in {
+        model.hasAvailablePayments mustBe true
+      }
+
+
+      "should return false when Available or Suspended items don't exist" in {
+        val model: LeppSummary = LeppSummary(
+          currentLock = 67,
+          cancelledItems = Some(Seq(
+            LeppItem(
+              id = "C-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Cancelled,
+              claimDate = None
+            )
+          ))
+        )
+        
+        model.hasAvailablePayments mustBe false
+      }
+    }
+    
+    "hasPaymentHistory" - {
+      "should return true when Cancelled or Paid items exist" in {
+        model.hasPaymentHistory mustBe true
+      }
+      
+      "should return false when Cancelled or Paid items dont exist" in {
+        val model: LeppSummary = LeppSummary(
+          currentLock = 67,
+          suspendedItems = Some(Seq(
+            LeppItem(
+              id = "C-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Suspended,
+              claimDate = None
+            )
+          ))
+        )
+        
+        model.hasPaymentHistory mustBe false
+      }
+    }
   }
 }
