@@ -45,13 +45,15 @@ import scala.concurrent.Future
 
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
-          items = Seq(
+          availableItems = Seq(
             LeppItem(
+              id = "A-25-1",
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              status = Available
+              status = Available,
+              claimDate = None
             )
           )
         )

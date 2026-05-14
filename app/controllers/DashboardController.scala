@@ -42,6 +42,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
       currentLock = 67,
       Seq(
         LeppItem(
+          id = "A-25-1",
           taxYear = 2025,
           contributions = 1000,
           taxRate = 20,
@@ -50,6 +51,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
           claimDate = None
         ),
         LeppItem(
+          id = "A-26-1",
           taxYear = 2026,
           contributions = 750,
           taxRate = 20,
@@ -60,7 +62,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
       )
     )
     
-    Future.successful(Ok(view(tempData.items, None)))
+    Future.successful(Ok(view(tempData.availableItems, None)))
   }
 
   def onSubmit(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>

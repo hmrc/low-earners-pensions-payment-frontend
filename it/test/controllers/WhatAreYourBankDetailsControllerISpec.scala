@@ -48,13 +48,15 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
 
   private val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
-    items = Seq(
+    availableItems = Seq(
       LeppItem(
+        id = "A-25-1",
         taxYear = 2025,
         contributions = 1000,
         taxRate = 20,
         entitlement = 200,
-        status = Available
+        status = Available,
+        claimDate = None
       )
     )
   )
@@ -87,9 +89,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         )
 
         val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
-
         val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-
         val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
 
         status(result) shouldBe OK

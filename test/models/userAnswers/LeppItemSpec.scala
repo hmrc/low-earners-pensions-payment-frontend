@@ -25,6 +25,7 @@ import java.time.LocalDate
 class LeppItemSpec extends SpecBase {
   "LeppItem" - {
     val model: LeppItem = LeppItem(
+      id = "A-24-1",
       taxYear = 2024,
       contributions = 1000,
       taxRate = 20,
@@ -36,6 +37,7 @@ class LeppItemSpec extends SpecBase {
     val json: JsValue = Json.parse(
       """
         |{
+        | "id": "A-24-1",
         | "taxYear": 2024,
         | "contributions": 1000.00,
         | "taxRate": 20.00,
@@ -62,7 +64,7 @@ class LeppItemSpec extends SpecBase {
         Json.toJson(model) mustBe json
       }
     }
-    
+
     "formattedAmount" - {
       "should return the expected value for a whole pounds number" in {
         model.formattedAmount mustBe "£200"
@@ -72,7 +74,7 @@ class LeppItemSpec extends SpecBase {
         model.copy(entitlement = 200.1).formattedAmount mustBe "£200.10"
       }
     }
-    
+
     "statusKey" - {
       "should return the expected string for an LEPP status of Paid" in {
         model.statusKey mustBe "paid"

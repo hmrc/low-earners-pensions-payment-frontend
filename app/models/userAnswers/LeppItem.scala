@@ -21,7 +21,8 @@ import utils.CurrencyFormats
 
 import java.time.LocalDate
 
-case class LeppItem(taxYear: Int,
+case class LeppItem(id: String, 
+                    taxYear: Int,
                     contributions: BigDecimal,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,

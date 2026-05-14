@@ -123,8 +123,9 @@ class LeppSubmissionServiceSpec extends SpecBase {
     "submitMultiple" - {
       val leppSummary: LeppSummary = LeppSummary(
         currentLock = 1,
-        items = Seq(
+        availableItems = Seq(
           LeppItem(
+            id = "A-24-1",
             taxYear = 2024,
             contributions = 100,
             taxRate = 20,
@@ -133,6 +134,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
             claimDate = None
           ),
           LeppItem(
+            id = "A-25-1",
             taxYear = 2025,
             contributions = 200,
             taxRate = 20,

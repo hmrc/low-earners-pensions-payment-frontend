@@ -67,6 +67,6 @@ class LeppSubmissionService @Inject()(placeholderBackendConnector: PlaceholderBa
       }
     }
 
-    doSubmit(leppSummary.currentLock, leppSummary.items.filter(_.status == Available))
+    doSubmit(leppSummary.currentLock, leppSummary.availableItems.filter(_.status == Available))
   }
 }

@@ -24,8 +24,9 @@ class LeppSummarySpec extends SpecBase {
   "LeppSummary" - {
     val model: LeppSummary = LeppSummary(
       currentLock = 67,
-      items = Seq(
+      availableItems = Seq(
         LeppItem(
+          id = "A-25-1",
           taxYear = 2025,
           contributions = 1000,
           taxRate = 20,
@@ -44,6 +45,7 @@ class LeppSummarySpec extends SpecBase {
             | "currentLock": 67,
             | "items": [
             |   {
+            |     "id": "A-25-1",
             |     "taxYear": 2025,
             |     "contributions": 1000.00,
             |     "taxRate": 20.00,
@@ -72,6 +74,7 @@ class LeppSummarySpec extends SpecBase {
             | "currentLock": 67,
             | "items": [
             |   {
+            |     "id": "A-25-1",
             |     "taxYear": 2025,
             |     "contributions": 1000.00,
             |     "taxRate": 20.00,
