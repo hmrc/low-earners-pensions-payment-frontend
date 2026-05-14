@@ -41,10 +41,9 @@ class LeppBaseControllerSpec extends SpecBase {
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
 
-
     val summaryModel: LeppSummary = LeppSummary(
       currentLock = 67,
-      availableItems = Seq(
+      availableItems = Some(Seq(
         LeppItem(
           id = "A-25-1",
           taxYear = 2025,
@@ -54,8 +53,8 @@ class LeppBaseControllerSpec extends SpecBase {
           status = Available,
           claimDate = None
         )
-      ),
-      paidItems = Seq(
+      )),
+      paidItems = Some(Seq(
         LeppItem(
           id = "P-25-1",
           taxYear = 2025,
@@ -65,8 +64,8 @@ class LeppBaseControllerSpec extends SpecBase {
           status = Paid,
           claimDate = None
         )
-      ),
-      suspendedItems = Seq(
+      )),
+      suspendedItems = Some(Seq(
         LeppItem(
           id = "S-25-1",
           taxYear = 2025,
@@ -76,8 +75,8 @@ class LeppBaseControllerSpec extends SpecBase {
           status = Suspended,
           claimDate = None
         )
-      ),
-      cancelledItems = Seq(
+      )),
+      cancelledItems = Some(Seq(
         LeppItem(
           id = "C-25-1",
           taxYear = 2025,
@@ -87,7 +86,7 @@ class LeppBaseControllerSpec extends SpecBase {
           status = Cancelled,
           claimDate = None
         )
-      )
+      ))
     )
     
     class DummyController(id: IdentifierAction,
