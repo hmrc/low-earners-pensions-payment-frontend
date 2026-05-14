@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
 @import java.time.LocalDate
+@import viewmodels.dashboard.DashboardUtilsSpec
 
 @this(
  table: GovukTable,
@@ -28,16 +29,6 @@
 )
 
 @(leppSummary: LeppSummary, tableRef: String)(implicit messages: Messages)
-
-@tableHeaders = @{
- Seq(
-  messages("dashboard.table.headerRow.taxYear"),
-  messages("dashboard.table.headerRow.amount"),
-  messages("dashboard.table.headerRow.dateAccepted"),
-  messages("dashboard.table.headerRow.status"),
-  messages("dashboard.table.headerRow.action")
- )
-}
 
 @claimDateContent(date: LocalDate) = @{
  s"${date.getDayOfMonth} ${messages(s"month.${date.getMonthValue}")} ${date.getYear}"
@@ -77,8 +68,8 @@
 
  @table(TableViewModel(
   caption = messages("dashboard.paymentHistory.heading"),
-  columnHeaders = tableHeaders,
   rows = tableRows(leppSummary.paidItems.getOrElse(Nil)) ++ tableRows(leppSummary.cancelledItems.getOrElse(Nil)),
+  columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action")),
   tableRef = tableRef
  ))
 

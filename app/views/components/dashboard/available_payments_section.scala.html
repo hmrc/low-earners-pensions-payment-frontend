@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
 @import utils.CurrencyFormats
+@import viewmodels.dashboard.DashboardUtilsSpec
 
 @this(
  table: GovukTable,
@@ -28,15 +29,6 @@
 )
 
 @(leppSummary: LeppSummary, tableRef: String, continueUrl: String)(implicit messages: Messages)
-
-@tableHeaders = @{
- Seq(
-  messages("dashboard.table.headerRow.taxYear"),
-  messages("dashboard.table.headerRow.amount"),
-  messages("dashboard.table.headerRow.availableUntil"),
-  messages("dashboard.table.headerRow.status")
- )
-}
 
 @tableRows(tableItems: Seq[LeppItem]) = @{
  tableItems.map(item => Seq(
@@ -63,8 +55,8 @@
 
  @table(TableViewModel(
   caption = messages("dashboard.availablePayments.heading"),
-  columnHeaders = tableHeaders,
   rows = tableRows(leppSummary.availableItems.getOrElse(Nil)) ++ tableRows(leppSummary.suspendedItems.getOrElse(Nil)),
+  columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status")),
   tableRef = tableRef
  ))
 

@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels.govuk
+package viewmodels.dashboard
 
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, Table, TableRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
 
-trait TableFluency {
-  object TableViewModel {
-    def apply(caption: String,
-              rows: Seq[Seq[TableRow]],
-              columnHeaders: Seq[HeadCell],
-              tableRef: String): Table = Table(
-      rows = rows,
-      head = Some(columnHeaders),
-      caption = Some(caption),
-      captionClasses = "govuk-table__caption--m",
-      attributes = Map("id" -> s"$tableRef")
-    )
-  }
+object DashboardUtils {
+  def tableHeaders(tableRef: String, headerNames: Seq[String])
+                  (implicit messages: Messages): Seq[HeadCell] = headerNames.map(headerName => {
+    HeadCell(
+      content = Text(messages(s"dashboard.table.header.$headerName")),
+      attributes = Map("id" -> s"${tableRef}_header_$headerName")
+    ) 
+  })
 }
