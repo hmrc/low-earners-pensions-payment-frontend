@@ -27,12 +27,9 @@ class LeppItemStatusSpec extends SpecBase {
         ("Available", Available),
         ("Paid", Paid),
         ("Suspended", Suspended),
-        ("Cancelled", Cancelled)
+        ("Cancelled", Cancelled),
+        ("Unsupported", Unsupported)
       ).foreach(enumReadsTest[LeppItemStatus])
-      
-      "should return a JsError for an unsupported value" in {
-        JsString("Deceased").validate[LeppItemStatus] mustBe a[JsError]
-      }
     }
     
     "writes" - {
@@ -40,7 +37,8 @@ class LeppItemStatusSpec extends SpecBase {
         (Available, "Available"),
         (Paid, "Paid"),
         (Suspended, "Suspended"),
-        (Cancelled, "Cancelled")
+        (Cancelled, "Cancelled"),
+        (Unsupported, "Unsupported")
       ).foreach(enumWritesTest[LeppItemStatus])
     }
   }

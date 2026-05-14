@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LeppSubmissionService @Inject()(placeholderBackendConnector: PlaceholderBackendConnector) {
-  protected[services] def submitSingle(currentLeppLock: Int, taxYear: Int, bankDetails: BankAccountDetails)
+  protected[services] def submitSingle(currentLeppLock: BigInt, taxYear: Int, bankDetails: BankAccountDetails)
                                       (implicit hc: HeaderCarrier,
                                        ec: ExecutionContext,
                                        cid: CorrelationId): ConnectorResponse[SubmitLeppResponse] = {
@@ -48,7 +48,7 @@ class LeppSubmissionService @Inject()(placeholderBackendConnector: PlaceholderBa
                      ec: ExecutionContext,
                      cid: CorrelationId): ConnectorResponse[SubmitLeppResponse] = {
 
-    def doSubmit(currentLeppLock: Int, toSubmit: Seq[LeppItem])
+    def doSubmit(currentLeppLock: BigInt, toSubmit: Seq[LeppItem])
                 (implicit hc: HeaderCarrier,
                  ec: ExecutionContext,
                  cid: CorrelationId): ConnectorResponse[SubmitLeppResponse] = {
@@ -66,7 +66,7 @@ class LeppSubmissionService @Inject()(placeholderBackendConnector: PlaceholderBa
           )
       }
     }
-
-    doSubmit(leppSummary.currentLock, leppSummary.availableItems.filter(_.status == Available))
+    
+    doSubmit(leppSummary.currentLock, leppSummary.availableItems.getOrElse(Nil))
   }
 }

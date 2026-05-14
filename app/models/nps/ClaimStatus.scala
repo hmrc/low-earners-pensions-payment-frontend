@@ -16,10 +16,19 @@
 
 package models.nps
 
+import models.userAnswers.LeppItemStatus
 import play.api.libs.json.*
 
 enum ClaimStatus {
   case Available, Paid, Suspended, Cancelled, AvailableCapacitor, DeceasedCapacitor, DeceasedNoCapacitor
+  
+  def toLeppItemStatus: LeppItemStatus = this match {
+    case ClaimStatus.Available => LeppItemStatus.Available
+    case ClaimStatus.Paid => LeppItemStatus.Paid
+    case ClaimStatus.Suspended => LeppItemStatus.Suspended
+    case ClaimStatus.Cancelled => LeppItemStatus.Cancelled
+    case _ => LeppItemStatus.Unsupported
+  }
 }
 
 object ClaimStatus {
@@ -33,6 +42,4 @@ object ClaimStatus {
     case JsString("SUSPENDED - RLS") => JsSuccess(Suspended)
     case _ => JsError("error.claimStatus.invalid")
   }
-  
-  implicit val writes: Writes[ClaimStatus] = (o: ClaimStatus) => JsString(o.toString)
 }

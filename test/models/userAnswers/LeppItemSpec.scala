@@ -17,6 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
+import models.nps.LowEarnersCalculation
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.*
 
@@ -90,6 +91,20 @@ class LeppItemSpec extends SpecBase {
 
       "should return the expected string for an LEPP status of Available" in {
         model.copy(status = Available).statusKey mustBe "available"
+      }
+    }
+    
+    "apply" - {
+      "should correctly construct from NPS model" in {
+        LeppItem(2025, calculation, 1) mustBe LeppItem(
+          id = "P-2025-1",
+          taxYear = 2025,
+          contributions = 10.56,
+          taxRate = 10.56,
+          entitlement = 10.56,
+          status = Paid,
+          claimDate = Some(LocalDate.of(2023, 6, 27))
+        )
       }
     }
   }

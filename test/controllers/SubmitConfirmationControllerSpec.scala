@@ -29,7 +29,7 @@ class SubmitConfirmationControllerSpec extends SpecBase {
   "Submit confirmation controller" - {
     val summaryModel: LeppSummary = LeppSummary(
       currentLock = 67,
-      availableItems = Seq(
+      availableItems = Some(Seq(
         LeppItem(
           id = "A-25-1",
           taxYear = 2025,
@@ -39,8 +39,8 @@ class SubmitConfirmationControllerSpec extends SpecBase {
           status = Available,
           claimDate = None
         )
-      ),
-      paidItems = Seq(
+      )),
+      paidItems = Some(Seq(
         LeppItem(
           id = "P-25-1",
           taxYear = 2025,
@@ -50,8 +50,8 @@ class SubmitConfirmationControllerSpec extends SpecBase {
           status = Paid,
           claimDate = None
         )
-      ),
-      suspendedItems = Seq(
+      )),
+      suspendedItems = Some(Seq(
         LeppItem(
           id = "S-25-1",
           taxYear = 2025,
@@ -61,8 +61,8 @@ class SubmitConfirmationControllerSpec extends SpecBase {
           status = Suspended,
           claimDate = None
         )
-      ),
-      cancelledItems = Seq(
+      )),
+      cancelledItems = Some(Seq(
         LeppItem(
           id = "C-25-1",
           taxYear = 2025,
@@ -73,7 +73,7 @@ class SubmitConfirmationControllerSpec extends SpecBase {
           claimDate = None
         )
       )
-    )
+      ))
 
     val bankAccountDetails: BankAccountDetails = BankAccountDetails(
       accountName = "name",

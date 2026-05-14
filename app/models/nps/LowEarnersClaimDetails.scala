@@ -16,7 +16,7 @@
 
 package models.nps
 
-import play.api.libs.json.{Json, Format}
+import play.api.libs.json.{Json, Reads}
 
 case class LowEarnersClaimDetails(claimSequenceNumber: BigInt,
                                   entitlementAmount: Option[BigDecimal],
@@ -29,5 +29,5 @@ case class LowEarnersClaimDetails(claimSequenceNumber: BigInt,
                                   originalAmount: Option[BigDecimal])
 
 object LowEarnersClaimDetails {
-  implicit val format: Format[LowEarnersClaimDetails] = Json.format[LowEarnersClaimDetails]
+  implicit val reads: Reads[LowEarnersClaimDetails] = Json.reads[LowEarnersClaimDetails]
 }

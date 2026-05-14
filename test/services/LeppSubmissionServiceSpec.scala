@@ -22,7 +22,7 @@ import connectors.{ConnectorResponse, PlaceholderBackendConnector}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
 import models.{CorrelationId, ResponseWrapper}
 import org.mockito.ArgumentMatchers
@@ -122,29 +122,52 @@ class LeppSubmissionServiceSpec extends SpecBase {
     
     "submitMultiple" - {
       val leppSummary: LeppSummary = LeppSummary(
-        currentLock = 1,
-        availableItems = Seq(
-          LeppItem(
-            id = "A-24-1",
-            taxYear = 2024,
-            contributions = 100,
-            taxRate = 20,
-            entitlement = 20,
-            status = Available,
-            claimDate = None
-          ),
+        currentLock = 67,
+        availableItems = Some(Seq(
           LeppItem(
             id = "A-25-1",
             taxYear = 2025,
-            contributions = 200,
+            contributions = 1000,
             taxRate = 20,
-            entitlement = 40,
+            entitlement = 200,
             status = Available,
             claimDate = None
           )
-        ),
-        paidItems = Nil
-      )
+        )),
+        paidItems = Some(Seq(
+          LeppItem(
+            id = "P-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Paid,
+            claimDate = None
+          )
+        )),
+        suspendedItems = Some(Seq(
+          LeppItem(
+            id = "S-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Suspended,
+            claimDate = None
+          )
+        )),
+        cancelledItems = Some(Seq(
+          LeppItem(
+            id = "C-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Cancelled,
+            claimDate = None
+          )
+        )
+        ))
       
       "handle as expected when all submissions complete successfully" in new Test {
         when(

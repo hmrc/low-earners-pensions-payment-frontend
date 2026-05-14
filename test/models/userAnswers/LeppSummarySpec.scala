@@ -17,14 +17,18 @@
 package models.userAnswers
 
 import base.SpecBase
+import models.nps.{LowEarnersCalculation, LowEarnersClaimDetails, LowEarnersDataDetails, LowEarnersDetails, RetrieveClaimsResponse}
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
+import models.nps.ClaimStatus.{DeceasedCapacitor, Available as NpsAvailable, Cancelled as NpsCancelled, Paid as NpsPaid, Suspended as NpsSuspended}
 import play.api.libs.json.*
+
+import java.time.LocalDate
 
 class LeppSummarySpec extends SpecBase {
   "LeppSummary" - {
     val model: LeppSummary = LeppSummary(
       currentLock = 67,
-      availableItems = Seq(
+      availableItems = Some(Seq(
         LeppItem(
           id = "A-25-1",
           taxYear = 2025,
@@ -34,8 +38,8 @@ class LeppSummarySpec extends SpecBase {
           status = Available,
           claimDate = None
         )
-      ),
-      paidItems = Seq(
+      )),
+      paidItems = Some(Seq(
         LeppItem(
           id = "P-25-1",
           taxYear = 2025,
@@ -45,8 +49,8 @@ class LeppSummarySpec extends SpecBase {
           status = Paid,
           claimDate = None
         )
-      ),
-      suspendedItems = Seq(
+      )),
+      suspendedItems = Some(Seq(
         LeppItem(
           id = "S-25-1",
           taxYear = 2025,
@@ -56,8 +60,8 @@ class LeppSummarySpec extends SpecBase {
           status = Suspended,
           claimDate = None
         )
-      ),
-      cancelledItems = Seq(
+      )),
+      cancelledItems = Some(Seq(
         LeppItem(
           id = "C-25-1",
           taxYear = 2025,
@@ -68,8 +72,8 @@ class LeppSummarySpec extends SpecBase {
           claimDate = None
         )
       )
-    )
-    
+      ))
+
     val json: JsValue = Json.parse(
       """
         |{
@@ -117,22 +121,187 @@ class LeppSummarySpec extends SpecBase {
         |}
       """.stripMargin
     )
-    
+
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
         json.validate[LeppSummary] mustBe a[JsSuccess[_]]
         json.as[LeppSummary] mustBe model
       }
-      
+
       "should return a JsError for invalid Json" in {
         JsObject.empty.validate[LeppSummary] mustBe a[JsError]
       }
     }
-    
+
     "writes" - {
       "should return the expected JSON" in {
         Json.toJson(model) mustBe json
       }
+    }
+    
+    "notEmptySeq" - {
+      "should map empty sequence to None" in {
+        LeppSummary.notEmptySeq(Nil) mustBe None
+      }
+
+      "should map non-empty sequence to optional value" in {
+        LeppSummary.notEmptySeq(Seq(1)) mustBe Some(Seq(1))
+      }
+    }
+
+    "apply" - {
+      "should correctly construct from NPS response model" in {
+        val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
+          responseTimestamp = Some("2023-06-27 09:12:28"),
+          calculationSequenceNumber = 123,
+          dataSourceMaster = "CESA",
+          netPayContributionsTotal = Some(10.56),
+          basicRatePercentage = Some(10.56),
+          totalAllowances = Some(10.56),
+          totalIncome = Some(10.56),
+          totalDeductions = Some(10.56),
+          totalTaxDue = Some(10.56)
+        )
+
+        val paidDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+          claimSequenceNumber = 123,
+          entitlementAmount = Some(10.56),
+          claimStatus = NpsPaid,
+          inSelfAssessment = true,
+          calculationDate = Some("2023-06-27"),
+          claimDate = Some("2023-06-27"),
+          reminderOutputSent = true,
+          reissueClaimOutput = true,
+          originalAmount = Some(10.56)
+        )
+
+        val paidCalculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = paidDetails,
+          lowEarnersDataDetails = dataDetails
+        )
+
+        val availableDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+          claimSequenceNumber = 123,
+          entitlementAmount = Some(10.56),
+          claimStatus = NpsAvailable,
+          inSelfAssessment = true,
+          calculationDate = Some("2023-06-27"),
+          claimDate = None,
+          reminderOutputSent = true,
+          reissueClaimOutput = true,
+          originalAmount = Some(10.56)
+        )
+
+        val availableCalculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = availableDetails,
+          lowEarnersDataDetails = dataDetails
+        )
+
+        val cancelledDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+          claimSequenceNumber = 123,
+          entitlementAmount = Some(10.56),
+          claimStatus = NpsCancelled,
+          inSelfAssessment = true,
+          calculationDate = Some("2023-06-27"),
+          claimDate = None,
+          reminderOutputSent = true,
+          reissueClaimOutput = true,
+          originalAmount = Some(10.56)
+        )
+
+        val cancelledCalculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = cancelledDetails,
+          lowEarnersDataDetails = dataDetails
+        )
+
+        val suspendedDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+          claimSequenceNumber = 123,
+          entitlementAmount = Some(10.56),
+          claimStatus = NpsSuspended,
+          inSelfAssessment = true,
+          calculationDate = Some("2023-06-27"),
+          claimDate = None,
+          reminderOutputSent = true,
+          reissueClaimOutput = true,
+          originalAmount = Some(10.56)
+        )
+
+        val suspendedCalculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = suspendedDetails,
+          lowEarnersDataDetails = dataDetails
+        )
+
+        val deceasedDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+          claimSequenceNumber = 123,
+          entitlementAmount = Some(10.56),
+          claimStatus = DeceasedCapacitor,
+          inSelfAssessment = true,
+          calculationDate = Some("2023-06-27"),
+          claimDate = None,
+          reminderOutputSent = true,
+          reissueClaimOutput = true,
+          originalAmount = Some(10.56)
+        )
+
+        val deceasedCalculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = deceasedDetails,
+          lowEarnersDataDetails = dataDetails
+        )
+
+        val details: LowEarnersDetails = LowEarnersDetails(
+          taxYear = 2025,
+          lowEarnersCalculations = Seq(
+            availableCalculation,
+            suspendedCalculation,
+            cancelledCalculation,
+            paidCalculation,
+            deceasedCalculation
+          )
+        )
+
+        val retrieveResponse: RetrieveClaimsResponse = RetrieveClaimsResponse(
+          currentLowEarnersOptimisticLock = 123,
+          identifier = "id",
+          lowEarnersDetailsList = Seq(
+            details,
+            details.copy(taxYear = 2026)
+          )
+        )
+        
+        val leppItem = LeppItem("A-2025-1", 2025, 10.56, 10.56, 10.56, Available, None)
+
+        LeppSummary(retrieveResponse) mustBe LeppSummary(
+          currentLock = 123,
+          availableItems = Some(Seq(
+            leppItem,
+            leppItem.copy(id = "A-2026-1", taxYear = 2026)
+          )),
+          paidItems = Some(Seq(
+            leppItem.copy(id = "P-2025-4", status = Paid, claimDate = Some(LocalDate.of(2023, 6, 27))),
+            leppItem.copy(id = "P-2026-4", taxYear = 2026, status = Paid, claimDate = Some(LocalDate.of(2023, 6, 27)))
+          )),
+          suspendedItems = Some(Seq(
+            leppItem.copy(id = "S-2025-2", status = Suspended),
+            leppItem.copy(id = "S-2026-2", taxYear = 2026, status = Suspended)
+          )),
+          cancelledItems = Some(Seq(
+            leppItem.copy(id = "C-2025-3", status = Cancelled),
+            leppItem.copy(id = "C-2026-3", taxYear = 2026, status = Cancelled)
+          ))
+        )
+      }
+      
+      "not include empty sequences" in {
+        val leppItem = LeppItem("P-11-1", 11, 10.56, 10.56, 10.56, Paid, Some(LocalDate.of(2023, 6, 27)))
+
+        LeppSummary(retrieveResponse) mustBe LeppSummary(
+          currentLock = 123,
+          availableItems = None,
+          paidItems = Some(Seq(leppItem)),
+          suspendedItems = None,
+          cancelledItems = None
+        )
+      } 
     }
   }
 }

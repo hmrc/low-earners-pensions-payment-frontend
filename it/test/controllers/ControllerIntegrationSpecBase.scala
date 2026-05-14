@@ -36,7 +36,7 @@ import scala.concurrent.Future
 trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
-    availableItems = Seq(
+    availableItems = Some(Seq(
       LeppItem(
         id = "A-25-1",
         taxYear = 2025,
@@ -46,8 +46,8 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         status = Available,
         claimDate = None
       )
-    ),
-    paidItems = Seq(
+    )),
+    paidItems = Some(Seq(
       LeppItem(
         id = "P-25-1",
         taxYear = 2025,
@@ -57,8 +57,8 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         status = Paid,
         claimDate = None
       )
-    ),
-    suspendedItems = Seq(
+    )),
+    suspendedItems = Some(Seq(
       LeppItem(
         id = "S-25-1",
         taxYear = 2025,
@@ -68,8 +68,8 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         status = Suspended,
         claimDate = None
       )
-    ),
-    cancelledItems = Seq(
+    )),
+    cancelledItems = Some(Seq(
       LeppItem(
         id = "C-25-1",
         taxYear = 2025,
@@ -80,7 +80,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         claimDate = None
       )
     )
-  )
+    ))
 
   val bankAccountDetails: BankAccountDetails = BankAccountDetails(
     accountName = "name",

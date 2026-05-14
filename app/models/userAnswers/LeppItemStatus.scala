@@ -19,16 +19,7 @@ package models.userAnswers
 import play.api.libs.json.*
 
 enum LeppItemStatus {
-  case Available, Paid, Suspended, Cancelled
-
-  def getHtmlClass: String = "govuk-tag " + {
-    this match {
-      case Available => "govuk-tag--blue"
-      case Paid => "govuk-tag--green"
-      case Suspended => "govuk-tag--yellow"
-      case Cancelled => "govuk-tag--red"
-    }
-  }
+  case Available, Paid, Suspended, Cancelled, Unsupported
 }
 
 object LeppItemStatus {
@@ -37,7 +28,7 @@ object LeppItemStatus {
     case JsString("Paid") => JsSuccess(Paid)
     case JsString("Suspended") => JsSuccess(Suspended)
     case JsString("Cancelled") => JsSuccess(Cancelled)
-    case _ => JsError("error.claimStatus.unsupported")
+    case _ => JsSuccess(Unsupported)
   }
 
   implicit val writes: Writes[LeppItemStatus] = (o: LeppItemStatus) => JsString(o.toString)

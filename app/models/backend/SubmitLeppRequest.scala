@@ -19,7 +19,7 @@ package models.backend
 import models.userAnswers.BankAccountDetails
 import play.api.libs.json.{Json, OWrites}
 
-case class SubmitLeppRequest(currentLowEarnersOptimisticLock: Int,
+case class SubmitLeppRequest(currentLowEarnersOptimisticLock: BigInt,
                              taxYear: Int,
                              accountDetails: BankAccountDetails)
 

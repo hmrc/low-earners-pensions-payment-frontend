@@ -16,14 +16,37 @@
 
 package models.userAnswers
 
+import models.nps.RetrieveClaimsResponse
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.{Json, OFormat}
 
-case class LeppSummary(currentLock: Int,
-                       availableItems: Seq[LeppItem],
-                       paidItems: Seq[LeppItem],
-                       suspendedItems: Seq[LeppItem] = Nil,
-                       cancelledItems: Seq[LeppItem] = Nil)
+case class LeppSummary(currentLock: BigInt,
+                       availableItems: Option[Seq[LeppItem]] = None,
+                       paidItems: Option[Seq[LeppItem]] = None,
+                       suspendedItems: Option[Seq[LeppItem]] = None,
+                       cancelledItems: Option[Seq[LeppItem]] = None)
 
 object LeppSummary {
+  def notEmptySeq[A](seq: Seq[A]): Option[Seq[A]] = if (seq.nonEmpty) Some(seq) else None
+  
+  def apply(retrieveClaimsResponse: RetrieveClaimsResponse): LeppSummary = {
+    import retrieveClaimsResponse.*
+    
+    val leppItems: Seq[LeppItem] = lowEarnersDetailsList.flatMap(details => 
+      val taxYear = details.taxYear
+      details.lowEarnersCalculations.zipWithIndex.map(
+        (calc, index) => LeppItem(taxYear = taxYear, calculation = calc, index = index + 1)
+      )
+    )
+    
+    LeppSummary(
+      currentLock = currentLowEarnersOptimisticLock,
+      availableItems = notEmptySeq(leppItems.filter(_.status == Available)),
+      paidItems = notEmptySeq(leppItems.filter(_.status == Paid)),
+      suspendedItems = notEmptySeq(leppItems.filter(_.status == Suspended)),
+      cancelledItems = notEmptySeq(leppItems.filter(_.status == Cancelled))
+    )
+  }
+  
   implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]
 }
