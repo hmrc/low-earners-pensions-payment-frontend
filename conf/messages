@@ -29,13 +29,22 @@ whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
 # Dashboard page
 dashboard.title = Your low earner''s pension payments
-dashboard.heading = Your low earner's pension payments
+dashboard.heading = Your low earner''s pension payments
+dashboard.moreInformation = For more information,
+dashboard.contactUs = contact us (opens in new tab)
+dashboard.contactUs.period ='.'
 dashboard.availablePayments.heading = Available payments
 dashboard.availablePayments.noneAvailable = You do not have any available payments.
+dashboard.availablePayments.totalAvailableText.start = You have a total of
+dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
 dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
+dashboard.availablePayments.button.accept = Accept
+dashboard.availablePayments.suspendedInset = Your payments are suspended.
 dashboard.paymentHistory.heading = Payment history
-dashboard.paymentHistory.paidHint = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
+dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
 dashboard.paymentHistory.noneAvailable = You do not have any previous payments.
+dashboard.paymentHistory.cancelledInset.start = We cancelled
+dashboard.paymentHistory.cancelledInset.end = of your payments.
 dashboard.table.headerRow.taxYear = Tax year
 dashboard.table.headerRow.amount = Amount
 dashboard.table.headerRow.availableUntil = Available until
@@ -47,9 +56,8 @@ dashboard.table.status.available = Available
 dashboard.table.status.paid = Paid
 dashboard.table.status.suspended = Suspended
 dashboard.table.status.cancelled = Cancelled
-
-
-
+dashboard.table.taxYearDates = 6 April {0} to 5 April {1}
+dashboard.table.availableUntil = 5 April {0}
 
 # Bank account details page
 bankDetails.title = Bank details
