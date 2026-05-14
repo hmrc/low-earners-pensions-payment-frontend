@@ -16,21 +16,25 @@
 
 package controllers
 
-import controllers.actions.{Actions, DataRetrievalAction}
+import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
+import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.*
-import pages.TempPage.{Breakdown, CheckYourAnswers}
+import pages.TempPage.Breakdown
 import play.api.i18n.I18nSupport
+import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Call, Result}
+import services.SessionCacheService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, Mode}
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LeppBaseController  @Inject()(actions: Actions,
-                                             getData: DataRetrievalAction) extends FrontendBaseController with I18nSupport:
+abstract class LeppBaseController @Inject()(identify: IdentifierAction,
+                                            getData: DataRetrievalAction)
+  extends FrontendBaseController with I18nSupport {
 
   protected def viewModel(mode: Mode, page: Page): FormPageViewModel =
     FormPageViewModel(
@@ -38,23 +42,82 @@ abstract class LeppBaseController  @Inject()(actions: Actions,
       backLinkUrl = Some(backLinkUrl(mode, page).url)
     )
 
-  protected def submitUrl(mode: Mode, page: Page): Call = page match {
-    case BreakdownPage => routes.TempLeppController.onSubmit(Breakdown)
+  protected[controllers] def submitUrl(mode: Mode, page: Page): Call = page match {
+    case WhatYouWillNeedPage => routes.WhatYouWillNeedController.onPageLoad()
+    case DashboardPage => routes.TempLeppController.onSubmit()
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
-    case CheckYourAnswersPage => routes.TempLeppController.onSubmit(CheckYourAnswers)
-    case _ => routes.WhatYouWillNeedController.onPageLoad() //Placeholder to avoid warnings
+    case CheckYourAnswersPage => routes.CheckYourAnswersController.onSubmit()
+    case _ => routes.TempLeppController.onPageLoad()
   }
 
-  private def backLinkUrl(mode: Mode, page: Page): Call = {
+  protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {
     val backPage: Page = (mode, page) match {
-      case (CheckMode, _ ) => CheckYourAnswersPage
-      case (_, WhatAreYourBankDetailsPage) => BreakdownPage
-      case (_, BreakdownPage) => WhatYouWillNeedPage
+      case (CheckMode, _) => CheckYourAnswersPage
+      case (_, DashboardPage) => WhatYouWillNeedPage
+      case (_, PaymentCalcBreakdownPage) => DashboardPage
+      case (_, WhatAreYourBankDetailsPage) => PaymentCalcBreakdownPage
+      case (_, CheckYourAnswersPage) => WhatAreYourBankDetailsPage
+      case (_, ConfirmationPage) => DashboardPage
       case _ => WhatYouWillNeedPage
     }
     backPage.route(mode)
   }
 
-  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] = (actions.authenticatedAction andThen getData).async :
-    implicit request => f(request)
+  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    (identify andThen getData).async(implicit req => f(req))
+}
+
+trait SessionDataHandling {
+  this: LeppBaseController =>
+  val sessionService: SessionCacheService
+  implicit val ec: ExecutionContext
+
+  private type BlockFor[A] = DataRequest[AnyContent] => A => Future[Result]
+
+  protected[controllers] def handleWithSubmissionCheck(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    handle { implicit req =>
+      req.userAnswers.get(CheckYourAnswersPage) match {
+        case Some(true) =>
+          val updatedAnswers: UserAnswers = req.userAnswers.copy(data = JsObject.empty)
+          for {
+            _ <- sessionService.save(updatedAnswers)
+            result <- f(req.copy(userAnswers = updatedAnswers))
+          } yield result
+        case _ => f(req)
+      }
+    }
+
+  def handleWithLeppData(f: BlockFor[LeppSummary]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
+    req.userAnswers.get(DashboardPage) match {
+      case Some(leppSummary) => f(req)(leppSummary)
+      case None => DashboardPage.asRedirect
+    }
+  }
+
+  def handleForCyaPage(f: BlockFor[(LeppSummary, BankAccountDetails)]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
+    import req.userAnswers
+
+    (userAnswers.get(DashboardPage), userAnswers.get(WhatAreYourBankDetailsPage)) match {
+      case (Some(leppData), Some(details)) => f(req)(leppData, details)
+      case (None, _) => DashboardPage.asRedirect
+      case (_, None) => WhatAreYourBankDetailsPage.asRedirect
+    }
+  }
+
+  def handleForConfirmationPage(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    handle { implicit req =>
+      import req.userAnswers
+
+      val leppDataOpt: Option[LeppSummary] = userAnswers.get(DashboardPage)
+      val bankDetailsOpt: Option[BankAccountDetails] = userAnswers.get(WhatAreYourBankDetailsPage)
+      val cyaSubmissionOpt: Option[Boolean] = userAnswers.get(CheckYourAnswersPage)
+
+      (leppDataOpt, bankDetailsOpt, cyaSubmissionOpt) match {
+        case (Some(_), Some(_), Some(true)) => f(req)
+        case (Some(_), Some(_), _) => CheckYourAnswersPage.asRedirect
+        case (Some(_), None, _) => WhatAreYourBankDetailsPage.asRedirect
+        case _ => DashboardPage.asRedirect
+      }
+    }
+}

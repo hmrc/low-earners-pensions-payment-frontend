@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package models.userAnswers
 
-import controllers.routes
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import viewmodels.Mode
+import play.api.libs.json.{Json, OFormat}
 
-case object CheckYourAnswersPage extends QuestionPage[Boolean] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "isSubmitted"
+case class LeppItem(taxYear: Int,
+                    contributions: BigDecimal,
+                    taxRate: BigDecimal,
+                    entitlement: BigDecimal,
+                    status: LeppItemStatus){
+  
+  def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
+}
+
+
+object LeppItem {
+  implicit val format: OFormat[LeppItem] = Json.format[LeppItem]
 }

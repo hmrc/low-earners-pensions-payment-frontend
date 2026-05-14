@@ -19,12 +19,12 @@ package pages
 import play.api.mvc.JavascriptLiteral
 
 enum TempPage {
-  case Breakdown, CheckYourAnswers
+  case Breakdown, Dashboard
 }
 
 object TempPage {
   implicit val jsLiteral: JavascriptLiteral[TempPage] = {
     case Breakdown => "Breakdown"
-    case CheckYourAnswers => "CheckYourAnswers"
+    case Dashboard => "Dashboard"
   }
 }

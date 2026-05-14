@@ -33,7 +33,7 @@ class NavigatorSpec extends SpecBase {
     
     "nextPage" - {
       "should go to the correct location when in NormalMode for a known page" in {
-        navigator.nextPage(WhatYouWillNeedPage, NormalMode) mustBe routes.TempLeppController.onPageLoad(Breakdown)
+        navigator.nextPage(WhatYouWillNeedPage, NormalMode) mustBe routes.TempLeppController.onPageLoad()
       }
 
       "should go to the correct location when in NormalMode for an unknown page" in {
@@ -41,7 +41,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "should go to the correct location when in CheckMode for a known page" in {
-        navigator.nextPage(WhatAreYourBankDetailsPage, CheckMode) mustBe routes.TempLeppController.onPageLoad(CheckYourAnswers)
+        navigator.nextPage(WhatAreYourBankDetailsPage, CheckMode) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
 
       "should go to the correct location when in CheckMode for an unknown page" in {

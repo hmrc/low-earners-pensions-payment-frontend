@@ -17,9 +17,13 @@
 package pages
 
 import controllers.routes
+import models.userAnswers.LeppSummary
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object BreakdownPage extends Page {
-  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad(TempPage.Breakdown)
+object DashboardPage extends QuestionPage[LeppSummary] {
+  override def route(mode: Mode): Call = routes.TempLeppController.onPageLoad()
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "leppSummary"
 }

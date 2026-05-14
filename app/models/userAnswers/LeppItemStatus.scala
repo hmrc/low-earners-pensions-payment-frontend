@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package models.userAnswers
 
-import controllers.routes
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import viewmodels.Mode
+import play.api.libs.json.*
 
-case object CheckYourAnswersPage extends QuestionPage[Boolean] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "isSubmitted"
+enum LeppItemStatus {
+  case Available, Paid, Suspended, Cancelled
+}
+
+object LeppItemStatus {
+  implicit val reads: Reads[LeppItemStatus] = Reads {
+    case JsString("Available") => JsSuccess(Available)
+    case JsString("Paid") => JsSuccess(Paid)
+    case JsString("Suspended") => JsSuccess(Suspended)
+    case JsString("Cancelled") => JsSuccess(Cancelled)
+    case _ => JsError("error.claimStatus.unsupported")
+  }
+  
+  implicit val writes: Writes[LeppItemStatus] = (o: LeppItemStatus) => JsString(o.toString)
 }

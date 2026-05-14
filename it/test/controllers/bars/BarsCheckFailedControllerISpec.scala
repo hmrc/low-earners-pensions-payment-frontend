@@ -18,7 +18,10 @@ package controllers.bars
 
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
+import models.userAnswers.*
+import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,11 +37,33 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
     ).withSession(SessionKeys.authToken -> "auth token")
     
     testControllerAuth(request)
+    testSessionDataHandling(request)
+    testLeppDataHandling(request)
 
     "should return the expected view for a successful request" in {
       mockAuthSuccess()
 
-      lazy val application: Application = fakeApplication()
+      val summaryModel: LeppSummary = LeppSummary(
+        currentLock = 67,
+        items = Seq(
+          LeppItem(
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Available
+          )
+        )
+      )
+
+      val userAnswers: UserAnswers = UserAnswers(
+        id = "1",
+        data = Json.obj(
+          "leppSummary" -> Json.toJson(summaryModel)
+        )
+      )
+
+      lazy val application: Application = applicationWithUserAnswers(userAnswers)
 
       lazy val result: Future[Result] = route(application, request).getOrElse(
         Future.failed(new RuntimeException("TEST_ERROR"))

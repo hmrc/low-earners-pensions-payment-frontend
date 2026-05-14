@@ -16,36 +16,69 @@
 
 package controllers
 
-import controllers.actions.{Actions, DataRetrievalAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
-import pages.{BreakdownPage, CheckYourAnswersPage, Page, TempPage}
+import pages.*
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.libs.json.JsObject
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.SessionCacheService
 import viewmodels.NormalMode
 import views.html.TempLeppView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class TempLeppController @Inject()(actions: Actions,
+class TempLeppController @Inject()(identify: IdentifierAction,
                                    getData: DataRetrievalAction,
                                    val controllerComponents: MessagesControllerComponents,
                                    tempView: TempLeppView,
+                                   sessionService: SessionCacheService,
                                    navigator: Navigator)
-  extends LeppBaseController(actions, getData) with I18nSupport:
+                                  (implicit ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport {
   
   def onPageLoad(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
-    val page: Page = tempPage match {
-      case TempPage.Breakdown => BreakdownPage
-      case TempPage.CheckYourAnswers => CheckYourAnswersPage
-    }
-    Future.successful(Ok(tempView(tempPage, viewModel(NormalMode, page))))
-  }
+    val result: Result = Ok(tempView(tempPage, viewModel(NormalMode, DashboardPage)))
+
+    for {
+      _ <- sessionService.save(request.userAnswers.copy(data = JsObject.empty))
+    } yield result
     
-  def onSubmit(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
-    val page: Page = tempPage match {
-      case TempPage.Breakdown => BreakdownPage
-      case TempPage.CheckYourAnswers => CheckYourAnswersPage
-    }
-    Future.successful(Redirect(navigator.nextPage(page, NormalMode)))
+    Future.successful(result)
   }
+
+  def onSubmit(tempPage: TempPage): Action[AnyContent] = handle { implicit request =>
+    val result: Result = Redirect(navigator.nextPage(DashboardPage, NormalMode))
+    
+         // placeholder for NPS integration
+        val tempData: LeppSummary = LeppSummary(
+          currentLock = 67,
+          Seq(
+            LeppItem(
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Available
+            ),
+            LeppItem(
+              taxYear = 2026,
+              contributions = 750,
+              taxRate = 20,
+              entitlement = 150,
+              status = Available
+            )
+          )
+        )
+    
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(DashboardPage, tempData))
+          _ <- sessionService.save(updatedAnswers)
+        } yield result
+      Future.successful(result)
+  }
+}
+  

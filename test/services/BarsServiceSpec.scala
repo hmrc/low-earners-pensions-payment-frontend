@@ -21,7 +21,7 @@ import cats.data.EitherT
 import connectors.{BarsConnector, ConnectorResponse}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.BarsResponse
-import models.bars.statuses.{AccountExists, AccountNumberWellFormatted, DirectCreditSupported, NameMatches, NonStandardAccountDetails, SortCodeExists}
+import models.bars.statuses.*
 import models.errors.ErrorResult
 import models.errors.ErrorResult.BarsErrorResult
 import org.mockito.ArgumentMatchers

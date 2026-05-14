@@ -39,7 +39,7 @@ import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
-import models.nps.{LowEarnersCalculation, LowEarnersClaimDetails, LowEarnersDataDetails, LowEarnersDetails, RetrieveClaimsResponse}
+import models.nps.*
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -53,7 +53,7 @@ import play.api.http.{HeaderNames, Status}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsString, JsSuccess, Reads}
+import play.api.libs.json.*
 import play.api.test.Helpers.running
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -109,8 +109,8 @@ trait SpecBase
   def urlEncode(input: String): String = URLEncoder.encode(input, "utf-8")
 
   val servicesConfig: Map[String, Any] = Map(
-    "microservice.services.lepp-backend.host"           -> wireMockHost,
-    "microservice.services.lepp-backend.port"           -> wireMockPort
+    "microservice.services.lepp-backend.host" -> wireMockHost,
+    "microservice.services.lepp-backend.port" -> wireMockPort
   )
 
   implicit val testCorrelationId: CorrelationId = CorrelationId("some-id")
@@ -250,6 +250,11 @@ trait SpecBase
       val json: JsString = JsString(jsonValue)
       json.validate[E] mustBe a[JsSuccess[_]]
       json.as[E] mustBe modelValue
+    }
+
+  def enumWritesTest[E: Writes](modelValue: E, jsonString: String): Unit =
+    s"should write correctly for a value of: ${modelValue.toString}" in {
+      Json.toJson(modelValue) mustBe JsString(jsonString)
     }
 
 }

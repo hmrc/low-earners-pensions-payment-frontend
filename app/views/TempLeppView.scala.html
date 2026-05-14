@@ -32,7 +32,7 @@
     backLinkUrl = viewModel.backLinkUrl
 ) {
 
-    @formHelper(action = controllers.routes.TempLeppController.onSubmit(pageName)) {
+    @formHelper(action = controllers.routes.TempLeppController.onSubmit()) {
         @heading("temp.heading", headerSize = "l")
 
         <p class="govuk-body">@messages("temp.p1")</p>

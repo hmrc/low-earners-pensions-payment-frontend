@@ -16,30 +16,32 @@
 
 package controllers
 
-import controllers.actions.{Actions, DataRetrievalAction}
+import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionCacheService
 import viewmodels.NormalMode
 import views.html.WhatYouWillNeedView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class WhatYouWillNeedController @Inject()(
-                                           actions: Actions,
-                                           getData: DataRetrievalAction,
-                                           val controllerComponents: MessagesControllerComponents,
-                                           whatYouWillNeedView: WhatYouWillNeedView,
-                                           navigator: Navigator
-                                         ) extends LeppBaseController(actions, getData) with I18nSupport {
+class WhatYouWillNeedController @Inject()(identify: IdentifierAction,
+                                          getData: DataRetrievalAction,
+                                          val sessionService: SessionCacheService,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          whatYouWillNeedView: WhatYouWillNeedView,
+                                          navigator: Navigator)
+                                         (implicit val ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
   val start: Action[AnyContent] = handle { implicit request =>
     Future.successful(Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad()))
   }
 
-  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+  def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
     Future.successful(Ok(whatYouWillNeedView(None, navigator.nextPage(WhatYouWillNeedPage, NormalMode).url)))
   }
 }

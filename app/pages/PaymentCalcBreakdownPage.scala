@@ -17,12 +17,9 @@
 package pages
 
 import controllers.routes
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object CheckYourAnswersPage extends QuestionPage[Boolean] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "isSubmitted"
+case object PaymentCalcBreakdownPage extends Page {
+  override def route(mode: Mode): Call = routes.PaymentCalcBreakdownController.onPageLoad()
 }

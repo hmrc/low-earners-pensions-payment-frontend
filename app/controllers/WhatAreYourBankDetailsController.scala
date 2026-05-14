@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import connectors.barsLockout.BarsVerifyStatusConnector
 import connectors.barsLockout.model.BarVerifyStatusId
-import controllers.actions.{Actions, DataRetrievalAction}
+import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -35,30 +35,30 @@ import views.html.WhatAreYourBankDetailsView
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WhatAreYourBankDetailsController @Inject()(actions: Actions,
+class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  getData: DataRetrievalAction,
+                                                 val sessionService: SessionCacheService,
                                                  correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
                                                  barsService: BarsService,
-                                                 sessionService: SessionCacheService,
                                                  navigator: Navigator,
                                                  barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                                  val controllerComponents: MessagesControllerComponents)
-                                                (implicit ec: ExecutionContext)
-  extends LeppBaseController(actions, getData) with I18nSupport with Logging {
+                                                (implicit val ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling with Logging {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = handle { implicit request =>
-    request.userAnswers.get(WhatAreYourBankDetailsPage) match {
+  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
+    req.userAnswers.get(WhatAreYourBankDetailsPage) match {
       case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
       case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit request =>
-    correlationIdHandler.handleCorrelationId(request)(implicit correlationId =>
+  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
+    correlationIdHandler.handleCorrelationId(req)(implicit cid =>
       form
         .bindFromRequest()
         .fold(
@@ -71,7 +71,7 @@ class WhatAreYourBankDetailsController @Inject()(actions: Actions,
             ).biSemiflatMap(
               err =>
                 barsVerifyStatusConnector
-                  .update(BarVerifyStatusId.from(request.user.nino)).map { verifyStatus =>
+                  .update(BarVerifyStatusId.from(req.user.nino)).map { verifyStatus =>
                     println("---------------------- STATUS VERIFY COUNT " + verifyStatus.attempts)
                     println("---------------------- STATUS VERIFY TIME " + verifyStatus.lockoutExpiryDateTime)
                     // here we catch a lockout BarsStatus condition and force a TooManyAttempts (BarsError) response
@@ -82,7 +82,7 @@ class WhatAreYourBankDetailsController @Inject()(actions: Actions,
                   } recover { case e =>
                   logger.error("[WhatAreYourBankDetailsController][onSubmit] ",
                     "updated failed for:" +
-                      s" ${request.user.nino.nino}", e
+                      s" ${req.user.nino.nino}", e
                   )
                 }
                 if (err.value.status == BAD_REQUEST) {
@@ -91,7 +91,7 @@ class WhatAreYourBankDetailsController @Inject()(actions: Actions,
                   Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
                 },
               _ => for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+                updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
                 _ <- sessionService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
             ).merge

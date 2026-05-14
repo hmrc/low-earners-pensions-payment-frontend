@@ -18,12 +18,13 @@ package controllers
 
 import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
-import models.userAnswers.{BankAccountDetails, UserAnswers}
-import pages.TempPage.{Breakdown, CheckYourAnswers}
-import pages.WhatAreYourBankDetailsPage
+import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.*
+import pages.TempPage.Breakdown
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -31,12 +32,11 @@ import uk.gov.hmrc.http.SessionKeys
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, NormalMode}
 import views.html.WhatAreYourBankDetailsView
-import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
 
 class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBase {
-  private val backUrl: String = routes.TempLeppController.onSubmit(Breakdown).url
+  private val backUrl: String = routes.PaymentCalcBreakdownController.onPageLoad().url
   private val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode)
 
   private val formViewModel: FormPageViewModel = FormPageViewModel(
@@ -47,28 +47,37 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
   private val formProvider: WhatAreYourBankDetailsFormProvider = new WhatAreYourBankDetailsFormProvider
   private val form: Form[BankAccountDetails] = formProvider()
 
+  private val summaryModel: LeppSummary = LeppSummary(
+    currentLock = 67,
+    items = Seq(
+      LeppItem(
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Available
+      )
+    )
+  )
+
+  private val userAnswersWithLepp: UserAnswers = UserAnswers(
+    id = "1",
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel)
+    )
+  )
+
   "GET /bank-details" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-
     "existing user answers are found" should {
       "return view with filled answers" in {
         mockAuthSuccess()
 
-        val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-          name = "name",
-          accountNumber = "number",
-          sortCode = "sortcode",
-          rollNumber = Some("rollNumber")
-        )
-
-        val application: Application = applicationWithUserAnswers(
-          UserAnswers("id").set(WhatAreYourBankDetailsPage, bankAccountDetails).get
-        )
+        val application: Application = applicationWithUserAnswers(userAnswers)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -88,7 +97,8 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "existing user answers are not found" should {
       "return blank view" in {
         mockAuthSuccess()
-        val application: Application = applicationWithUserAnswers(UserAnswers("id"))
+        
+        val application: Application = applicationWithUserAnswers(userAnswersWithLepp)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -111,11 +121,11 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "loaded should include the correct back link" in {
-      val backUrl: String = routes.TempLeppController.onSubmit(CheckYourAnswers).url
+      val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
       mockAuthSuccess()
-      val application: Application = applicationWithUserAnswers(UserAnswers("id"))
+      val application: Application = applicationWithUserAnswers(userAnswers)
 
       lazy val result: Future[Result] = route(application, request).getOrElse(
         Future.failed(new RuntimeException("TEST_ERROR"))
@@ -129,10 +139,12 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         backLinkUrl = Some(backUrl)
       )
 
+      val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
+
       val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
       status(result) shouldBe OK
-      contentAsString(result) shouldEqual view(form, formViewModel)(request, messages).toString
+      contentAsString(result) shouldEqual view(filledForm, formViewModel)(request, messages).toString
     }
   }
 
@@ -144,8 +156,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
 
-    testControllerAuth(request())
-
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,
                             accountName: Option[String],
@@ -154,7 +164,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
                             rollNumber: Option[String]): Unit = s"handle correctly for scenario - $scenarioName" in {
         mockAuthSuccess()
 
-        val app: Application = fakeApplication()
+        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
 
         val formData: Seq[(String, String)] = Seq(
           accountName.map(name => "bankDetails.accountName" -> name),
@@ -242,7 +252,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         )
 
 
-        val app: Application = fakeApplication()
+        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
 
         val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -353,7 +363,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
 
         mockAuthSuccess()
 
-        val app: Application = fakeApplication()
+        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
 
         val formData: Seq[(String, String)] = Seq(
           "bankDetails.accountName" -> "Taxwell Payer",
@@ -368,7 +378,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
-        val backUrl: String = routes.TempLeppController.onSubmit(CheckYourAnswers).url
+        val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
         val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
         val formViewModel: FormPageViewModel = FormPageViewModel(

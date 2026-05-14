@@ -19,7 +19,6 @@ package connectors.httpHandlers
 import base.SpecBase
 import connectors.DownstreamResponse
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper, SuccessWrapper}
-import models.nps.RetrieveClaimsResponse
 import models.errors.ErrorResult.ServiceErrorResult
 import models.nps.*
 import models.{CorrelationId, ResponseWrapper}

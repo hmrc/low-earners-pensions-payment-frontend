@@ -16,13 +16,16 @@
 
 package pages
 
-import play.api.mvc.Call
-import viewmodels.Mode
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{Call, Result}
+import viewmodels.{Mode, NormalMode}
 
+import scala.concurrent.Future
 import scala.language.implicitConversions
 
 trait Page {
   def route(mode: Mode): Call
+  def asRedirect: Future[Result] = Future.successful(Redirect(route(NormalMode)))
 }
 
 object Page {

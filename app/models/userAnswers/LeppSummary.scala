@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package models.userAnswers
 
-import controllers.routes
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import viewmodels.Mode
+import play.api.libs.json.{Json, OFormat}
 
-case object CheckYourAnswersPage extends QuestionPage[Boolean] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "isSubmitted"
+case class LeppSummary(currentLock: Int, items: Seq[LeppItem]) {
+  def total = items.map(_.entitlement).sum
+}
+
+object LeppSummary {
+  implicit val format: OFormat[LeppSummary] = Json.format[LeppSummary]
 }

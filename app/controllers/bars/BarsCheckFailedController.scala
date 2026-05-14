@@ -17,21 +17,26 @@
 package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
-import controllers.LeppBaseController
-import controllers.actions.{Actions, DataRetrievalAction}
+
+import controllers.{LeppBaseController, SessionDataHandling}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionCacheService
 import views.html.bars.BarsCheckFailedView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BarsCheckFailedController @Inject()(actions: Actions,
+class BarsCheckFailedController @Inject()(identify: IdentifierAction,
                                           getData: DataRetrievalAction,
+                                          val sessionService: SessionCacheService,
                                           view: BarsCheckFailedView,
                                           val controllerComponents: MessagesControllerComponents)
-  extends LeppBaseController(actions, getData) with I18nSupport {
-  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+                                         (implicit val ec: ExecutionContext)
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  
+  def onPageLoad(): Action[AnyContent] = handleWithLeppData { implicit request => _ =>
     Future.successful(InternalServerError(view()))
   }
 }

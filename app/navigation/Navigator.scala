@@ -25,8 +25,9 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject() {
   private val normalRoutes: Page => Page = {
-    case WhatYouWillNeedPage => BreakdownPage
-    case BreakdownPage => WhatAreYourBankDetailsPage
+    case WhatYouWillNeedPage => DashboardPage
+    case DashboardPage => PaymentCalcBreakdownPage
+    case PaymentCalcBreakdownPage => WhatAreYourBankDetailsPage
     case WhatAreYourBankDetailsPage => CheckYourAnswersPage
     case CheckYourAnswersPage => ConfirmationPage
     case _ => WhatYouWillNeedPage

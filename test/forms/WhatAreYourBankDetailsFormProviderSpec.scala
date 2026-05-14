@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.WhatAreYourBankDetailsFormProvider.formatSortCode
 import models.userAnswers.BankAccountDetails
 import play.api.data.Form
 
@@ -44,7 +45,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
 
     "formatSortCode" - {
       "should format correctly" in {
-        formProvider.formatSortCode("112233") mustBe "11-22-33"
+        formatSortCode("112233") mustBe "11-22-33"
       }
     }
 

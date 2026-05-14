@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package models.backend
 
-import controllers.routes
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import viewmodels.Mode
+import models.userAnswers.BankAccountDetails
+import play.api.libs.json.{Json, OWrites}
 
-case object CheckYourAnswersPage extends QuestionPage[Boolean] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "isSubmitted"
+case class SubmitLeppRequest(currentLowEarnersOptimisticLock: Int,
+                             taxYear: Int,
+                             accountDetails: BankAccountDetails)
+
+object SubmitLeppRequest {
+  implicit val writes: OWrites[SubmitLeppRequest] = Json.writes[SubmitLeppRequest]
 }
