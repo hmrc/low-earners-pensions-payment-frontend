@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.govuk
 
-package object govuk {
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 
-  object All
-    extends ImplicitConversions
-      with ButtonFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with SummaryListFluency
-      with InsetTextFluency
-      with TableRowFluency
-      with TableFluency
-      with TagFluency
+trait TableRowFluency {
+  object TableRowViewModel {
+    def apply(content: Content): TableRow = TableRow(
+      content = content
+    )
+
+    def apply(html: Html): TableRow = TableRow(
+      content = HtmlContent(html)
+    )
+  }
 }

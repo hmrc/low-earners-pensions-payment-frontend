@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.govuk
 
-package object govuk {
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
-  object All
-    extends ImplicitConversions
-      with ButtonFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with SummaryListFluency
-      with InsetTextFluency
-      with TableRowFluency
-      with TableFluency
-      with TagFluency
+trait TagFluency {
+  object TagViewModel {
+    def apply(content: Content, classes: String): Tag =
+      Tag(
+        content = content,
+        classes = classes
+      )
+  }
 }
