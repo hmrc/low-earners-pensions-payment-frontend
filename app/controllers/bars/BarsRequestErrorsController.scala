@@ -17,8 +17,8 @@
 package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
-import controllers.{LeppBaseController, SessionDataHandling}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.{LeppBaseController, SessionDataHandling}
 import pages.BarsRequestErrorsPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

@@ -22,7 +22,6 @@ import connectors.{ConnectorResponse, PlaceholderBackendConnector}
 import models.CorrelationId
 import models.ResponseWrapper.SuccessWrapper
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
-import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
 import uk.gov.hmrc.http.HeaderCarrier
 

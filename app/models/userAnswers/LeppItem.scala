@@ -16,7 +16,7 @@
 
 package models.userAnswers
 
-import models.nps.{LowEarnersCalculation, LowEarnersDetails}
+import models.nps.LowEarnersCalculation
 import play.api.libs.json.{Json, OFormat}
 import utils.CurrencyFormats
 
