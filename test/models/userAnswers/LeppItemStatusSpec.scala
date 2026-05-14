@@ -44,10 +44,10 @@ class LeppItemStatusSpec extends SpecBase {
 
     "toHtmlClass" - {
       Seq(
-        (Available, "govuk-tag govuk-tag--blue"),
-        (Paid, "govuk-tag govuk-tag--green"),
-        (Suspended, "govuk-tag govuk-tag--yellow"),
-        (Cancelled, "govuk-tag govuk-tag--red"),
+        (Available, "govuk-tag--blue"),
+        (Paid, "govuk-tag--green"),
+        (Suspended, "govuk-tag--yellow"),
+        (Cancelled, "govuk-tag--red"),
         (Unsupported, "")
       ).foreach((status, expectedHtmlClass) =>
         s"for status: ${status.toString} should return a class of: $expectedHtmlClass" in {

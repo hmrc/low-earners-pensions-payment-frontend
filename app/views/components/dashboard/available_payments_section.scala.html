@@ -15,14 +15,16 @@
  *@
 
 @import models.userAnswers.{LeppSummary, LeppItem, LeppItemStatus}
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components._
 @import utils.CurrencyFormats
 
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
  tag: GovukTag,
- heading: h1
+ heading: h1,
+ statusElement: status_element
 )
 
 @(leppSummary: LeppSummary, tableRef: String, continueUrl: String)(implicit messages: Messages)
@@ -36,16 +38,12 @@
  )
 }
 
-@statusContent(status: LeppItemStatus) = {
- @tag(TagViewModel(Text(messages(s"dashboard.table.status.${status.toMessagesKey}")), status.getHtmlClass))
-}
-
 @tableRows(tableItems: Seq[LeppItem]) = @{
  tableItems.map(item => Seq(
   TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
   TableRowViewModel(Text(item.formattedAmount)),
   TableRowViewModel(Text(messages("dashboard.table.availableUntil", s"${item.taxYear + 5}"))),
-  TableRowViewModel(statusContent(item.status))
+  TableRowViewModel(statusElement(item.status))
  ))
 }
 

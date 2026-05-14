@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.govuk
+@import models.userAnswers.{LeppItemStatus}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
-import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
+@this(tag: GovukTag)
 
-trait TagFluency {
-  object TagViewModel {
-    def apply(content: Content, classes: String): Tag = Tag(
-      content = content,
-      classes = classes
-    )
-  }
-}
+@(status: LeppItemStatus)(implicit messages: Messages)
+
+@tag(TagViewModel(
+ content = Text(messages(s"dashboard.table.status.${status.toMessagesKey}")),
+ classes = status.getHtmlClass
+))
