@@ -31,7 +31,7 @@ class LeppItemStatusSpec extends SpecBase {
         ("Unsupported", Unsupported)
       ).foreach(enumReadsTest[LeppItemStatus])
     }
-    
+
     "writes" - {
       Seq(
         (Available, "Available"),
@@ -40,6 +40,19 @@ class LeppItemStatusSpec extends SpecBase {
         (Cancelled, "Cancelled"),
         (Unsupported, "Unsupported")
       ).foreach(enumWritesTest[LeppItemStatus])
+    }
+
+    "toHtmlClass" - {
+      Seq(
+        (Available, "govuk-tag govuk-tag--blue"),
+        (Paid, "govuk-tag govuk-tag--green"),
+        (Suspended, "govuk-tag govuk-tag--yellow"),
+        (Cancelled, "govuk-tag govuk-tag--red"),
+        (Unsupported, "")
+      ).foreach((status, expectedHtmlClass) =>
+        s"for status: ${status.toString} should return a class of: $expectedHtmlClass" in {
+          status.getHtmlClass mustBe expectedHtmlClass
+        })
     }
   }
 

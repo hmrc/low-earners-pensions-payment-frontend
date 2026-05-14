@@ -20,6 +20,16 @@ import play.api.libs.json.*
 
 enum LeppItemStatus {
   case Available, Paid, Suspended, Cancelled, Unsupported
+  
+  def getHtmlClass: String = this match {
+    case LeppItemStatus.Available => "govuk-tag govuk-tag--blue"
+    case LeppItemStatus.Paid => "govuk-tag govuk-tag--green"
+    case LeppItemStatus.Suspended => "govuk-tag govuk-tag--yellow"
+    case LeppItemStatus.Cancelled => "govuk-tag govuk-tag--red"
+    case _ => ""
+  }
+  
+  def toMessagesKey: String = this.toString.toLowerCase
 }
 
 object LeppItemStatus {
