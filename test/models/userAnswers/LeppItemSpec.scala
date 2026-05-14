@@ -75,24 +75,6 @@ class LeppItemSpec extends SpecBase {
         model.copy(entitlement = 200.1).formattedAmount mustBe "£200.10"
       }
     }
-
-    "statusKey" - {
-      "should return the expected string for an LEPP status of Paid" in {
-        model.statusKey mustBe "paid"
-      }
-
-      "should return the expected string for an LEPP status of Cancelled" in {
-        model.copy(status = Cancelled).statusKey mustBe "cancelled"
-      }
-
-      "should return the expected string for an LEPP status of Suspended" in {
-        model.copy(status = Suspended).statusKey mustBe "suspended"
-      }
-
-      "should return the expected string for an LEPP status of Available" in {
-        model.copy(status = Available).statusKey mustBe "available"
-      }
-    }
     
     "apply" - {
       "should correctly construct from NPS model" in {

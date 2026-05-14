@@ -31,7 +31,6 @@ case class LeppItem(id: String,
                     claimDate: Option[LocalDate]) {
   def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
   val formattedAmount: String = CurrencyFormats.format(entitlement)
-  val statusKey: String = status.toString.toLowerCase
 }
 
 object LeppItem {
