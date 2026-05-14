@@ -1,0 +1,93 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.userAnswers.{LeppSummary, LeppItem, LeppItemStatus}
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
+@import utils.CurrencyFormats
+
+@this(
+ table: GovukTable,
+ insetText: GovukInsetText,
+ tag: GovukTag,
+ heading: h1
+)
+
+@(leppSummary: LeppSummary, tableRef: String, continueUrl: String)(implicit messages: Messages)
+
+@tableHeaders = @{
+ Seq(
+  messages("dashboard.table.headerRow.taxYear"),
+  messages("dashboard.table.headerRow.amount"),
+  messages("dashboard.table.headerRow.availableUntil"),
+  messages("dashboard.table.headerRow.status")
+ )
+}
+
+@statusContent(status: LeppItemStatus) = {
+ @tag(TagViewModel(Text(messages(s"dashboard.table.status.${status.toMessagesKey}")), status.getHtmlClass))
+}
+
+@tableRows(tableItems: Seq[LeppItem]) = @{
+ tableItems.map(item => Seq(
+  TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
+  TableRowViewModel(Text(item.formattedAmount)),
+  TableRowViewModel(Text(messages("dashboard.table.availableUntil", s"${item.taxYear + 5}"))),
+  TableRowViewModel(statusContent(item.status))
+ ))
+}
+
+@suspendedInsetContent = {
+ @messages("dashboard.availablePayments.suspendedInset") @messages("dashboard.moreInformation")
+ <a class="govuk-link govuk-link--no-visited-state" href = "/">@messages("dashboard.contactUs")</a>.
+}
+
+@availableTotal = @{
+ leppSummary.availableItems.getOrElse(Nil).map(_.entitlement).sum
+}
+
+@if(leppSummary.hasAvailablePayments){
+ @if(leppSummary.suspendedItems.nonEmpty) {
+  @insetText(InsetTextViewModel(html = suspendedInsetContent))
+ }
+
+ @table(TableViewModel(
+  caption = messages("dashboard.availablePayments.heading"),
+  columnHeaders = tableHeaders,
+  rows = tableRows(leppSummary.availableItems.getOrElse(Nil)) ++ tableRows(leppSummary.suspendedItems.getOrElse(Nil)),
+  tableRef = tableRef
+ ))
+
+ <p class = "govuk-body">
+  @messages("dashboard.availablePayments.totalAvailableText.start")
+  <strong class="govuk-!-font-weight-bold">@{CurrencyFormats.format(availableTotal)}</strong>
+  @messages("dashboard.availablePayments.totalAvailableText.end")
+ </p>
+ <p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.acceptText")</p>
+
+ <a href="@continueUrl"
+    role="button"
+    draggable="false"
+    class="govuk-button govuk-button--continue"
+    data-module="govuk-button">
+  @messages("dashboard.availablePayments.button.acceptPayments")
+ </a>
+
+ <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" style="margin-top: 4px;">
+
+} else {
+ @heading(msgKey = messages("dashboard.availablePayments.heading"), headerSize = "m")
+ <p class = "govuk-body">@messages("dashboard.availablePayments.noneAvailable")</p>
+}

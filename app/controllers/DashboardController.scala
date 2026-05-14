@@ -20,11 +20,14 @@ import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator
+import pages.DashboardPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
+import viewmodels.NormalMode
 import views.html.DashboardView
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +62,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
           taxRate = 20,
           entitlement = 200,
           status = Paid,
-          claimDate = None
+          claimDate = Some(LocalDate.of(2025, 1, 1))
         )
       )),
       suspendedItems = Some(Seq(
@@ -86,11 +89,16 @@ class DashboardController @Inject()(identify: IdentifierAction,
       )
     ))
     
-    Future.successful(Ok(view(tempData.availableItems.get, None)))
-  }
-
-  def onSubmit(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    Future.successful(Ok(""))
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.set(DashboardPage, tempData))
+      _ <- sessionService.save(updatedAnswers)
+    } yield {
+      Ok(view(
+        tempData,
+        Some(backLinkUrl(NormalMode, DashboardPage).url),
+        navigator.nextPage(DashboardPage, NormalMode).url
+      ))
+    }
   }
 }
 

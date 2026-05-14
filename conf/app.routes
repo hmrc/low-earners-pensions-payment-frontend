@@ -11,7 +11,6 @@ GET    /start                               controllers.WhatYouWillNeedControlle
 
 # Dashboard page
 GET    /dashboard                           controllers.DashboardController.onPageLoad()
-POST   /dashboard                           controllers.DashboardController.onSubmit()
 
 # Payment Calc Breakdown page
 GET    /breakdown                           controllers.PaymentCalcBreakdownController.onPageLoad()

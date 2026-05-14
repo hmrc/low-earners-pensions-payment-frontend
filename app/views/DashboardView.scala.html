@@ -14,25 +14,35 @@
  * limitations under the License.
  *@
 
+@import models.userAnswers.LeppSummary
 @import views.html.components._
 @import viewmodels.govuk._
+@import viewmodels.formPages.FormPageViewModel
 
 @this(
     layout: templates.Layout,
     heading: h1,
-    heading2: h2,
-    insetText: GovukInsetText
+    availablePaymentsSection: available_payments_section,
+    paymentHistorySection: payment_history_section
 )
 
-@(backLinkUrl: Option[String], continueUrl: String)(implicit request: Request[_], messages: Messages)
+@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("dashboard.title")),
-    backLinkUrl = backLinkUrl
+    backLinkUrl = backLinkUrl,
+    fullWidthContent = true
 ) {
     @heading("dashboard.heading")
 
-    @heading2("dashboard.availablePayments.heading")
+    @availablePaymentsSection(
+        leppSummary: LeppSummary,
+        tableRef = "dashboard_table_available_payments",
+        continueUrl = continueUrl
+    )
 
-    @heading2("dashboard.paymentHistory.heading")
+    @paymentHistorySection(
+        leppSummary: LeppSummary,
+        tableRef = "dashboard_table_payment_history"
+    )
 }
