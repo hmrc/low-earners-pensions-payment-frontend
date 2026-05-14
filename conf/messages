@@ -38,7 +38,7 @@ dashboard.availablePayments.noneAvailable = You do not have any available paymen
 dashboard.availablePayments.totalAvailableText.start = You have a total of
 dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
 dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
-dashboard.availablePayments.button.accept = Accept
+dashboard.availablePayments.button.acceptPayments = Accept payments
 dashboard.availablePayments.suspendedInset = Your payments are suspended.
 dashboard.paymentHistory.heading = Payment history
 dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
@@ -130,6 +130,20 @@ timeout.keepAlive = Stay signed in
 sessionTimeout.title = For your security, we signed you out
 sessionTimeout.heading = For your security, we signed you out
 sessionTimeout.signIn = Sign in
+
+# Months
+month.1 = January
+month.2 = February
+month.3 = March
+month.4 = April
+month.5 = May
+month.6 = June
+month.7 = July
+month.8 = August
+month.9 = September
+month.10 = October
+month.11 = November
+month.12 = December
 
 # Common content
 common.signOut = Sign out
