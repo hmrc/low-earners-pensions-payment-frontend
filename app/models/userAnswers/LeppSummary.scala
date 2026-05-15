@@ -25,8 +25,12 @@ case class LeppSummary(currentLock: BigInt,
                        paidItems: Option[Seq[LeppItem]] = None,
                        suspendedItems: Option[Seq[LeppItem]] = None,
                        cancelledItems: Option[Seq[LeppItem]] = None) {
-  val hasAvailablePayments: Boolean = Seq(availableItems, suspendedItems).flatten.flatten.nonEmpty
-  val hasPaymentHistory: Boolean = Seq(cancelledItems, paidItems).flatten.flatten.nonEmpty
+  val availablePaymentItems: Seq[LeppItem] = Seq(availableItems, suspendedItems).flatten.flatten
+  val totalAvailableEntitlement: BigDecimal = availableItems.getOrElse(Nil).map(_.entitlement).sum
+  val hasAvailablePayments: Boolean = availablePaymentItems.nonEmpty
+  
+  val paymentHistoryItems: Seq[LeppItem] = Seq(cancelledItems, paidItems).flatten.flatten
+  val hasPaymentHistory: Boolean = paymentHistoryItems.nonEmpty
 }
 
 object LeppSummary {

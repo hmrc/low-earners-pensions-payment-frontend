@@ -303,7 +303,122 @@ class LeppSummarySpec extends SpecBase {
         )
       } 
     }
+
+    "availablePaymentItems" - {
+      "should return an empty list when available and suspended items don't exist" in {
+        LeppSummary(1).availablePaymentItems mustBe Nil
+      }
+
+      "should return a non-empty list when available and suspended items exist" in {
+        model.availablePaymentItems must not be empty
+      }
+    }
     
+    "totalAvailableEntitlement" - {
+      "should return 0 when no available items exist" in {
+        val model: LeppSummary = LeppSummary(
+          currentLock = 67,
+          availableItems = None,
+          paidItems = Some(Seq(
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            )
+          )),
+          suspendedItems = Some(Seq(
+            LeppItem(
+              id = "S-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Suspended,
+              claimDate = None
+            )
+          )),
+          cancelledItems = Some(Seq(
+            LeppItem(
+              id = "C-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Cancelled,
+              claimDate = None
+            )
+          ))
+        )
+        
+        model.totalAvailableEntitlement mustBe 0
+      }
+      
+      "should return correct total when available items exist" in {
+        val model: LeppSummary = LeppSummary(
+          currentLock = 67,
+          availableItems = Some(Seq(
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            ),
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            )
+          )),
+          paidItems = Some(Seq(
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            )
+          )),
+          suspendedItems = Some(Seq(
+            LeppItem(
+              id = "S-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Suspended,
+              claimDate = None
+            )
+          )),
+          cancelledItems = Some(Seq(
+            LeppItem(
+              id = "C-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Cancelled,
+              claimDate = None
+            )
+          ))
+        )
+
+        model.totalAvailableEntitlement mustBe 400
+      }
+    }
+
     "hasAvailablePayments" - {
       "should return true when Available or Suspended items exist" in {
         model.hasAvailablePayments mustBe true
@@ -325,16 +440,26 @@ class LeppSummarySpec extends SpecBase {
             )
           ))
         )
-        
+
         model.hasAvailablePayments mustBe false
       }
     }
-    
+
+    "paymentHistoryItems" - {
+      "should return an empty list when available and suspended items don't exist" in {
+        LeppSummary(1).paymentHistoryItems mustBe Nil
+      }
+
+      "should return a non-empty list when available and suspended items exist" in {
+        model.paymentHistoryItems must not be empty
+      }
+    }
+
     "hasPaymentHistory" - {
       "should return true when Cancelled or Paid items exist" in {
         model.hasPaymentHistory mustBe true
       }
-      
+
       "should return false when Cancelled or Paid items dont exist" in {
         val model: LeppSummary = LeppSummary(
           currentLock = 67,
@@ -350,7 +475,7 @@ class LeppSummarySpec extends SpecBase {
             )
           ))
         )
-        
+
         model.hasPaymentHistory mustBe false
       }
     }
