@@ -16,9 +16,13 @@
 
 package viewmodels.dashboard
 
+import models.userAnswers.LeppItem
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+import viewmodels.govuk.All.TableRowViewModel
+import views.html.components.dashboard.status_element
+import views.html.components.link_element
 
 object DashboardUtils {
   def tableHeaders(tableRef: String, headerNames: Seq[String])
@@ -28,4 +32,40 @@ object DashboardUtils {
       attributes = Map("id" -> s"${tableRef}_header_$headerName")
     ) 
   })
+  
+  def tableRows(tableRef: String,
+                items: Seq[LeppItem],
+                statusElementBuilder: status_element,
+                linkElementBuilderOpt: Option[link_element] = None,
+                isHistoric: Boolean = false)
+               (implicit messages: Messages): Seq[Seq[TableRow]] = items.map(item => {
+    val dateRow: TableRow = if (isHistoric){
+      TableRowViewModel(Text(
+        item.claimDate
+          .map(date => s"${date.getDayOfMonth} ${messages(s"month.${date.getMonthValue}")} ${date.getYear}")
+          .getOrElse("N/A"))
+      )
+    } else {
+      TableRowViewModel(Text(messages("dashboard.table.availableUntil", s"${item.taxYear + 5}")))
+    }
+    
+    val baseRows: Seq[TableRow] = Seq(
+      TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
+      TableRowViewModel(Text(item.formattedAmount)),
+      dateRow,
+      TableRowViewModel(statusElementBuilder(status = item.status))
+    )
+    
+    linkElementBuilderOpt.fold(baseRows)(linkElementBuilder => 
+      val linkRow: TableRow = TableRowViewModel(
+        linkElementBuilder(
+          href = s"${controllers.routes.TempLeppController.onPageLoad()}?id=${item.id}",
+          msgKey = "dashboard.table.link.checkCalculation"
+        )
+      )
+
+      baseRows :+ linkRow
+    )
+  })
+  
 }
