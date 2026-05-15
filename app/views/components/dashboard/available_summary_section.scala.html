@@ -18,11 +18,11 @@
 
 @this()
 
-@(entitlement: BigDecimal, continueUrl: String)(implicit messages: Messages)
+@(entitlement: String, continueUrl: String)(implicit messages: Messages)
 
 <p class = "govuk-body">
  @messages("dashboard.availablePayments.totalAvailableText.start")
- <strong class="govuk-!-font-weight-bold">@{CurrencyFormats.format(entitlement)}</strong>
+ <strong class="govuk-!-font-weight-bold">@entitlement</strong>
  @messages("dashboard.availablePayments.totalAvailableText.end")
 </p>
 <p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.acceptText")</p>

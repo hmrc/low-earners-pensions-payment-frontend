@@ -29,7 +29,7 @@ class AvailableSummarySectionSpec extends SpecBase {
 
   "available_summary_section" - {
     "should produce expected HTML element" in new Setup {
-      val html: String = view(100.111, "/href").html
+      val html: String = view("£100.11", "/href").html
       html must include("""<strong class="govuk-!-font-weight-bold">£100.11</strong>""")
       html must include("To accept these payments, you need to provide us with your bank details.")
       html must include("""<a href="/href"""")
@@ -41,7 +41,7 @@ class AvailableSummarySectionSpec extends SpecBase {
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    def view(entitlement: BigDecimal, continueUrl: String): Document = Jsoup.parse(
+    def view(entitlement: String, continueUrl: String): Document = Jsoup.parse(
       app.injector.instanceOf[available_summary_section].apply(entitlement, continueUrl).body
     )
   }

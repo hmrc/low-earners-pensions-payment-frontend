@@ -19,6 +19,7 @@ package models.userAnswers
 import models.nps.RetrieveClaimsResponse
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.{Json, OFormat}
+import utils.CurrencyFormats
 
 case class LeppSummary(currentLock: BigInt,
                        availableItems: Option[Seq[LeppItem]] = None,
@@ -26,8 +27,14 @@ case class LeppSummary(currentLock: BigInt,
                        suspendedItems: Option[Seq[LeppItem]] = None,
                        cancelledItems: Option[Seq[LeppItem]] = None) {
   val availablePaymentItems: Seq[LeppItem] = Seq(availableItems, suspendedItems).flatten.flatten
-  val totalAvailableEntitlement: BigDecimal = availableItems.getOrElse(Nil).map(_.entitlement).sum
   val hasAvailablePayments: Boolean = availablePaymentItems.nonEmpty
+
+  protected[userAnswers] val totalAvailableEntitlement: BigDecimal = availableItems
+    .getOrElse(Nil)
+    .map(_.entitlement)
+    .sum
+  
+  val totalEntitlementString: String = CurrencyFormats.format(totalAvailableEntitlement)
   
   val paymentHistoryItems: Seq[LeppItem] = Seq(cancelledItems, paidItems).flatten.flatten
   val hasPaymentHistory: Boolean = paymentHistoryItems.nonEmpty

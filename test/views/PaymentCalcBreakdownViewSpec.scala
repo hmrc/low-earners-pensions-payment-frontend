@@ -29,14 +29,16 @@ import views.html.PaymentCalcBreakdownView
 
 class PaymentCalcBreakdownViewSpec extends SpecBase {
 
-  val leppItem = LeppItem(
+  val leppItem: LeppItem = LeppItem(
+    id = "id-1",
     taxYear = 2025,
     contributions = 1000,
     taxRate = 20,
     entitlement = 200,
-    status = Available
+    status = Available,
+    claimDate = None
   )
-  val summary = LeppSummary(1, Seq(leppItem))
+  val summary = LeppSummary(1, Some(Seq(leppItem)))
   
   "view" - {
 
@@ -47,7 +49,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     }
 
     "display correct guidance and text" in new Setup {
-      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.heading", summary.total)
+      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.heading", summary.totalEntitlementString)
 
       view.html.contains(messages(app)("breakdown.p1"))
       view.text.contains(messages(app)("breakdown.u1"))

@@ -32,17 +32,17 @@
     pageTitle = titleNoForm(messages("breakdown.title")),
     backLinkUrl = None
 ) {
-    @heading(messages("breakdown.heading", paymentSummary.total), headerSize = "l")
+    @heading(messages("breakdown.heading", paymentSummary.totalEntitlementString), headerSize = "l")
 
     <p class="govuk-body">@messages("breakdown.p1")</p>
-    @for(item <- paymentSummary.items) {
+    @for(item <- paymentSummary.availableItems.getOrElse(Nil)) {
         @insetText(
             InsetText(content = HtmlContent(
             List(
-                    s"""${heading2(messages("breakdown.u1", item.taxYearString), marginBottom = "0")}""",
-                    messages("breakdown.l1", item.contributions),
+                    s"""${heading2(s"${messages("breakdown.u1")} ${messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")}", marginBottom = "0")}""",
+                    messages("breakdown.l1", item.formattedContributions),
                     messages("breakdown.l2", item.taxRate),
-                    messages("breakdown.l3", item.entitlement)
+                    messages("breakdown.l3", item.formattedEntitlement)
                     ).mkString("<br />")))
             )
         }

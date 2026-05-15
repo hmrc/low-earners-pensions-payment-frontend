@@ -18,7 +18,6 @@ package models.userAnswers
 
 import base.SpecBase
 import models.userAnswers.LeppItemStatus.*
-import play.api.libs.json.{JsError, JsString}
 
 class LeppItemStatusSpec extends SpecBase {
   "LeppItemStatus" - {

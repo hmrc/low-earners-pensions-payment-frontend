@@ -418,6 +418,69 @@ class LeppSummarySpec extends SpecBase {
         model.totalAvailableEntitlement mustBe 400
       }
     }
+    
+    "totalEntitlementString" - {
+      "should be formatted correctly" - {
+        val model: LeppSummary = LeppSummary(
+          currentLock = 67,
+          availableItems = Some(Seq(
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            ),
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            )
+          )),
+          paidItems = Some(Seq(
+            LeppItem(
+              id = "P-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = None
+            )
+          )),
+          suspendedItems = Some(Seq(
+            LeppItem(
+              id = "S-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Suspended,
+              claimDate = None
+            )
+          )),
+          cancelledItems = Some(Seq(
+            LeppItem(
+              id = "C-25-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Cancelled,
+              claimDate = None
+            )
+          ))
+        )
+        
+        model.totalEntitlementString mustBe "£400"
+      }
+    }
 
     "hasAvailablePayments" - {
       "should return true when Available or Suspended items exist" in {

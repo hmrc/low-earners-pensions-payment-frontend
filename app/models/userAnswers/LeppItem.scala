@@ -29,8 +29,8 @@ case class LeppItem(id: String,
                     entitlement: BigDecimal,
                     status: LeppItemStatus,
                     claimDate: Option[LocalDate]) {
-  def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
-  val formattedAmount: String = CurrencyFormats.format(entitlement)
+  val formattedEntitlement: String = CurrencyFormats.format(entitlement)
+  val formattedContributions: String = CurrencyFormats.format(contributions)
 }
 
 object LeppItem {

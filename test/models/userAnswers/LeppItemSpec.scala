@@ -65,13 +65,23 @@ class LeppItemSpec extends SpecBase {
       }
     }
 
-    "formattedAmount" - {
+    "formattedEntitlement" - {
       "should return the expected value for a whole pounds number" in {
-        model.formattedAmount mustBe "£200"
+        model.formattedEntitlement mustBe "£200"
       }
 
       "should return the expected value for a number with decimals" in {
-        model.copy(entitlement = 200.1).formattedAmount mustBe "£200.10"
+        model.copy(entitlement = 200.1).formattedEntitlement mustBe "£200.10"
+      }
+    }
+
+    "formattedContributions" - {
+      "should return the expected value for a whole pounds number" in {
+        model.formattedContributions mustBe "£1,000"
+      }
+
+      "should return the expected value for a number with decimals" in {
+        model.copy(contributions = 200.1).formattedContributions mustBe "£200.10"
       }
     }
     

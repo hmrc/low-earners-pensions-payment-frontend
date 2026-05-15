@@ -50,8 +50,8 @@ object DashboardUtils {
     }
     
     val baseRows: Seq[TableRow] = Seq(
-      TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
-      TableRowViewModel(Text(item.formattedAmount)),
+      TableRowViewModel(Text(messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
+      TableRowViewModel(Text(item.formattedEntitlement)),
       dateRow,
       TableRowViewModel(statusElementBuilder(status = item.status))
     )
@@ -59,7 +59,7 @@ object DashboardUtils {
     linkElementBuilderOpt.fold(baseRows)(linkElementBuilder => 
       val linkRow: TableRow = TableRowViewModel(
         linkElementBuilder(
-          href = s"${controllers.routes.TempLeppController.onPageLoad()}?id=${item.id}",
+          href = s"${controllers.routes.PaymentCalcBreakdownController.onPageLoad()}?id=${item.id}",
           msgKey = "dashboard.table.link.checkCalculation"
         )
       )
