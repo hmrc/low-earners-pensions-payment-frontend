@@ -18,46 +18,25 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
 @import java.time.LocalDate
-@import viewmodels.dashboard.DashboardUtilsSpec
+@import viewmodels.dashboard.DashboardUtils
 
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
- tag: GovukTag,
  heading: h1,
- statusElement: status_element
+ statusElement: status_element,
+ linkElement: link_element,
+ contactLinkElement: contact_link_element
 )
 
 @(leppSummary: LeppSummary, tableRef: String)(implicit messages: Messages)
-
-@claimDateContent(date: LocalDate) = @{
- s"${date.getDayOfMonth} ${messages(s"month.${date.getMonthValue}")} ${date.getYear}"
-}
-
-@checkCalculationContent(id: String) = {
-<a class="govuk-link govuk-link--no-visited-state"
-   href="@{routes.TempLeppController.onPageLoad()}?id=@id">
- @messages("dashboard.table.link.checkCalculation")
-</a>
-}
-
-@tableRows(tableItems: Seq[LeppItem]) = @{
- tableItems.map(item => Seq(
-  TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
-  TableRowViewModel(Text(item.formattedAmount)),
-  TableRowViewModel(Text(item.claimDate.map(date => claimDateContent(date)).getOrElse("N/A"))),
-  TableRowViewModel(statusElement(item.status)),
-  TableRowViewModel(checkCalculationContent(item.id))
- ))
-}
 
 @cancelledInsetContent = {
  <p>
   @messages("dashboard.paymentHistory.cancelledInset.start")
   <strong class="govuk-!-font-weight-bold">@leppSummary.cancelledItems.getOrElse(Nil).length</strong>
   @messages("dashboard.paymentHistory.cancelledInset.end")
-  @messages("dashboard.moreInformation")
-  <a class="govuk-link govuk-link--no-visited-state" href = "/">@messages("dashboard.contactUs")</a>.
+  @contactLinkElement()
  </p>
 }
 
@@ -68,7 +47,7 @@
 
  @table(TableViewModel(
   caption = messages("dashboard.paymentHistory.heading"),
-  rows = tableRows(leppSummary.paidItems.getOrElse(Nil)) ++ tableRows(leppSummary.cancelledItems.getOrElse(Nil)),
+  rows =  DashboardUtils.tableRows(tableRef, leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
   columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action")),
   tableRef = tableRef
  ))

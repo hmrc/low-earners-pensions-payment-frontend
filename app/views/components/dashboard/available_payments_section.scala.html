@@ -18,34 +18,22 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
 @import utils.CurrencyFormats
-@import viewmodels.dashboard.DashboardUtilsSpec
+@import viewmodels.dashboard.DashboardUtils
 
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
- tag: GovukTag,
  heading: h1,
- statusElement: status_element
+ statusElement: status_element,
+ contactLinkElement: contact_link_element,
+ availableSummarySection: available_summary_section,
 )
 
 @(leppSummary: LeppSummary, tableRef: String, continueUrl: String)(implicit messages: Messages)
 
-@tableRows(tableItems: Seq[LeppItem]) = @{
- tableItems.map(item => Seq(
-  TableRowViewModel(Text(messages("dashboard.table.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))),
-  TableRowViewModel(Text(item.formattedAmount)),
-  TableRowViewModel(Text(messages("dashboard.table.availableUntil", s"${item.taxYear + 5}"))),
-  TableRowViewModel(statusElement(item.status))
- ))
-}
-
 @suspendedInsetContent = {
- @messages("dashboard.availablePayments.suspendedInset") @messages("dashboard.moreInformation")
- <a class="govuk-link govuk-link--no-visited-state" href = "/">@messages("dashboard.contactUs")</a>.
-}
-
-@availableTotal = @{
- leppSummary.availableItems.getOrElse(Nil).map(_.entitlement).sum
+ @messages("dashboard.availablePayments.suspendedInset")
+ @contactLinkElement()
 }
 
 @if(leppSummary.hasAvailablePayments){
@@ -55,27 +43,12 @@
 
  @table(TableViewModel(
   caption = messages("dashboard.availablePayments.heading"),
-  rows = tableRows(leppSummary.availableItems.getOrElse(Nil)) ++ tableRows(leppSummary.suspendedItems.getOrElse(Nil)),
+  rows = DashboardUtils.tableRows(tableRef, leppSummary.availablePaymentItems, statusElement),
   columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status")),
   tableRef = tableRef
  ))
 
- <p class = "govuk-body">
-  @messages("dashboard.availablePayments.totalAvailableText.start")
-  <strong class="govuk-!-font-weight-bold">@{CurrencyFormats.format(availableTotal)}</strong>
-  @messages("dashboard.availablePayments.totalAvailableText.end")
- </p>
- <p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.acceptText")</p>
-
- <a href="@continueUrl"
-    role="button"
-    draggable="false"
-    class="govuk-button govuk-button--continue"
-    data-module="govuk-button">
-  @messages("dashboard.availablePayments.button.acceptPayments")
- </a>
-
- <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" style="margin-top: 4px;">
+ @availableSummarySection(leppSummary.totalAvailableEntitlement, continueUrl)
 
 } else {
  @heading(msgKey = messages("dashboard.availablePayments.heading"), headerSize = "m")
