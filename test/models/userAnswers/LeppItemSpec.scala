@@ -17,8 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.nps.LowEarnersCalculation
-import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
+import models.userAnswers.LeppItemStatus.Paid
 import play.api.libs.json.*
 
 import java.time.LocalDate

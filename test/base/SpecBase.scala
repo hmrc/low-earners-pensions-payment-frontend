@@ -40,7 +40,7 @@ import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
-import models.nps.ClaimStatus.{Cancelled, Paid}
+import models.nps.ClaimStatus.Paid
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
