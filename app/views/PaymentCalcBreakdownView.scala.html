@@ -28,6 +28,10 @@
 
 @(paymentSummary: LeppSummary, continueUrl: String)(implicit request: Request[_], messages: Messages)
 
+@taxYearString(item: LeppItem) = @{
+    messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")
+}
+
 @layout(
     pageTitle = titleNoForm(messages("breakdown.title")),
     backLinkUrl = None
@@ -39,7 +43,7 @@
         @insetText(
             InsetText(content = HtmlContent(
             List(
-                    s"""${heading2(s"${messages("breakdown.u1")} ${messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")}", marginBottom = "0")}""",
+                    s"""${heading2(s"${messages("breakdown.u1")} ${taxYearString(item)}", marginBottom = "0")}""",
                     messages("breakdown.l1", item.formattedContributions),
                     messages("breakdown.l2", item.taxRate),
                     messages("breakdown.l3", item.formattedEntitlement)

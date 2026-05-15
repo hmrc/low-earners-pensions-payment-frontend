@@ -33,7 +33,6 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)
-                                              (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
