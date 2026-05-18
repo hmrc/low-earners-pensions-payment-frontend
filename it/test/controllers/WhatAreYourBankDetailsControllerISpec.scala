@@ -92,7 +92,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         )
 
         val view: WhatAreYourBankDetailsView = application.injector.instanceOf[WhatAreYourBankDetailsView]
-
         val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
@@ -127,7 +126,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       )
 
       val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
-
       val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
       status(result) shouldBe OK
@@ -222,144 +220,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
       }
-
-
-      /*      def handleForBarsResponse(scenarioName: String,
-                                barsStatus: Int,
-                                barsBody: String,
-                                expectedRedirect: String,
-                                barsRedirectHeader: Option[String]): Unit = s"handle for BARS scenario: $scenarioName" in {
-        mockAuthSuccess()
-
-        val formData: Seq[(String, String)] = Seq(
-          "bankDetails.accountName" -> "Taxwell Payer",
-          "bankDetails.sortCode" -> "11-22-33",
-          "bankDetails.accountNumber" -> "12345678",
-          "bankDetails.rollNumber" -> "1234/678"
-        )
-
-        val barsRequest: JsValue = Json.parse(
-          """
-            |{
-            | "account": {
-            |   "accountNumber":"12345678",
-            |   "sortCode":"112233",
-            |   "rollNumber":"1234678"
-            | },
-            | "subject": {
-            |   "name":"Taxwell Payer"
-            | }
-            |}
-            """.stripMargin
-        )
-
-        barsRedirectHeader.fold(
-          when(method = POST, uri = "/verify/personal")
-            .withRequestBody(barsRequest)
-            .thenReturn(barsStatus, barsBody)
-        )(rdr =>
-          when(method = POST, uri = "/verify/personal")
-            .withRequestBody(barsRequest)
-            .thenReturn(barsStatus, Map(LOCATION -> rdr))
-        )
-
-
-        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
-
-        val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(expectedRedirect)
-      }
-
-      def handleBarsWithNoRedirects(scenarioName: String,
-                                    barsStatus: Int,
-                                    barsBody: String,
-                                    expectedRedirect: String): Unit =
-        handleForBarsResponse(
-          scenarioName = scenarioName,
-          barsStatus = barsStatus,
-          barsBody = barsBody,
-          expectedRedirect = expectedRedirect,
-          barsRedirectHeader = None
-        )
-
-      val checkFailedRoute: String = controllers.bars.routes.BarsCheckFailedController.onPageLoad().url
-      val requestErrorsRoute: String = controllers.bars.routes.BarsRequestErrorsController.onPageLoad().url
-
-      "BARS returns an error status" should {
-        Seq(
-          ("BARS returns 500 status", INTERNAL_SERVER_ERROR, "n/a", checkFailedRoute, None),
-          ("BARS returns 404 status", NOT_FOUND, "n/a", checkFailedRoute, None),
-          ("BARS returns 403 status", FORBIDDEN, "n/a", checkFailedRoute, None),
-          ("BARS returns 400 status", BAD_REQUEST, "n/a", checkFailedRoute, None),
-          ("BARS returns 301 status", MOVED_PERMANENTLY, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns 303 status", SEE_OTHER, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns 307 status", TEMPORARY_REDIRECT, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns unhandled status", IM_A_TEAPOT, "n/a", checkFailedRoute, None)
-        ).foreach(handleForBarsResponse)
-      }
-
-      "BARS returns a success response" should {
-        def barsResponse(isWellFormatted: String = "yes",
-                         accountExists: String = "yes",
-                         nameMatches: String = "yes",
-                         nonStandard: String = "no",
-                         sortCodeFound: String = "yes",
-                         supportsDirectCredit: String = "yes"): String =
-          s"""
-             |{
-             | "accountNumberIsWellFormatted": "$isWellFormatted",
-             | "accountExists": "$accountExists",
-             | "nameMatches": "$nameMatches",
-             | "accountName": "name",
-             | "nonStandardAccountDetailsRequiredForBacs": "$nonStandard",
-             | "sortCodeIsPresentOnEISCD": "$sortCodeFound",
-             | "sortCodeSupportsDirectDebit": "yes",
-             | "sortCodeSupportsDirectCredit": "$supportsDirectCredit",
-             | "sortCodeBankName": "bank name",
-             | "iban": "iban"
-             |}
-          """.stripMargin
-
-        val errorsBarsBody: String = barsResponse(
-          accountExists = "error",
-          nameMatches = "error",
-          sortCodeFound = "error",
-          supportsDirectCredit = "error"
-        )
-
-        val indeterminateBarsBody: String = barsResponse(
-          accountExists = "indeterminate",
-          nameMatches = "indeterminate"
-        )
-
-        val multipleRequestErrorsBarsBody: String = barsResponse(
-          supportsDirectCredit = "no",
-          nonStandard = "yes"
-        )
-
-        val mixedErrorsBarsBody: String = barsResponse(
-          supportsDirectCredit = "no",
-          nonStandard = "yes",
-          sortCodeFound = "error"
-        )
-
-        Seq(
-          ("Account doesn't support direct credit", OK, barsResponse(supportsDirectCredit = "no"), requestErrorsRoute),
-          ("Sort code not found", OK, barsResponse(sortCodeFound = "no"), requestErrorsRoute),
-          ("Extra info required", OK, barsResponse(nonStandard = "yes"), requestErrorsRoute),
-          ("Name doesn't match", OK, barsResponse(nameMatches = "no"), requestErrorsRoute),
-          ("Account not found", OK, barsResponse(accountExists = "no"), requestErrorsRoute),
-          ("Failed modulus check", OK, barsResponse(isWellFormatted = "no"), requestErrorsRoute),
-          ("Field errors", OK, errorsBarsBody, checkFailedRoute),
-          ("Result indeterminate", OK, indeterminateBarsBody, checkFailedRoute),
-          ("Multiple request errors", OK, multipleRequestErrorsBarsBody, requestErrorsRoute),
-          ("Mixed errors", OK, mixedErrorsBarsBody, checkFailedRoute)
-        ).foreach(handleBarsWithNoRedirects)
-      }*/
     }
   }
 

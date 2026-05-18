@@ -16,13 +16,18 @@
 
 package controllers
 
+import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.userAnswers.BankAccountDetails
+import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
 import pages.CheckYourAnswersPage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{LeppSubmissionService, SessionCacheService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{BarsService, LeppSubmissionService, SessionCacheService}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.CorrelationIdOptional
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
@@ -33,13 +38,14 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            getData: DataRetrievalAction,
-                                           val controllerComponents: MessagesControllerComponents,
                                            view: CheckYourAnswersView,
-                                           leppSubmissionService: LeppSubmissionService,
-                                           val sessionService: SessionCacheService,
                                            correlationIdHandler: CorrelationIdOptional,
+                                           barsService: BarsService,
+                                           leppSubmissionService: LeppSubmissionService,
                                            navigator: Navigator,
-                                           errorView: ErrorTemplate)
+                                           errorView: ErrorTemplate,
+                                           val sessionService: SessionCacheService,
+                                           val controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
@@ -53,22 +59,38 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       ))
   }
 
-  def onSubmit(): Action[AnyContent] = handleForCyaPage { implicit req =>
-    (leppData, bankDetails) =>
-      correlationIdHandler.handleCorrelationId(req) { implicit cid =>
-        leppSubmissionService.submitMultiple(leppData, bankDetails).biSemiflatMap(
-          err =>
-            for {
-              _ <- sessionService.clear(req.userAnswers)
-            } yield InternalServerError(errorView("title", "heading", "message")), 
+  def onSubmit(): Action[AnyContent] = handleForCyaPage { implicit req => (leppData, bankDetails) =>
+    correlationIdHandler.handleCorrelationId(req) { implicit cid =>
+      handleWithBars(bankDetails)(() => {
+        val result: EitherT[Future, ErrorWrapper, Result] = for {
+          _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
+          updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
+          _ <- EitherT.right(sessionService.save(updatedUserAnswers))
+        } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
+
+        result.leftSemiflatMap(_ =>
+          for {
+            _ <- sessionService.clear(req.userAnswers)
+          } yield InternalServerError(errorView("title", "heading", "message")),
           //TODO - Need to write content for this page
           //TODO - should probably implement ClearCacheController like in MPE
-          _ =>
-            for {
-              updatedAnswers <- Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true))
-              _ <- sessionService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
         ).merge
-      }
+      })
+    }
   }
+
+  protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])
+                                           (implicit hc: HeaderCarrier,
+                                            ec: ExecutionContext,
+                                            cid: CorrelationId): Future[Result] =
+    barsService
+      .checkBankAccountDetails(bankDetails.toBarsRequest)
+      .leftMap {
+        case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
+          Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())
+        case err =>
+          Redirect(bars.routes.BarsCheckFailedController.onPageLoad())
+      }
+      .semiflatMap(_ => f())
+      .merge
 }

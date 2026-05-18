@@ -64,19 +64,6 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
             updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
             _ <- sessionService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
-          /*barsService.checkBankAccountDetails(
-            barsRequest = answer.toBarsRequest
-          ).biSemiflatMap(
-            err => if(err.value.status == BAD_REQUEST) {
-              Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
-            } else {
-              Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
-            },
-            _ => for {
-              updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
-              _ <- sessionService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
-          ).merge*/
         }
       )
   }

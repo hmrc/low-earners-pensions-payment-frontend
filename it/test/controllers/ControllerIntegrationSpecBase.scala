@@ -83,10 +83,10 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     ))
 
   val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-    accountName = "name",
-    accountNumber = "number",
-    sortCode = "sortcode",
-    rollNumber = Some("rollNumber")
+    accountName = "Taxwell Payer",
+    accountNumber = "12345678",
+    sortCode = "112233",
+    rollNumber = Some("1234678")
   )
 
   val userAnswers: UserAnswers = UserAnswers(
