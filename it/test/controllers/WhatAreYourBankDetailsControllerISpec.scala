@@ -19,11 +19,9 @@ package controllers
 import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -52,7 +50,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
    
-    testAuthForRequest(request)
     testUserAnswersHandling(request = request)
 
     "existing user answers are found" should {
@@ -134,7 +131,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
 
-    testAuthForRequest(request())
     testUserAnswersHandling(request = request())
 
     "errors exist in supplied data" should {

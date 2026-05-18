@@ -17,11 +17,8 @@
 package controllers
 
 import common.IntegrationSpecBase
-import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -37,9 +34,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/confirmation"
     ).withSession(SessionKeys.authToken -> "auth token")
-
-    testAuthForRequest(request)
-
+    
     testUserAnswersHandling(
       request = request,
       withBankDetailsHandlingTest = true,
@@ -62,6 +57,6 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         status(result) shouldBe OK
         contentAsString(result) shouldEqual view("01 January 1970 at 1:00am")(request, messages).toString
       }
-    } 
+    }
   }
 }

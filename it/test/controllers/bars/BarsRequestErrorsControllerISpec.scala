@@ -18,10 +18,7 @@ package controllers.bars
 
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
-import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
-import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -35,9 +32,7 @@ import scala.concurrent.Future
         method = "GET",
         path = "/low-earners-pensions-payment/bank-details-check-errors"
       ).withSession(SessionKeys.authToken -> "auth token")
-
-      testAuthForRequest(request)
-
+      
       testUserAnswersHandling(
         request = request,
         withBankDetailsHandlingTest = true

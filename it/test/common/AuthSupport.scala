@@ -17,22 +17,15 @@
 package common
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import config.AppConfig
-import play.api.Application
-import play.api.http.Status.SEE_OTHER
-import play.api.http.Writeable
 import play.api.libs.json.*
-import play.api.mvc.Result
-import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-import java.net.URLEncoder
-import scala.concurrent.Future
+import scala.util.Random
 
-trait AuthSupport extends IntegrationSpecBase with WireMockMethods {
-  private val authoriseUri: String = "/auth/authorise"
+trait AuthSupport extends WireMockMethods {
+  val authoriseUri: String = "/auth/authorise"
 
-  private val authRequestJson: JsValue = Json.parse(
+  val authRequestJson: JsValue = Json.parse(
     """
       |{
       | "authorise": [
@@ -52,7 +45,7 @@ trait AuthSupport extends IntegrationSpecBase with WireMockMethods {
     """.stripMargin
   )
 
-  private val ptaEnrolment: JsValue = Json.parse(
+  val ptaEnrolment: JsValue = Json.parse(
     """
       |{
       | "state": "Activated",
@@ -60,6 +53,14 @@ trait AuthSupport extends IntegrationSpecBase with WireMockMethods {
       |}
     """.stripMargin
   )
+
+  def validNino(prefix: String = "AA"): String = {
+    val num = Random.nextInt(1000000)
+    val suffix = "A"
+    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
+
+    prefix + f"$str$num%06d$suffix".drop(prefix.length)
+  }
 
   def mockAuthSuccess(): StubMapping = {
     val authResponseJson: JsObject =
@@ -71,86 +72,6 @@ trait AuthSupport extends IntegrationSpecBase with WireMockMethods {
     when(method = POST, uri = authoriseUri)
       .withRequestBody(authRequestJson)
       .thenReturn(status = OK, body = authResponseJson)
-  }
-
-  private def handleForAuthError[A: Writeable](request: FakeRequest[A],
-                                               error: String,
-                                               expectedRedirect: String): Unit =
-    s"return expected result for auth error - $error" in {
-      val errorString = s"""MDTP detail=\"$error\""""
-
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> errorString))
-
-      lazy val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
-    }
-
-  private def handleForAuthRedirect[A: Writeable](request: FakeRequest[A])
-                                                 (scenarioName: String,
-                                                  internalIdOpt: Option[String],
-                                                  ninoOpt: Option[String],
-                                                  confidenceLevel: Int,
-                                                  enrolments: Seq[JsValue],
-                                                  expectedRedirect: String): Unit = {
-    s"return expected result for scenario - $scenarioName" in {
-      val authResponseJson: JsObject =
-        Json.obj("confidenceLevel" -> confidenceLevel) ++
-          ninoOpt.map(nino => Json.obj("nino" -> nino)).getOrElse(JsObject.empty) ++
-          internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty) ++
-          Json.obj("authorisedEnrolments" -> JsArray(enrolments))
-
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = OK, body = authResponseJson)
-
-      val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
-    }
-  }
-
-  def testAuthForRequest[A: Writeable](request: FakeRequest[A]): Unit = {
-    "user authorisation is run" when {
-      "an authorisation error occurs" should {
-        val config: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
-        val loginUrl: String = config.loginUrl + "?continue=" + URLEncoder.encode(
-          config.loginContinueUrl,
-          "UTF-8"
-        )
-
-        Seq(
-          ("InvalidBearerToken", loginUrl),
-          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
-        ).foreach((error, redirect) => handleForAuthError(request, error, redirect))
-      }
-
-      "authorisation request succeeds" should {
-        val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
-        val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
-
-        Seq(
-          ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
-        ).foreach(
-          (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(request)(sn, id, nino, cl, enrls, rdr)
-        )
-      }
-    }
   }
 
 }

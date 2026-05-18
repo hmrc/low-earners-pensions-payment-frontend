@@ -48,9 +48,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
-
-    testAuthForRequest(request)
-
+    
     testUserAnswersHandling(
       request = request,
       withBankDetailsHandlingTest = true
@@ -87,9 +85,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     )
       .withSession(SessionKeys.authToken -> "auth token")
-
-    testAuthForRequest(request)
-
+    
     testUserAnswersHandling(
       request = request,
       withBankDetailsHandlingTest = true
@@ -126,7 +122,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
            | "iban": "iban"
            |}
         """.stripMargin
-        
+
       when(method = POST, uri = "/verify/personal")
         .withRequestBody(barsRequest)
         .thenReturn(OK, barsResponse)

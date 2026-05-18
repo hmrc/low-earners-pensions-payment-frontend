@@ -16,7 +16,7 @@
 
 package controllers
 
-import common.{AuthSupport, IntegrationSpecBase, WireMockMethods}
+import common.{AuthSupport, IntegrationSpecBase}
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
@@ -31,7 +31,7 @@ import viewmodels.NormalMode
 import java.time.Instant
 import scala.concurrent.Future
 
-trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
+trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport {
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
     availableItems = Some(Seq(
