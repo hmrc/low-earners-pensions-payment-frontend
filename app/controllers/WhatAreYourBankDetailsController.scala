@@ -39,7 +39,6 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
-                                                 barsService: BarsService,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
@@ -63,7 +62,11 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
             view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
           )),
           answer => {
-            barsService.checkBankAccountDetails(
+              for {
+                updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+                _ <- sessionService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
+            /*barsService.checkBankAccountDetails(
               barsRequest = answer.toBarsRequest
             ).biSemiflatMap(
               err => if(err.value.status == BAD_REQUEST) {
@@ -75,7 +78,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                 updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
                 _ <- sessionService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
-            ).merge
+            ).merge*/
           }
         )
     )

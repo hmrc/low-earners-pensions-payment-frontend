@@ -84,7 +84,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "existing user answers are not found" should {
       "return blank view" in {
         mockAuthSuccess()
-        
+
         val application: Application = applicationWithUserAnswers(userAnswersWithLepp)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -107,7 +107,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       path = "/low-earners-pensions-payment/change-bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    "loaded should include the correct back link" in {
+    "page is loaded should include the correct back link" in {
       val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
@@ -178,7 +178,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         status(result) shouldBe BAD_REQUEST
         contentAsString(result) shouldEqual view(formWithData, formViewModel)(requestWithFormData, messages).toString
       }
-      
+
       Seq(
         ("accountName field is missing", None, Some("11-22-33"), Some("12345678"), None),
         ("accountName field is empty", Some(""), Some("11-22-33"), Some("12345678"), None),
@@ -202,8 +202,29 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       ).foreach(testErrorScenario)
     }
 
-    "a valid request is submitted" when {
-      def handleForBarsResponse(scenarioName: String,
+    "a valid request is submitted" should {
+      "redirect to the CYA page" in {
+        mockAuthSuccess()
+
+        val formData: Seq[(String, String)] = Seq(
+          "bankDetails.accountName" -> "Taxwell Payer",
+          "bankDetails.sortCode" -> "11-22-33",
+          "bankDetails.accountNumber" -> "12345678",
+          "bankDetails.rollNumber" -> "1234/678"
+        )
+
+        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
+
+        val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
+      }
+
+
+      /*      def handleForBarsResponse(scenarioName: String,
                                 barsStatus: Int,
                                 barsBody: String,
                                 expectedRedirect: String,
@@ -338,20 +359,21 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
           ("Multiple request errors", OK, multipleRequestErrorsBarsBody, requestErrorsRoute),
           ("Mixed errors", OK, mixedErrorsBarsBody, checkFailedRoute)
         ).foreach(handleBarsWithNoRedirects)
-      }
+      }*/
     }
   }
 
   "POST /change-bank-details" when {
-    "errors in request" should {
-      "load page with correct back links" in {
-        def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
-          method = "POST",
-          path = "/low-earners-pensions-payment/change-bank-details"
-        )
-          .withSession(SessionKeys.authToken -> "auth token")
-          .withFormUrlEncodedBody(data: _*)
 
+    def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
+      method = "POST",
+      path = "/low-earners-pensions-payment/change-bank-details"
+    )
+      .withSession(SessionKeys.authToken -> "auth token")
+      .withFormUrlEncodedBody(data: _*)
+
+    "errors exist in supplied data" should {
+      "load page with errors and CYA back link" in {
         mockAuthSuccess()
 
         val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
@@ -384,6 +406,28 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         formWithData.errors should not be empty
         status(result) shouldBe BAD_REQUEST
         contentAsString(result) shouldEqual view(formWithData, formViewModel)(requestWithFormData, messages).toString
+      }
+    }
+
+    "a valid request is submitted" should {
+      "redirect to the CYA page" in {
+        mockAuthSuccess()
+
+        val formData: Seq[(String, String)] = Seq(
+          "bankDetails.accountName" -> "Taxwell Payer",
+          "bankDetails.sortCode" -> "11-22-33",
+          "bankDetails.accountNumber" -> "12345678",
+          "bankDetails.rollNumber" -> "1234/678"
+        )
+
+        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
+
+        val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
       }
     }
   }
