@@ -49,16 +49,18 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
-    testSessionDataHandling(request)
+    testAuthForRequest(request)
+
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true
+    )
 
     "a valid request is made" should {
       "return the expected view" in {
         mockAuthSuccess()
 
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -86,10 +88,12 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     )
       .withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
-    testSessionDataHandling(request)
+    testAuthForRequest(request)
+
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true
+    )
 
     val barsRequest: JsValue = Json.parse(
       """
@@ -146,7 +150,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
             .thenReturn(barsStatus, Map(LOCATION -> rdr))
         )
 
-        val app: Application = applicationWithUserAnswers(userAnswers)
+        val app: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         val result: Future[Result] = route(app, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -244,7 +248,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       "redirect to error page" in {
         mockAuthSuccess()
         mockBarsSuccess()
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -276,7 +280,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       "redirect to confirmation page" in {
         mockAuthSuccess()
         mockBarsSuccess()
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))

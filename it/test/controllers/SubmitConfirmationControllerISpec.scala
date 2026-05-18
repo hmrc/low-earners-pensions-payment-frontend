@@ -18,6 +18,7 @@ package controllers
 
 import common.IntegrationSpecBase
 import models.userAnswers.*
+import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.libs.json.{JsBoolean, Json}
@@ -32,61 +33,35 @@ import scala.concurrent.Future
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
   
   "GET /confirmation" when {
-    val userAnswers: UserAnswers = UserAnswers(
-      id = "1",
-      data = Json.obj(
-        "leppSummary" -> Json.toJson(summaryModel),
-        "bankDetails" -> Json.toJson(bankAccountDetails)
-      )
-    )
-
-    val userAnswersWithConfirmation: UserAnswers = UserAnswers(
-      id = "1",
-      data = Json.obj(
-        "leppSummary" -> Json.toJson(summaryModel),
-        "bankDetails" -> Json.toJson(bankAccountDetails),
-        "isSubmitted" -> JsBoolean(true)
-      )
-    )
-    
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/low-earners-pensions-payment/confirmation"
     ).withSession(SessionKeys.authToken -> "auth token")
-    
-    testControllerAuth(request)
-    testLeppDataHandling(request)
-    testBankDetailsHandling(request)
 
-    "CYA flag is missing" should {
-      "redirect to CYA page" in {
+    testAuthForRequest(request)
+
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true,
+      submissionShouldExist = true
+    )
+
+    "a valid request is made" should {
+      "render view correctly" in {
         mockAuthSuccess()
 
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithExistingSubmission)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
+        val view = application.injector.instanceOf[SubmitConfirmationView]
+        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) shouldEqual view("01 January 1970 at 1:00am")(request, messages).toString
       }
-    }
-
-    "LEPP data, bank details, and CYA flag exist in session should load correct view" in {
-      mockAuthSuccess()
-
-      val application: Application = applicationWithUserAnswers(userAnswersWithConfirmation)
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      val view = application.injector.instanceOf[SubmitConfirmationView]
-      val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-      
-      status(result) shouldBe OK
-      contentAsString(result) shouldEqual view("01 January 1970 at 1:00am")(request, messages).toString
-    }
+    } 
   }
 }

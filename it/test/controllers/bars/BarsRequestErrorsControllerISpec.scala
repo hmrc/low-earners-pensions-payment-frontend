@@ -19,6 +19,7 @@ package controllers.bars
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
 import models.userAnswers.*
+import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -34,29 +35,28 @@ import scala.concurrent.Future
         method = "GET",
         path = "/low-earners-pensions-payment/bank-details-check-errors"
       ).withSession(SessionKeys.authToken -> "auth token")
-      
-      testControllerAuth(request)
-      testSessionDataHandling(request)
-      testLeppDataHandling(request)
-      
-      "should return the expected view for a successful request" in {
-        mockAuthSuccess()
 
-        val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = Json.obj(
-            "leppSummary" -> Json.toJson(summaryModel)
+      testAuthForRequest(request)
+
+      testUserAnswersHandling(
+        request = request,
+        withBankDetailsHandlingTest = true
+      )
+      
+      "a valid request is made" should {
+        "render view correctly" in {
+          mockAuthSuccess()
+
+          lazy val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
+
+          lazy val result: Future[Result] = route(application, request).getOrElse(
+            Future.failed(new RuntimeException("TEST_ERROR"))
           )
-        )
 
-        lazy val application: Application = applicationWithUserAnswers(userAnswers)
+          status(result) shouldBe BAD_REQUEST
+          contentAsString(result) should include("If this issue persists you may have to contact HMRC")
+        }
 
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        status(result) shouldBe BAD_REQUEST
-        contentAsString(result) should include("If this issue persists you may have to contact HMRC")
       }
     }
 }

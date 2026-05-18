@@ -49,7 +49,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                           (implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
-  def onPageLoad(): Action[AnyContent] = handleForCyaPage { implicit req =>
+  def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit req =>
     (_, bankDetails) =>
       Future.successful(Ok(
         view(
@@ -59,7 +59,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       ))
   }
 
-  def onSubmit(): Action[AnyContent] = handleForCyaPage { implicit req => (leppData, bankDetails) =>
+  def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req => (leppData, bankDetails) =>
     correlationIdHandler.handleCorrelationId(req) { implicit cid =>
       handleWithBars(bankDetails)(() => {
         val result: EitherT[Future, ErrorWrapper, Result] = for {
