@@ -21,8 +21,7 @@ import models.CorrelationId
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.userAnswers.LeppItemStatus.{Available, Paid}
-import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
+import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application

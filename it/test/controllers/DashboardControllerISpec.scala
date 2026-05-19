@@ -17,22 +17,10 @@
 package controllers
 
 import common.IntegrationSpecBase
-import forms.WhatAreYourBankDetailsFormProvider
-import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
-import play.api.Application
-import play.api.data.Form
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, Result}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
-import viewmodels.formPages.FormPageViewModel
-import viewmodels.{CheckMode, NormalMode}
-import views.html.WhatAreYourBankDetailsView
-
-import scala.concurrent.Future
 
 class DashboardControllerISpec extends ControllerIntegrationSpecBase {
   "GET /dashboard" when {

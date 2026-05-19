@@ -19,7 +19,6 @@ package controllers
 import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}

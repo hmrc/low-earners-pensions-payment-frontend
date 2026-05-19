@@ -19,7 +19,6 @@ package controllers.bars
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
 import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
