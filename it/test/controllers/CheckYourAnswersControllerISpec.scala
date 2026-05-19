@@ -24,8 +24,10 @@ import models.errors.ErrorResult.ServiceErrorResult
 import models.userAnswers.LeppItemStatus.{Available, Paid}
 import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
@@ -35,8 +37,6 @@ import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
 import views.html.{CheckYourAnswersView, ErrorTemplate}
-import org.mockito.Mockito.when as mockitoWhen
-import play.api.libs.json.Json
 
 import scala.concurrent.Future
 

@@ -18,11 +18,11 @@ package controllers.bars
 
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
-import play.api.Application
-import play.api.mvc.{AnyContentAsEmpty, Result}
 import models.userAnswers.*
 import models.userAnswers.LeppItemStatus.Available
+import play.api.Application
 import play.api.libs.json.Json
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys

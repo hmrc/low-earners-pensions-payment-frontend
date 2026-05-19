@@ -26,7 +26,7 @@ import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                getData: DataRetrievalAction,
