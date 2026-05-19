@@ -18,7 +18,6 @@ package controllers
 
 import common.IntegrationSpecBase
 import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.libs.json.{JsBoolean, Json}
@@ -33,26 +32,6 @@ import scala.concurrent.Future
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
   
   "GET /confirmation" when {
-    val summaryModel: LeppSummary = LeppSummary(
-      currentLock = 67,
-      items = Seq(
-        LeppItem(
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available
-        )
-      )
-    )
-
-    val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-      accountName = "name",
-      accountNumber = "number",
-      sortCode = "sortcode",
-      rollNumber = Some("rollNumber")
-    )
-
     val userAnswers: UserAnswers = UserAnswers(
       id = "1",
       data = Json.obj(

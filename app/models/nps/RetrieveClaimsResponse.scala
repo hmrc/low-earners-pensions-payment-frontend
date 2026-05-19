@@ -16,12 +16,12 @@
 
 package models.nps
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, Reads}
 
 case class RetrieveClaimsResponse(currentLowEarnersOptimisticLock: BigInt,
                                   identifier: String,
                                   lowEarnersDetailsList: Seq[LowEarnersDetails])
 
 object RetrieveClaimsResponse {
-  implicit val format: OFormat[RetrieveClaimsResponse] = Json.format[RetrieveClaimsResponse]
+  implicit val format: Reads[RetrieveClaimsResponse] = Json.reads[RetrieveClaimsResponse]
 }

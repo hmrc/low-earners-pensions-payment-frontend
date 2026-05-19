@@ -27,6 +27,49 @@ whatYouWillNeed.t1 = This payment is not classed as income. It will not affect a
 whatYouWillNeed.h2.p1 = Before you continue
 whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
+# Dashboard page
+dashboard.title = Your low earner''s pension payments
+dashboard.heading = Your low earner''s pension payments
+dashboard.moreInformation = For more information,
+dashboard.contactUs = contact us (opens in new tab)
+dashboard.availablePayments.heading = Available payments
+dashboard.availablePayments.noneAvailable = You do not have any available payments.
+dashboard.availablePayments.totalAvailableText.start = You have a total of
+dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
+dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
+dashboard.availablePayments.button.acceptPayments = Accept payments
+dashboard.availablePayments.suspendedInset = Your payments are suspended.
+dashboard.paymentHistory.heading = Payment history
+dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
+dashboard.paymentHistory.noneAvailable = You do not have any previous payments.
+dashboard.paymentHistory.cancelledInset.start = We cancelled
+dashboard.paymentHistory.cancelledInset.end = of your payments.
+dashboard.table.header.taxYear = Tax year
+dashboard.table.header.amount = Amount
+dashboard.table.header.availableUntil = Available until
+dashboard.table.header.dateAccepted = Date accepted
+dashboard.table.header.status = Status
+dashboard.table.header.action = Action
+dashboard.table.link.checkCalculation = Check calculation
+dashboard.table.status.available = Available
+dashboard.table.status.paid = Paid
+dashboard.table.status.suspended = Suspended
+dashboard.table.status.cancelled = Cancelled
+dashboard.table.availableUntil = 5 April {0}
+
+# Calculation Breakdown page
+breakdown.title = Payment calculation breakdown page
+breakdown.heading = You''re eligible for a total of {0}
+breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
+breakdown.u1 = For the tax year
+breakdown.l1 = Your net pay pension contributions: {0}
+breakdown.l2 = Your relevant basic tax rate: {0}%
+breakdown.l3 = Your payment: {0}
+
+breakdown.p2 = If you think the amounts are wrong, you can
+breakdown.p2.a1 = contact us (opens in new tab)
+breakdown.p3 = To accept these payments, you need to provide us with your bank details.
+
 # Bank account details page
 bankDetails.title = Bank details
 bankDetails.heading = What are your bank details?
@@ -99,8 +142,23 @@ sessionTimeout.title = For your security, we signed you out
 sessionTimeout.heading = For your security, we signed you out
 sessionTimeout.signIn = Sign in
 
+# Months
+month.1 = January
+month.2 = February
+month.3 = March
+month.4 = April
+month.5 = May
+month.6 = June
+month.7 = July
+month.8 = August
+month.9 = September
+month.10 = October
+month.11 = November
+month.12 = December
+
 # Common content
 common.signOut = Sign out
+common.taxYearDates = 6 April {0} to 5 April {1}
 site.start = Start now
 site.change = Change
 site.continue = Continue
@@ -109,23 +167,3 @@ site.print = Print this page
 site.acceptAndSubmit = Submit
 error.title.prefix = Error:
 submitted.on = Submitted on
-
-# Temp content
-temp.title = Temporary placeholder page
-temp.heading = Temporary placeholder page
-temp.p1 = This is temporary placeholder page to emulate the navigation flow
-temp.Dashboard = Pretend this is the Dashboard page
-temp.Breakdown = Pretend this is the Breakdown page
-
-# Calculation Breakdown page
-breakdown.title = Payment calculation breakdown page
-breakdown.heading = You''re eligible for a total of £{0}
-breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
-breakdown.u1 = For the tax year {0}
-breakdown.l1 = Your net pay pension contributions: £{0}
-breakdown.l2 = Your relevant basic tax rate: {0}%
-breakdown.l3 = Your payment: £{0}
-
-breakdown.p2 = If you think the amounts are wrong, you can
-breakdown.p2.a1 = contact us (opens in new tab)
-breakdown.p3 = To accept these payments, you need to provide us with your bank details.

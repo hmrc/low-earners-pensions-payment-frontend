@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
@@ -40,6 +40,54 @@ class LeppBaseControllerSpec extends SpecBase {
     val mockSessionService: SessionCacheService = mock[SessionCacheService]
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
+
+    val summaryModel: LeppSummary = LeppSummary(
+      currentLock = 67,
+      availableItems = Some(Seq(
+        LeppItem(
+          id = "A-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Available,
+          claimDate = None
+        )
+      )),
+      paidItems = Some(Seq(
+        LeppItem(
+          id = "P-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Paid,
+          claimDate = None
+        )
+      )),
+      suspendedItems = Some(Seq(
+        LeppItem(
+          id = "S-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Suspended,
+          claimDate = None
+        )
+      )),
+      cancelledItems = Some(Seq(
+        LeppItem(
+          id = "C-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Cancelled,
+          claimDate = None
+        )
+      ))
+    )
     
     class DummyController(id: IdentifierAction,
                           data: DataRetrievalAction,
@@ -61,7 +109,6 @@ class LeppBaseControllerSpec extends SpecBase {
         }
 
       Seq(
-        (NormalMode, DashboardPage, "/low-earners-pensions-payment/dashboard"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
@@ -164,23 +211,10 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should evaluate block when LEPP data is cached" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj("leppSummary" -> Json.toJson(summaryModel))
@@ -195,19 +229,6 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should clear user answers and redirect to dashboard page when data has already been submitted" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-        
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = JsObject(Seq(
@@ -228,7 +249,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
     
@@ -239,23 +260,10 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj("leppSummary" -> Json.toJson(summaryModel))
@@ -272,19 +280,6 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should evaluate block when all data is cached" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         val detailsModel: BankAccountDetails = BankAccountDetails(
           accountName = "name nameson",
           accountNumber = "112233",
@@ -309,19 +304,6 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should clear user answers and redirect to dashboard page when data has already been submitted" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = JsObject(Seq(
@@ -342,7 +324,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
     
@@ -353,23 +335,10 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj("leppSummary" -> Json.toJson(summaryModel))
@@ -386,19 +355,6 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should redirect to CYA page when data hasn't been submitted" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         val detailsModel: BankAccountDetails = BankAccountDetails(
           accountName = "name nameson",
           accountNumber = "112233",
@@ -423,19 +379,6 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should evaluate block when all data is cached" in new Test {
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
         val detailsModel: BankAccountDetails = BankAccountDetails(
           accountName = "name nameson",
           accountNumber = "112233",

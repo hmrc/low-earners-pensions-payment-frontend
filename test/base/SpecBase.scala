@@ -40,6 +40,7 @@ import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
+import models.nps.ClaimStatus.Paid
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -198,8 +199,7 @@ trait SpecBase
     value = dummyBarsResponse,
     correlationId = testCorrelationId
   )
-
-
+  
   private val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
     responseTimestamp = Some("2023-06-27 09:12:28"),
     calculationSequenceNumber = 123,
@@ -215,7 +215,7 @@ trait SpecBase
   private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
     claimSequenceNumber = 123,
     entitlementAmount = Some(10.56),
-    claimStatus = "CANCELLED",
+    claimStatus = Paid,
     inSelfAssessment = true,
     calculationDate = Some("2023-06-27"),
     claimDate = Some("2023-06-27"),
@@ -224,7 +224,7 @@ trait SpecBase
     originalAmount = Some(10.56)
   )
 
-  private val calculation: LowEarnersCalculation = LowEarnersCalculation(
+  val calculation: LowEarnersCalculation = LowEarnersCalculation(
     lowEarnersClaimDetails = claimDetails,
     lowEarnersDataDetails = dataDetails
   )

@@ -16,12 +16,16 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
 
 trait InsetTextFluency {
   object InsetTextViewModel {
     def apply(content: Content): InsetText = 
       InsetText(content = content)
+    
+    def apply(html: Html): InsetText =
+      InsetText(content = HtmlContent(html))
   }
 }

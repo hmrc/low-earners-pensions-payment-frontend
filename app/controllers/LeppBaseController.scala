@@ -42,12 +42,10 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
     )
 
   protected[controllers] def submitUrl(mode: Mode, page: Page): Call = page match {
-    case WhatYouWillNeedPage => routes.WhatYouWillNeedController.onPageLoad()
-    case DashboardPage => routes.TempLeppController.onSubmit()
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case CheckYourAnswersPage => routes.CheckYourAnswersController.onSubmit()
-    case _ => routes.TempLeppController.onPageLoad()
+    case _ => routes.DashboardController.onPageLoad()
   }
 
   protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {

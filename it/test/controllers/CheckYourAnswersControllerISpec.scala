@@ -21,11 +21,12 @@ import models.CorrelationId
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.userAnswers.LeppItemStatus.{Available, Paid}
-import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
+import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
@@ -35,8 +36,6 @@ import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
 import views.html.{CheckYourAnswersView, ErrorTemplate}
-import org.mockito.Mockito.when as mockitoWhen
-import play.api.libs.json.Json
 
 import scala.concurrent.Future
 
@@ -142,34 +141,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     "submission succeeds for a multiple available LEPP items" should {
       "redirect to confirmation page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            ),
-            LeppItem(
-              taxYear = 2026,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            ),
-            LeppItem(
-              taxYear = 2024,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Paid
-            )
-          )
-        )
-
+        
         val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj(

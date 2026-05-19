@@ -16,11 +16,11 @@
 
 package models.nps
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, Reads}
 
 case class LowEarnersCalculation(lowEarnersClaimDetails: LowEarnersClaimDetails,
                                  lowEarnersDataDetails: LowEarnersDataDetails)
 
 object LowEarnersCalculation {
-  implicit val format: OFormat[LowEarnersCalculation] = Json.format[LowEarnersCalculation]
+  implicit val reads: Reads[LowEarnersCalculation] = Json.reads[LowEarnersCalculation]
 }

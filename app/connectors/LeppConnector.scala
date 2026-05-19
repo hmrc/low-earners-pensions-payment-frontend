@@ -21,8 +21,6 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
 import models.nps.RetrieveClaimsResponse
-import play.api.libs.json.*
-import play.api.libs.json.Format.GenericFormat
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}

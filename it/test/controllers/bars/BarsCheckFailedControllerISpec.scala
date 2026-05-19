@@ -19,7 +19,6 @@ package controllers.bars
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
 import models.userAnswers.*
-import models.userAnswers.LeppItemStatus.Available
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -42,19 +41,6 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
 
     "should return the expected view for a successful request" in {
       mockAuthSuccess()
-
-      val summaryModel: LeppSummary = LeppSummary(
-        currentLock = 67,
-        items = Seq(
-          LeppItem(
-            taxYear = 2025,
-            contributions = 1000,
-            taxRate = 20,
-            entitlement = 200,
-            status = Available
-          )
-        )
-      )
 
       val userAnswers: UserAnswers = UserAnswers(
         id = "1",

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.AnyContentAsEmpty
@@ -29,16 +29,51 @@ class SubmitConfirmationControllerSpec extends SpecBase {
   "Submit confirmation controller" - {
     val summaryModel: LeppSummary = LeppSummary(
       currentLock = 67,
-      items = Seq(
+      availableItems = Some(Seq(
         LeppItem(
+          id = "A-25-1",
           taxYear = 2025,
           contributions = 1000,
           taxRate = 20,
           entitlement = 200,
-          status = Available
+          status = Available,
+          claimDate = None
+        )
+      )),
+      paidItems = Some(Seq(
+        LeppItem(
+          id = "P-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Paid,
+          claimDate = None
+        )
+      )),
+      suspendedItems = Some(Seq(
+        LeppItem(
+          id = "S-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Suspended,
+          claimDate = None
+        )
+      )),
+      cancelledItems = Some(Seq(
+        LeppItem(
+          id = "C-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Cancelled,
+          claimDate = None
         )
       )
-    )
+      ))
 
     val bankAccountDetails: BankAccountDetails = BankAccountDetails(
       accountName = "name",

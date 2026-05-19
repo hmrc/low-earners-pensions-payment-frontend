@@ -10,8 +10,7 @@ GET    /                                    controllers.WhatYouWillNeedControlle
 GET    /start                               controllers.WhatYouWillNeedController.onPageLoad()
 
 # Dashboard page
-GET    /dashboard                           controllers.TempLeppController.onPageLoad(tempPage: TempPage = Dashboard)
-POST   /dashboard                           controllers.TempLeppController.onSubmit(tempPage: TempPage = Dashboard)
+GET    /dashboard                           controllers.DashboardController.onPageLoad()
 
 # Payment Calc Breakdown page
 GET    /breakdown                           controllers.PaymentCalcBreakdownController.onPageLoad()

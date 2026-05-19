@@ -18,8 +18,8 @@ package controllers.actions
 
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
-import play.api.test.Helpers.stubBodyParser
 import play.api.mvc.Results.Redirect
+import play.api.test.Helpers.stubBodyParser
 
 import scala.concurrent.{ExecutionContext, Future}
 

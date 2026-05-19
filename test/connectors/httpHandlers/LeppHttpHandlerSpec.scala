@@ -120,7 +120,7 @@ class LeppHttpHandlerSpec extends SpecBase {
             |           "claimSequenceNumber": 123,
             |           "calculationDate": "2023-06-27",
             |           "claimDate": "2023-06-27",
-            |           "claimStatus": "CANCELLED",
+            |           "claimStatus": "PAID",
             |           "entitlementAmount": 10.56,
             |           "inSelfAssessment": true,
             |           "originalAmount": 10.56,

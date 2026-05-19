@@ -18,9 +18,7 @@ package controllers
 
 import common.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
-import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.*
-import pages.TempPage.Breakdown
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
@@ -46,20 +44,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
 
   private val formProvider: WhatAreYourBankDetailsFormProvider = new WhatAreYourBankDetailsFormProvider
   private val form: Form[BankAccountDetails] = formProvider()
-
-  private val summaryModel: LeppSummary = LeppSummary(
-    currentLock = 67,
-    items = Seq(
-      LeppItem(
-        taxYear = 2025,
-        contributions = 1000,
-        taxRate = 20,
-        entitlement = 200,
-        status = Available
-      )
-    )
-  )
-
+  
   private val userAnswersWithLepp: UserAnswers = UserAnswers(
     id = "1",
     data = Json.obj(
@@ -73,6 +58,10 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
+    testControllerAuth(request)
+    testSessionDataHandling(request)
+    testLeppDataHandling(request)
+
     "existing user answers are found" should {
       "return view with filled answers" in {
         mockAuthSuccess()
@@ -84,9 +73,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         )
 
         val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
-
         val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-
         val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
 
         status(result) shouldBe OK
@@ -155,6 +142,10 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
+
+    testControllerAuth(request())
+    testSessionDataHandling(request())
+    testLeppDataHandling(request())
 
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,

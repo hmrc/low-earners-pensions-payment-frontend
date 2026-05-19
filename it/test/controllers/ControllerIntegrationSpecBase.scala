@@ -19,9 +19,8 @@ package controllers
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.{IntegrationSpecBase, WireMockMethods}
 import config.AppConfig
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
-import pages.TempPage.Dashboard
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
 import play.api.http.Writeable
@@ -37,16 +36,51 @@ import scala.concurrent.Future
 trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
-    items = Seq(
+    availableItems = Some(Seq(
       LeppItem(
+        id = "A-25-1",
         taxYear = 2025,
         contributions = 1000,
         taxRate = 20,
         entitlement = 200,
-        status = Available
+        status = Available,
+        claimDate = None
+      )
+    )),
+    paidItems = Some(Seq(
+      LeppItem(
+        id = "P-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Paid,
+        claimDate = None
+      )
+    )),
+    suspendedItems = Some(Seq(
+      LeppItem(
+        id = "S-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Suspended,
+        claimDate = None
+      )
+    )),
+    cancelledItems = Some(Seq(
+      LeppItem(
+        id = "C-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Cancelled,
+        claimDate = None
       )
     )
-  )
+    ))
 
   val bankAccountDetails: BankAccountDetails = BankAccountDetails(
     accountName = "name",
@@ -189,27 +223,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     "an LEPP submission has already been made for the current session" should {
       "wipe user answers and redirect to dashboard page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
-        val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-          accountName = "name",
-          accountNumber = "number",
-          sortCode = "sortcode",
-          rollNumber = Some("rollNumber")
-        )
-
+        
         val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj(
@@ -226,7 +240,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
   }
@@ -248,7 +262,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
   }
@@ -257,20 +271,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     "bank details cannot be found in the session" should {
       "redirect to dashboard page" in {
         mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
-        )
-
+        
         lazy val application: Application = applicationWithUserAnswers(
           UserAnswers(
             id = "1",

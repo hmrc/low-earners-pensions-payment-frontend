@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import play.api.mvc.JavascriptLiteral
+import java.text.NumberFormat
+import java.util.{Currency, Locale}
 
-enum TempPage {
-  case Breakdown, Dashboard
-}
-
-object TempPage {
-  implicit val jsLiteral: JavascriptLiteral[TempPage] = {
-    case Breakdown => "Breakdown"
-    case Dashboard => "Dashboard"
+object CurrencyFormats {
+  private val currencyFormatter = {
+    val f: NumberFormat = NumberFormat.getCurrencyInstance
+    f.setCurrency(Currency.getInstance(Locale.UK))
+    f
   }
+
+  def format(value: Number): String =
+    currencyFormatter
+      .format(value)
+      .replace("GBP", "")
+      .replace(".00", "")
 }
