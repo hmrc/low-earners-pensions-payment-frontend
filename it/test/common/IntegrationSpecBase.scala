@@ -79,7 +79,9 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.bars.host" -> wireMockHost,
         "microservice.services.bars.env" -> "local",
         "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.auth.host" -> wireMockHost
+        "microservice.services.auth.host" -> wireMockHost,
+        "microservice.services.lepp-backend.port" -> wireMockPort,
+        "microservice.services.lepp-backend.host" -> wireMockHost
       )
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),

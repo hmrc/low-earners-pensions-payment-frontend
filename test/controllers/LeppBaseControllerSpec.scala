@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
+import controllers.actions.*
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
@@ -41,10 +41,11 @@ class LeppBaseControllerSpec extends SpecBase {
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
     
-    class DummyController(id: IdentifierAction,
+    
+    class DummyController(identifierAction: IdentifierAction,
                           data: DataRetrievalAction,
                           val controllerComponents: MessagesControllerComponents = mockCc)
-      extends LeppBaseController(id, data) with SessionDataHandling {
+      extends LeppBaseController(identifierAction, data) with SessionDataHandling {
       
       override val sessionService: SessionCacheService = mockSessionService
       override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global

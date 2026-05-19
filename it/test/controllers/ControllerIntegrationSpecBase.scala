@@ -19,9 +19,9 @@ package controllers
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.{IntegrationSpecBase, WireMockMethods}
 import config.AppConfig
+import connectors.barsLockout.model.{BarVerifyStatusId, BarsUpdateVerifyStatusParams}
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
-import pages.TempPage.Dashboard
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
 import play.api.http.Writeable
@@ -32,6 +32,8 @@ import play.api.test.Helpers.*
 import viewmodels.NormalMode
 
 import java.net.URLEncoder
+import java.time.temporal.ChronoUnit.HOURS
+import java.time.*
 import scala.concurrent.Future
 
 trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
@@ -62,6 +64,11 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
       "bankDetails" -> Json.toJson(bankAccountDetails)
     )
   )
+
+  val initialLocalDate: LocalDate = LocalDate.parse("2020-12-25")
+  val clock: Clock = Clock.fixed(initialLocalDate.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneId.of("Z"))
+  val expectedLockout: Instant = Instant.now(clock).plus(24, HOURS)
+  val nino: String = validNino()
   
   private val authoriseUri: String = "/auth/authorise"
 
@@ -94,16 +101,25 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     """.stripMargin
   )
 
-  def mockAuthSuccess(): StubMapping = {
+  def mockAuthSuccess(nino: String = nino): StubMapping = {
     val authResponseJson: JsObject =
       Json.obj("confidenceLevel" -> 250) ++
-        Json.obj("nino" -> validNino()) ++
+        Json.obj("nino" -> nino) ++
         Json.obj("internalId" -> "anId") ++
         Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment)))
 
     when(method = POST, uri = authoriseUri)
       .withRequestBody(authRequestJson)
       .thenReturn(status = OK, body = authResponseJson)
+  }
+
+  def mockBarsAction(url: String,
+                      status: Int = OK,
+                      response: JsValue): StubMapping = {
+
+    when(method = POST, uri = url)
+      .withRequestBody(Json.toJson(BarsUpdateVerifyStatusParams(BarVerifyStatusId(nino))))
+      .thenReturn(status = status, body = response)
   }
 
   private def handleForAuthError[A: Writeable](request: FakeRequest[A],

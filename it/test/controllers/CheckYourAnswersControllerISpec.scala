@@ -24,8 +24,10 @@ import models.errors.ErrorResult.ServiceErrorResult
 import models.userAnswers.LeppItemStatus.{Available, Paid}
 import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
@@ -35,23 +37,26 @@ import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
 import views.html.{CheckYourAnswersView, ErrorTemplate}
-import org.mockito.Mockito.when as mockitoWhen
-import play.api.libs.json.Json
 
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
-
+  
+  val barsVerifyStatusUrl = ""
   "GET /check-your-answers" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/low-earners-pensions-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
 
+    val barsResponse = s"""{"attempts":3,"lockoutExpiryDateTime":"${expectedLockout.toString}"}"""
+    
     "a valid request is made" should {
       "return the expected view" in {
         mockAuthSuccess()
-
+        mockBarsAction(url = "/low-earners-pensions-payment/bars/verify/status",
+          response = Json.parse(s"""{"attempts":1}""".stripMargin))
+        
         val application: Application = applicationWithUserAnswers(userAnswers)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -83,6 +88,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     "backend returns an error for any LEPP submissions" should {
       "redirect to error page" in {
         mockAuthSuccess()
+        
         val application: Application = applicationWithUserAnswers(userAnswers)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(

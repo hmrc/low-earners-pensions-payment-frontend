@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 

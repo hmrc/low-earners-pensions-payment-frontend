@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.{Inject, Singleton}
 import connectors.barsLockout.BarsVerifyStatusConnector
 import connectors.barsLockout.model.BarVerifyStatusId
-import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction, Actions}
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -36,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
+                                                 barsLockout: BarsLockoutAction,
                                                  getData: DataRetrievalAction,
                                                  val sessionService: SessionCacheService,
                                                  correlationIdHandler: CorrelationIdOptional,
@@ -46,7 +47,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling with Logging {
+  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
@@ -70,22 +71,19 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
               barsRequest = answer.toBarsRequest
             ).biSemiflatMap(
               err =>
-                barsVerifyStatusConnector
-                  .update(BarVerifyStatusId.from(req.user.nino)).map { verifyStatus =>
-                    println("---------------------- STATUS VERIFY COUNT " + verifyStatus.attempts)
-                    println("---------------------- STATUS VERIFY TIME " + verifyStatus.lockoutExpiryDateTime)
-                    // here we catch a lockout BarsStatus condition and force a TooManyAttempts (BarsError) response
-//                                        verifyStatus.lockoutExpiryDateTime
-//                                          .map { expiry =>
-//                                            Redirect(controllers.bars.routes.BarsLockoutController.barsLockout)
-//                                          }
-                  } recover { case e =>
-                  logger.error("[WhatAreYourBankDetailsController][onSubmit] ",
-                    "updated failed for:" +
-                      s" ${req.user.nino.nino}", e
-                  )
-                }
                 if (err.value.status == BAD_REQUEST) {
+                  barsVerifyStatusConnector
+                    .update(BarVerifyStatusId.from(req.user.nino)).map { verifyStatus =>
+                                                              verifyStatus.lockoutExpiryDateTime
+                                                                .map { expiry =>
+                                                                  Redirect(controllers.bars.routes.BarsLockoutController.barsLockout)
+                                                                }
+                    } recover { case e =>
+                    logger.error("[WhatAreYourBankDetailsController][onSubmit] ",
+                      "updated failed for:" +
+                        s" ${req.user.nino.nino}", e
+                    )
+                  }
                   Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
                 } else {
                   Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))

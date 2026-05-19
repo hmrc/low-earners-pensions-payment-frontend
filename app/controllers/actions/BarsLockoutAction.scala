@@ -29,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BarsLockoutActionRefiner @Inject() (
+class BarsLockoutAction @Inject()(
   barsVerifyStatusConnector: BarsVerifyStatusConnector
 )(implicit ec: ExecutionContext)
     extends ActionRefiner[IdentifierRequest, BarsVerifiedRequest]
@@ -38,7 +38,6 @@ class BarsLockoutActionRefiner @Inject() (
 
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
     implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    println(" -------------------------- YES NO "+headerCarrier.authorization.get.value)
 
     barsVerifyStatusConnector.status(BarVerifyStatusId.from(request.user.nino)).map { status =>
       status.lockoutExpiryDateTime match {
@@ -48,7 +47,7 @@ class BarsLockoutActionRefiner @Inject() (
           Right(
             new BarsVerifiedRequest(
               request = request,
-              numberOfBarsVerifyAttempts = status.attempts
+              numberOfBarsVerifyAttempts = status.attempts,
             )
           )
       }

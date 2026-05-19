@@ -34,6 +34,7 @@ package base
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import connectors.barsLockout.BarsVerifyStatusConnector
 import controllers.actions.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
@@ -91,13 +92,18 @@ trait SpecBase
 
   val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction()
 
+  val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(mockBarsConnector, 1)
+  
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
+                                   barsLockoutAction: BarsLockoutAction = mockBarsLockoutAction,
                                    servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
       .overrides(
         bind[IdentifierAction].toInstance(identifierAction),
+        bind[BarsLockoutAction].toInstance(barsLockoutAction),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
 

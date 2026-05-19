@@ -45,4 +45,4 @@ GET     /service-timeout-idle               controllers.auth.SessionTimeoutContr
 GET     /refresh-session                    controllers.KeepAliveController.keepAlive()
 
 # BARs lockout
-GET         /bars-lockout                   controllers.bars.BarsLockoutController.barsLockout
+GET         /bars-lockout                   controllers.bars.BarsLockoutController.barsLockout()

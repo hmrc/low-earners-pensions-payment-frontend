@@ -17,24 +17,40 @@
 package controllers.actions
 
 import controllers.actions.request.{BarsVerifiedRequest, LockedOutJourneyRequest}
-import models.requests.IdentifierRequest
+import models.requests.{DataRequest, IdentifierRequest}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, Request}
 
 import javax.inject.Inject
 
 class Actions @Inject()(
-  actionBuilder:                     DefaultActionBuilder,
-  authorisedRefiner:                 IdentifierAction,
-  barsLockoutActionRefiner:          BarsLockoutActionRefiner,
-  barsLockedOutJourneyActionRefiner: BarsLockedOutJourneyActionRefiner
+                         actionBuilder: DefaultActionBuilder,
+                         authorisedRefiner: IdentifierAction,
+                         barsLockoutAction: BarsLockoutAction,
+                         getData: DataRetrievalAction,
+                         barsLockedOutJourneyActionRefiner: BarsLockedOutJourneyActionRefiner
 ) {
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val authenticatedAction: ActionBuilder[BarsVerifiedRequest, AnyContent] =
+  val authenticatedAction: ActionBuilder[IdentifierRequest, AnyContent] =
     actionBuilder
       .andThen[IdentifierRequest](authorisedRefiner)
-      .andThen[BarsVerifiedRequest](barsLockoutActionRefiner)
+
+  val authenticatedActionWithData: ActionBuilder[DataRequest, AnyContent] =
+    actionBuilder
+      .andThen[IdentifierRequest](authorisedRefiner)
+      .andThen[DataRequest](getData)  
+
+  val authWithBarsLockoutAction: ActionBuilder[BarsVerifiedRequest, AnyContent] =
+    actionBuilder
+      .andThen[IdentifierRequest](authorisedRefiner)
+      .andThen[BarsVerifiedRequest](barsLockoutAction)
+
+  val authWithBarsLockoutActionWithData: ActionBuilder[DataRequest, AnyContent] =
+    actionBuilder
+      .andThen[IdentifierRequest](authorisedRefiner)
+      .andThen[BarsVerifiedRequest](barsLockoutAction)
+      .andThen[DataRequest](getData)
 
   val barsLockedOutAction: ActionBuilder[LockedOutJourneyRequest, AnyContent] =
     actionBuilder

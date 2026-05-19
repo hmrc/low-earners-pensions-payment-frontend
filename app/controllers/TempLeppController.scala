@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{LeppItem, LeppSummary}
 import navigation.Navigator

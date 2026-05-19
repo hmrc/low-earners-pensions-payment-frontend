@@ -16,33 +16,29 @@
 
 package controllers.bars
 
-import controllers.actions.Actions
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.actions.{BarsLockedOutJourneyActionRefiner, IdentifierAction}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
 import views.html.bars.BarsLockout
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton
 class BarsLockoutController @Inject()(
-  barsLockoutView: BarsLockout,
-  actions:         Actions,
-  mcc:             MessagesControllerComponents
+                                     identify: IdentifierAction,
+                                     barsLockedOutJourneyAction: BarsLockedOutJourneyActionRefiner,
+                                     barsLockoutView: BarsLockout,
+                                     mcc:             MessagesControllerComponents
 )(implicit languageUtils: LanguageUtils)
     extends FrontendController(mcc)
     with I18nSupport {
 
-  // checking for a return url, returning urls when none is found
-  override def messagesApi: MessagesApi = mcc.messagesApi
-  val barsLockout: Action[AnyContent]   = actions.barsLockedOutAction { implicit request =>
-    val returnUrl = request.returnUrl match {
-      case Some(url) => url.value
-      case None      => controllers.routes.WhatYouWillNeedController.onPageLoad().url
-    }
+  val barsLockout: Action[AnyContent]   = (identify andThen barsLockedOutJourneyAction).async  { implicit request =>
+    val returnUrl = controllers.routes.TempLeppController.onPageLoad().url
 
-    Ok(barsLockoutView(request.barsLockoutExpiryTime, returnUrl))
+    Future.successful(Ok(barsLockoutView(request.barsLockoutExpiryTime, returnUrl)))
   }
-
 }

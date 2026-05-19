@@ -25,6 +25,5 @@ import java.time.Instant
 class LockedOutJourneyRequest[A](
                                   override val request:           IdentifierRequest[A],
                                   val barsLockoutExpiryTime:      Instant,
-                                  val numberOfBarsVerifyAttempts: NumberOfBarsVerifyAttempts,
-                                  val returnUrl:                  Option[ReturnUrl]
+                                  val numberOfBarsVerifyAttempts: NumberOfBarsVerifyAttempts
 ) extends IdentifierRequest[A](request, request.user)

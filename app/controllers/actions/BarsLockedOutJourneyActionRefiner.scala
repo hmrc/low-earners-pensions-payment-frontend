@@ -49,8 +49,7 @@ class BarsLockedOutJourneyActionRefiner @Inject() (
             new LockedOutJourneyRequest(
               request = request,
               barsLockoutExpiryTime = expiry,
-              numberOfBarsVerifyAttempts = status.attempts,
-              None
+              numberOfBarsVerifyAttempts = status.attempts
             )
           )
         case None =>

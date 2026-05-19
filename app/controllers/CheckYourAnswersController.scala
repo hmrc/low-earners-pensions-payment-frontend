@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction, Actions}
 import navigation.Navigator
 import pages.CheckYourAnswersPage
 import play.api.i18n.I18nSupport
@@ -32,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
+                                           barsLockout: BarsLockoutAction,
                                            getData: DataRetrievalAction,
                                            val controllerComponents: MessagesControllerComponents,
                                            view: CheckYourAnswersView,
@@ -41,7 +42,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            navigator: Navigator,
                                            errorView: ErrorTemplate)
                                           (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling {
 
   def onPageLoad(): Action[AnyContent] = handleForCyaPage { implicit req =>
     (_, bankDetails) =>

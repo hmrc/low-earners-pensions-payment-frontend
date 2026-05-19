@@ -31,16 +31,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BarsVerifyStatusConnector @Inject()(httpClient: HttpClientV2,
                                 config: AppConfig) {
-
-  // POST to keep the Id out of the url
-  def status(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[BarsVerifyStatusResponse] = {
-    println(" -------------------------- YES YES "+hc.authorization.get.value)
+  
+  def status(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[BarsVerifyStatusResponse] =
     httpClient
       .post(url"${config.verifyStatus}")
       .setHeader((correlationIdKey, "correlationId"))
       .withBody(Json.toJson(BarsUpdateVerifyStatusParams(id)))
       .execute[BarsVerifyStatusResponse]
-  }
 
   def update(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext,
                                     correlationId: CorrelationId): Future[BarsVerifyStatusResponse] =

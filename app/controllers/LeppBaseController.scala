@@ -16,11 +16,10 @@
 
 package controllers
 
-import controllers.actions.{Actions, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.*
-import pages.TempPage.Breakdown
 import play.api.i18n.I18nSupport
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Call, Result}

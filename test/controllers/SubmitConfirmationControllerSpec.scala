@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.{BarsLockoutAction, FakeBarsLockoutAction}
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.libs.json.{JsBoolean, Json}
@@ -57,6 +58,7 @@ class SubmitConfirmationControllerSpec extends SpecBase {
     )
     
     "must return OK and the correct view for a GET" in {
+      
       val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
@@ -66,6 +68,23 @@ class SubmitConfirmationControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to BARS lockout controller when bars check limit exceeds" in {
+
+      val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(mockBarsConnector, 3)
+      
+      val application = applicationBuilder(userAnswers = userAnswers, barsLockoutAction = mockBarsLockoutAction).build()
+
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.SubmitConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(bars.routes.BarsLockoutController.barsLockout.url)
       }
     }
   }

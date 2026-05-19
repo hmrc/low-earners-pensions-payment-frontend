@@ -129,3 +129,22 @@ breakdown.l3 = Your payment: £{0}
 breakdown.p2 = If you think the amounts are wrong, you can
 breakdown.p2.a1 = contact us (opens in new tab)
 breakdown.p3 = To accept these payments, you need to provide us with your bank details.
+
+# BARS lockout page
+bars.lockout.title = You’ve tried to confirm your bank details too many times
+bars.lockout.p2 = You can try again after {0} to confirm your bank details.
+bars.lockout.go-to-tax-account = Go to tax account
+
+# Months
+JANUARY = January
+FEBRUARY = February
+MARCH = March
+APRIL = April
+MAY = May
+JUNE = June
+JULY = July
+AUGUST = August
+SEPTEMBER = September
+OCTOBER = October
+NOVEMBER = November
+DECEMBER = December

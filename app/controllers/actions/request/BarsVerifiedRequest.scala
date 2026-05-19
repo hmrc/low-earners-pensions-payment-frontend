@@ -19,7 +19,10 @@ package controllers.actions.request
 import connectors.barsLockout.model.NumberOfBarsVerifyAttempts
 import models.requests.IdentifierRequest
 
+import java.time.Instant
+
 class BarsVerifiedRequest[A](
                               override val request:           IdentifierRequest[A],
-                              val numberOfBarsVerifyAttempts: NumberOfBarsVerifyAttempts = NumberOfBarsVerifyAttempts.zero
+                              val numberOfBarsVerifyAttempts: NumberOfBarsVerifyAttempts = NumberOfBarsVerifyAttempts.zero,
+                              val barsLockoutExpiryTime:      Option[Instant] = None,
 ) extends IdentifierRequest[A](request, request.user)
