@@ -26,7 +26,6 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.*
-import utils.CorrelationIdOptional
 import viewmodels.Mode
 import views.html.WhatAreYourBankDetailsView
 
@@ -36,10 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  getData: DataRetrievalAction,
                                                  val sessionService: SessionCacheService,
-                                                 correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
-                                                 barsService: BarsService,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
@@ -47,37 +44,27 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
 
   private val form: Form[BankAccountDetails] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
-    req.userAnswers.get(WhatAreYourBankDetailsPage) match {
-      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
-      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
-    }
+  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>
+    _ =>
+      req.userAnswers.get(WhatAreYourBankDetailsPage) match {
+        case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
+        case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+      }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
-    correlationIdHandler.handleCorrelationId(req)(implicit cid =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(
-            view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
-          )),
-          answer => {
-            barsService.checkBankAccountDetails(
-              barsRequest = answer.toBarsRequest
-            ).biSemiflatMap(
-              err => if(err.value.status == BAD_REQUEST) {
-                Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
-              } else {
-                Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
-              },
-              _ => for {
-                updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
-                _ <- sessionService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
-            ).merge
-          }
-        )
-    )
+  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req => _ =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(
+          view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
+        )),
+        answer => {
+          for {
+            updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+            _ <- sessionService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
+        }
+      )
   }
 }

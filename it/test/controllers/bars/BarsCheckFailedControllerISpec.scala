@@ -18,9 +18,7 @@ package controllers.bars
 
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
-import models.userAnswers.*
 import play.api.Application
-import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,29 +32,24 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details-check-failed"
     ).withSession(SessionKeys.authToken -> "auth token")
-    
-    testControllerAuth(request)
-    testSessionDataHandling(request)
-    testLeppDataHandling(request)
 
-    "should return the expected view for a successful request" in {
-      mockAuthSuccess()
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true
+    )
 
-      val userAnswers: UserAnswers = UserAnswers(
-        id = "1",
-        data = Json.obj(
-          "leppSummary" -> Json.toJson(summaryModel)
+    "a valid request is made" should {
+      "render view correctly" in {
+        mockAuthSuccess()
+        lazy val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
         )
-      )
 
-      lazy val application: Application = applicationWithUserAnswers(userAnswers)
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-      
-      status(result) shouldBe INTERNAL_SERVER_ERROR
-      contentAsString(result) should include("Please try again later")
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+        contentAsString(result) should include("Please try again later")
+      }
     }
   }
 }

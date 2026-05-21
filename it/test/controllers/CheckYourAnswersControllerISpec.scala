@@ -17,16 +17,18 @@
 package controllers
 
 import cats.data.EitherT
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.CorrelationId
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.userAnswers.{LeppSummary, UserAnswers}
+import models.userAnswers.LeppItemStatus.{Available, Paid}
+import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
@@ -37,6 +39,7 @@ import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
 import views.html.{CheckYourAnswersView, ErrorTemplate}
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
@@ -46,12 +49,17 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
+    
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true
+    )
 
     "a valid request is made" should {
       "return the expected view" in {
         mockAuthSuccess()
 
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -78,11 +86,166 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     )
       .withSession(SessionKeys.authToken -> "auth token")
+    
+    testUserAnswersHandling(
+      request = request,
+      withBankDetailsHandlingTest = true
+    )
+
+    val barsRequest: JsValue = Json.parse(
+      """
+        |{
+        | "account": {
+        |   "accountNumber":"12345678",
+        |   "sortCode":"112233",
+        |   "rollNumber":"1234678"
+        | },
+        | "subject": {
+        |   "name":"Taxwell Payer"
+        | }
+        |}
+      """.stripMargin
+    )
+
+    def mockBarsSuccess(): StubMapping = {
+      val barsResponse: String =
+        s"""
+           |{
+           | "accountNumberIsWellFormatted": "yes",
+           | "accountExists": "yes",
+           | "nameMatches": "yes",
+           | "accountName": "name",
+           | "nonStandardAccountDetailsRequiredForBacs": "no",
+           | "sortCodeIsPresentOnEISCD": "yes",
+           | "sortCodeSupportsDirectDebit": "yes",
+           | "sortCodeSupportsDirectCredit": "yes",
+           | "sortCodeBankName": "bank name",
+           | "iban": "iban"
+           |}
+        """.stripMargin
+
+      when(method = POST, uri = "/verify/personal")
+        .withRequestBody(barsRequest)
+        .thenReturn(OK, barsResponse)
+    }
+
+    "BARS check fails" should {
+      def handleForBarsResponse(scenarioName: String,
+                                barsStatus: Int,
+                                barsBody: String,
+                                expectedRedirect: String,
+                                barsRedirectHeader: Option[String] = None): Unit = s"handle for BARS scenario: $scenarioName" in {
+        mockAuthSuccess()
+
+        barsRedirectHeader.fold(
+          when(method = POST, uri = "/verify/personal")
+            .withRequestBody(barsRequest)
+            .thenReturn(barsStatus, barsBody)
+        )(rdr =>
+          when(method = POST, uri = "/verify/personal")
+            .withRequestBody(barsRequest)
+            .thenReturn(barsStatus, Map(LOCATION -> rdr))
+        )
+
+        val app: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
+
+        val result: Future[Result] = route(app, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(expectedRedirect)
+      }
+
+      val checkFailedRoute: String = controllers.bars.routes.BarsCheckFailedController.onPageLoad().url
+      val requestErrorsRoute: String = controllers.bars.routes.BarsRequestErrorsController.onPageLoad().url
+
+      "the BARS service return an error response" must {
+        Seq(
+          ("BARS returns 500 status", INTERNAL_SERVER_ERROR, "n/a", checkFailedRoute, None),
+          ("BARS returns 404 status", NOT_FOUND, "n/a", checkFailedRoute, None),
+          ("BARS returns 403 status", FORBIDDEN, "n/a", checkFailedRoute, None),
+          ("BARS returns 400 status", BAD_REQUEST, "n/a", checkFailedRoute, None),
+          ("BARS returns 301 status", MOVED_PERMANENTLY, "n/a", checkFailedRoute, Some("url")),
+          ("BARS returns 303 status", SEE_OTHER, "n/a", checkFailedRoute, Some("url")),
+          ("BARS returns 307 status", TEMPORARY_REDIRECT, "n/a", checkFailedRoute, Some("url")),
+          ("BARS returns unhandled status", IM_A_TEAPOT, "n/a", checkFailedRoute, None)
+        ).foreach(handleForBarsResponse)
+      }
+
+      "the BARS service return an OK response with business rule violations" should {
+        def barsResponse(isWellFormatted: String = "yes",
+                         accountExists: String = "yes",
+                         nameMatches: String = "yes",
+                         nonStandard: String = "no",
+                         sortCodeFound: String = "yes",
+                         supportsDirectCredit: String = "yes"): String =
+          s"""
+             |{
+             | "accountNumberIsWellFormatted": "$isWellFormatted",
+             | "accountExists": "$accountExists",
+             | "nameMatches": "$nameMatches",
+             | "accountName": "name",
+             | "nonStandardAccountDetailsRequiredForBacs": "$nonStandard",
+             | "sortCodeIsPresentOnEISCD": "$sortCodeFound",
+             | "sortCodeSupportsDirectDebit": "yes",
+             | "sortCodeSupportsDirectCredit": "$supportsDirectCredit",
+             | "sortCodeBankName": "bank name",
+             | "iban": "iban"
+             |}
+          """.stripMargin
+
+        val errorsBarsBody: String = barsResponse(
+          accountExists = "error",
+          nameMatches = "error",
+          sortCodeFound = "error",
+          supportsDirectCredit = "error"
+        )
+
+        val indeterminateBarsBody: String = barsResponse(
+          accountExists = "indeterminate",
+          nameMatches = "indeterminate"
+        )
+
+        val multipleRequestErrorsBarsBody: String = barsResponse(
+          supportsDirectCredit = "no",
+          nonStandard = "yes"
+        )
+
+        val mixedErrorsBarsBody: String = barsResponse(
+          supportsDirectCredit = "no",
+          nonStandard = "yes",
+          sortCodeFound = "error"
+        )
+
+        Seq(
+          ("Account doesn't support direct credit", OK, barsResponse(supportsDirectCredit = "no"), requestErrorsRoute),
+          ("Sort code not found", OK, barsResponse(sortCodeFound = "no"), requestErrorsRoute),
+          ("Extra info required", OK, barsResponse(nonStandard = "yes"), requestErrorsRoute),
+          ("Name doesn't match", OK, barsResponse(nameMatches = "no"), requestErrorsRoute),
+          ("Account not found", OK, barsResponse(accountExists = "no"), requestErrorsRoute),
+          ("Failed modulus check", OK, barsResponse(isWellFormatted = "no"), requestErrorsRoute),
+          ("Field errors", OK, errorsBarsBody, checkFailedRoute),
+          ("Result indeterminate", OK, indeterminateBarsBody, checkFailedRoute),
+          ("Multiple request errors", OK, multipleRequestErrorsBarsBody, requestErrorsRoute),
+          ("Mixed errors", OK, mixedErrorsBarsBody, checkFailedRoute)
+        ).foreach((scenarioName, barsStatus, barsBody, expectedRedirect) =>
+          handleForBarsResponse(
+            scenarioName = scenarioName,
+            barsStatus = barsStatus,
+            barsBody = barsBody,
+            expectedRedirect = expectedRedirect,
+            barsRedirectHeader = None
+          )
+        )
+      }
+    }
 
     "backend returns an error for any LEPP submissions" should {
       "redirect to error page" in {
         mockAuthSuccess()
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        mockBarsSuccess()
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -104,16 +267,17 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
 
         val view = application.injector.instanceOf[ErrorTemplate]
         implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-        
+
         status(result) shouldBe INTERNAL_SERVER_ERROR
         contentAsString(result) shouldBe view("title", "heading", "message")(request, messages).toString
       }
     }
-    
+
     "submission succeeds for a single available LEPP item" should {
       "redirect to confirmation page" in {
         mockAuthSuccess()
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        mockBarsSuccess()
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -132,7 +296,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
             value = SubmitLeppResponse(updatedLowEarnersOptimisticLock = 2),
             correlationId = CorrelationId("cid")))
         )))
-        
+
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some(routes.SubmitConfirmationController.onPageLoad().url)
       }
@@ -141,7 +305,43 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     "submission succeeds for a multiple available LEPP items" should {
       "redirect to confirmation page" in {
         mockAuthSuccess()
-        
+        mockBarsSuccess()
+
+        val summaryModel: LeppSummary = LeppSummary(
+          currentLock = 67,
+          availableItems = Some(Seq(
+            LeppItem(
+              id = "id-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Available,
+              claimDate = None
+            ),
+            LeppItem(
+              id = "id-2",
+              taxYear = 2026,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Available,
+              claimDate = None
+            )
+          )),
+          paidItems = Some(Seq(
+            LeppItem(
+              id = "id-3",
+              taxYear = 2024,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = Some(LocalDate.of(2025, 1, 1))
+            )
+          ))
+        )
+
         val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = Json.obj(
@@ -149,7 +349,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
             "bankDetails" -> Json.toJson(bankAccountDetails)
           )
         )
-        
+
         val application: Application = applicationWithUserAnswers(userAnswers)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(

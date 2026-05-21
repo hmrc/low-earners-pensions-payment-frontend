@@ -36,7 +36,7 @@ class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
                                             val controllerComponents: MessagesControllerComponents)
                                            (implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
-  def onPageLoad(): Action[AnyContent] = handleWithLeppData { implicit request => _ =>
+  def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit request => _ =>
     Future.successful(BadRequest(view(viewModel(NormalMode, BarsRequestErrorsPage))))
   }
 }

@@ -16,10 +16,8 @@
 
 package controllers
 
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import common.{IntegrationSpecBase, WireMockMethods}
-import config.AppConfig
-import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
+import common.{AuthSupport, IntegrationSpecBase}
+import models.userAnswers.LeppItemStatus._
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
@@ -30,10 +28,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.NormalMode
 
-import java.net.URLEncoder
+import java.time.Instant
 import scala.concurrent.Future
 
-trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
+trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport {
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
     availableItems = Some(Seq(
@@ -83,154 +81,66 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
     ))
 
   val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-    accountName = "name",
-    accountNumber = "number",
-    sortCode = "sortcode",
-    rollNumber = Some("rollNumber")
+    accountName = "Taxwell Payer",
+    accountNumber = "12345678",
+    sortCode = "112233",
+    rollNumber = Some("1234678")
   )
 
-  val userAnswers: UserAnswers = UserAnswers(
-    id = "1",
+  val emptyUserAnswers = UserAnswers(
+    id = "some-id",
+    data = JsObject.empty,
+    lastUpdated = Instant.MIN
+  )
+
+  val userAnswersWithLeppSummary: UserAnswers = emptyUserAnswers.copy(
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel)
+    )
+  )
+
+  val userAnswersWithBankDetails: UserAnswers = emptyUserAnswers.copy(
     data = Json.obj(
       "leppSummary" -> Json.toJson(summaryModel),
       "bankDetails" -> Json.toJson(bankAccountDetails)
     )
   )
-  
-  private val authoriseUri: String = "/auth/authorise"
 
-  private val authRequestJson: JsValue = Json.parse(
-    """
-      |{
-      | "authorise": [
-      |   {
-      |      "identifiers": [],
-      |      "state": "Activated",
-      |      "enrolment": "HMRC-PI"
-      |   }
-      | ],
-      | "retrieve": [
-      |   "internalId",
-      |   "nino",
-      |   "confidenceLevel",
-      |   "authorisedEnrolments"
-      | ]
-      |}
-    """.stripMargin
+  val userAnswersWithExistingSubmission: UserAnswers = UserAnswers(
+    id = "1",
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel),
+      "bankDetails" -> Json.toJson(bankAccountDetails),
+      "isSubmitted" -> JsBoolean(true)
+    )
   )
 
-  private val ptaEnrolment: JsValue = Json.parse(
-    """
-      |{
-      | "state": "Activated",
-      | "key": "HMRC-PI"
-      |}
-    """.stripMargin
-  )
 
-  def mockAuthSuccess(): StubMapping = {
-    val authResponseJson: JsObject =
-      Json.obj("confidenceLevel" -> 250) ++
-        Json.obj("nino" -> validNino()) ++
-        Json.obj("internalId" -> "anId") ++
-        Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment)))
-
-    when(method = POST, uri = authoriseUri)
-      .withRequestBody(authRequestJson)
-      .thenReturn(status = OK, body = authResponseJson)
-  }
-
-  private def handleForAuthError[A: Writeable](request: FakeRequest[A],
-                                               error: String,
-                                               expectedRedirect: String): Unit =
-    s"return expected result for auth error - $error" in {
-      val errorString = s"""MDTP detail=\"$error\""""
-
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> errorString))
-
-      lazy val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
-    }
-
-  private def handleForAuthRedirect[A: Writeable](request: FakeRequest[A])
-                                                 (scenarioName: String,
-                                                  internalIdOpt: Option[String],
-                                                  ninoOpt: Option[String],
-                                                  confidenceLevel: Int,
-                                                  enrolments: Seq[JsValue],
-                                                  expectedRedirect: String): Unit =
-    s"return expected result for scenario - $scenarioName" in {
-      val authResponseJson: JsObject =
-        Json.obj("confidenceLevel" -> confidenceLevel) ++
-          ninoOpt.map(nino => Json.obj("nino" -> nino)).getOrElse(JsObject.empty) ++
-          internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty) ++
-          Json.obj("authorisedEnrolments" -> JsArray(enrolments))
-
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = OK, body = authResponseJson)
-
-      val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
-    }
-
-  def testControllerAuth[A: Writeable](request: FakeRequest[A]): Unit = {
-    "user authorisation is run" when {
-      "an authorisation error occurs" should {
-        val config: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
-        val loginUrl: String = config.loginUrl + "?continue=" + URLEncoder.encode(
-          config.loginContinueUrl,
-          "UTF-8"
+  private def dataTest[A: Writeable](scenario: String,
+                                     expectedResult: String,
+                                     request: FakeRequest[A],
+                                     leppSummaryOpt: Option[LeppSummary] = Some(summaryModel),
+                                     bankDetailsOpt: Option[BankAccountDetails] = Some(bankAccountDetails),
+                                     isSubmittedOpt: Option[Boolean] = None,
+                                     expectedRedirect: String): Unit =
+    s"$scenario" must {
+      s"$expectedResult" in {
+        lazy val leppSummaryJson: JsObject = leppSummaryOpt.fold(JsObject.empty)(
+          leppSummary => Json.obj("leppSummary" -> Json.toJson(leppSummary))
         )
 
-        Seq(
-          ("InvalidBearerToken", loginUrl),
-          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
-        ).foreach((error, redirect) => handleForAuthError(request, error, redirect))
-      }
-
-      "authorisation request succeeds" should {
-        val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
-        val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
-
-        Seq(
-          ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
-        ).foreach(
-          (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(request)(sn, id, nino, cl, enrls, rdr)
+        lazy val bankDetailsJson: JsObject = bankDetailsOpt.fold(JsObject.empty)(
+          bankDetails => Json.obj("bankDetails" -> Json.toJson(bankDetails))
         )
-      }
-    }
-  }
 
-  def testSessionDataHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "an LEPP submission has already been made for the current session" should {
-      "wipe user answers and redirect to dashboard page" in {
-        mockAuthSuccess()
-        
-        val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = Json.obj(
-            "leppSummary" -> Json.toJson(summaryModel),
-            "bankDetails" -> Json.toJson(bankAccountDetails),
-            "isSubmitted" -> JsBoolean(true)
-          )
+        lazy val isSubmittedJson: JsObject = isSubmittedOpt.fold(JsObject.empty)(
+          isSubmitted => Json.obj("isSubmitted" -> JsBoolean(isSubmitted))
+        )
+
+        lazy val userAnswers = UserAnswers(
+          id = "some-id",
+          data = leppSummaryJson ++ bankDetailsJson ++ isSubmittedJson,
+          lastUpdated = Instant.MIN
         )
 
         lazy val application: Application = applicationWithUserAnswers(userAnswers)
@@ -239,54 +149,55 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
+        mockAuthSuccess()
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(expectedRedirect)
       }
     }
-  }
 
-  def testLeppDataHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "LEPP data cannot be found in the session" should {
-      "redirect to dashboard page" in {
-        mockAuthSuccess()
-        
-        lazy val application: Application = applicationWithUserAnswers(
-          UserAnswers(
-            id = "1",
-            data = JsObject.empty
-          )
+  def testUserAnswersHandling[A: Writeable](request: FakeRequest[A],
+                                            withLeppDataHandlingTest: Boolean = true,
+                                            withBankDetailsHandlingTest: Boolean = false,
+                                            submissionShouldExist: Boolean = false): Unit = {
+    def existingSubmissionHandlingTest(): Unit = {
+      if (submissionShouldExist) {
+        dataTest(
+          scenario = "an existing submission is required and missing from user answers",
+          expectedResult = "redirect to CheckYourAnswers page",
+          request = request,
+          isSubmittedOpt = None,
+          expectedRedirect = routes.CheckYourAnswersController.onPageLoad().url
         )
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
+      } else {
+        dataTest(
+          scenario = "an existing submission has already been made",
+          expectedResult = "wipe user answers and redirect to Dashboard page",
+          request = request,
+          isSubmittedOpt = Some(true),
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.DashboardController.onPageLoad().url)
       }
     }
-  }
 
-  def testBankDetailsHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "bank details cannot be found in the session" should {
-      "redirect to dashboard page" in {
-        mockAuthSuccess()
-        
-        lazy val application: Application = applicationWithUserAnswers(
-          UserAnswers(
-            id = "1",
-            data = JsObject(Seq(
-              "leppSummary" -> Json.toJson(summaryModel)
-            ))
-          )
+    "checking user answers" when {
+      existingSubmissionHandlingTest()
+      if (withLeppDataHandlingTest) {
+        dataTest(
+          request = request,
+          scenario = "LeppSummary is required and is missing from user answers",
+          expectedResult = "redirect to Dashboard page",
+          leppSummaryOpt = None,
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
+      }
+      if (withBankDetailsHandlingTest) {
+        dataTest(
+          request = request,
+          scenario = "BankDetails are required and are missing from user answers",
+          expectedResult = "redirect to BankDetails page",
+          bankDetailsOpt = None,
+          expectedRedirect = routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url
         )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
       }
     }
   }

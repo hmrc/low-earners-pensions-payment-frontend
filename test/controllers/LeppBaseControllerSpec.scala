@@ -253,9 +253,9 @@ class LeppBaseControllerSpec extends SpecBase {
       }
     }
     
-    "handleForCyaPage" - {
+    "handleWithBankDetails" - {
       "should redirect to dashboard page when claims data isn't cached" in new Test {
-        val result: Future[Result] = controller.handleForCyaPage(
+        val result: Future[Result] = controller.handleWithBankDetails(
           _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
@@ -269,7 +269,7 @@ class LeppBaseControllerSpec extends SpecBase {
           data = Json.obj("leppSummary" -> Json.toJson(summaryModel))
         )
 
-        val result: Future[Result] = controller.handleForCyaPage(
+        val result: Future[Result] = controller.handleWithBankDetails(
           _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
@@ -319,7 +319,7 @@ class LeppBaseControllerSpec extends SpecBase {
           )
         ).thenReturn(Future.successful(()))
 
-        val result: Future[Result] = controller.handleForCyaPage(
+        val result: Future[Result] = controller.handleWithBankDetails(
           req => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 

@@ -37,7 +37,6 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import utils.DateTime
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
   with Matchers
@@ -96,12 +95,4 @@ class IntegrationSpecBase extends AnyWordSpec
         .withRequestBody(equalTo(requestBody))
         .willReturn(response)
     )
-
-  def validNino(prefix: String = "AA"): String = {
-    val num = Random.nextInt(1000000)
-    val suffix = "A"
-    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
-
-    prefix + f"$str$num%06d$suffix".drop(prefix.length)
-  }
 }

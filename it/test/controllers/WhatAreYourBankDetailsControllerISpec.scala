@@ -22,7 +22,6 @@ import models.userAnswers.*
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -44,29 +43,20 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
 
   private val formProvider: WhatAreYourBankDetailsFormProvider = new WhatAreYourBankDetailsFormProvider
   private val form: Form[BankAccountDetails] = formProvider()
-  
-  private val userAnswersWithLepp: UserAnswers = UserAnswers(
-    id = "1",
-    data = Json.obj(
-      "leppSummary" -> Json.toJson(summaryModel)
-    )
-  )
 
   "GET /bank-details" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
-
-    testControllerAuth(request)
-    testSessionDataHandling(request)
-    testLeppDataHandling(request)
+   
+    testUserAnswersHandling(request = request)
 
     "existing user answers are found" should {
       "return view with filled answers" in {
         mockAuthSuccess()
 
-        val application: Application = applicationWithUserAnswers(userAnswers)
+        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -84,15 +74,14 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "existing user answers are not found" should {
       "return blank view" in {
         mockAuthSuccess()
-        
-        val application: Application = applicationWithUserAnswers(userAnswersWithLepp)
+
+        val application: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
         val view: WhatAreYourBankDetailsView = application.injector.instanceOf[WhatAreYourBankDetailsView]
-
         val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
@@ -107,12 +96,12 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       path = "/low-earners-pensions-payment/change-bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    "loaded should include the correct back link" in {
+    "page is loaded should include the correct back link" in {
       val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
       mockAuthSuccess()
-      val application: Application = applicationWithUserAnswers(userAnswers)
+      val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
       lazy val result: Future[Result] = route(application, request).getOrElse(
         Future.failed(new RuntimeException("TEST_ERROR"))
@@ -127,7 +116,6 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       )
 
       val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
-
       val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
       status(result) shouldBe OK
@@ -143,9 +131,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
 
-    testControllerAuth(request())
-    testSessionDataHandling(request())
-    testLeppDataHandling(request())
+    testUserAnswersHandling(request = request())
 
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,
@@ -155,7 +141,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
                             rollNumber: Option[String]): Unit = s"handle correctly for scenario - $scenarioName" in {
         mockAuthSuccess()
 
-        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
+        val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         val formData: Seq[(String, String)] = Seq(
           accountName.map(name => "bankDetails.accountName" -> name),
@@ -178,7 +164,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         status(result) shouldBe BAD_REQUEST
         contentAsString(result) shouldEqual view(formWithData, formViewModel)(requestWithFormData, messages).toString
       }
-      
+
       Seq(
         ("accountName field is missing", None, Some("11-22-33"), Some("12345678"), None),
         ("accountName field is empty", Some(""), Some("11-22-33"), Some("12345678"), None),
@@ -202,12 +188,8 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       ).foreach(testErrorScenario)
     }
 
-    "a valid request is submitted" when {
-      def handleForBarsResponse(scenarioName: String,
-                                barsStatus: Int,
-                                barsBody: String,
-                                expectedRedirect: String,
-                                barsRedirectHeader: Option[String]): Unit = s"handle for BARS scenario: $scenarioName" in {
+    "a valid request is submitted" should {
+      "redirect to the CYA page" in {
         mockAuthSuccess()
 
         val formData: Seq[(String, String)] = Seq(
@@ -217,144 +199,32 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
           "bankDetails.rollNumber" -> "1234/678"
         )
 
-        val barsRequest: JsValue = Json.parse(
-          """
-            |{
-            | "account": {
-            |   "accountNumber":"12345678",
-            |   "sortCode":"112233",
-            |   "rollNumber":"1234678"
-            | },
-            | "subject": {
-            |   "name":"Taxwell Payer"
-            | }
-            |}
-            """.stripMargin
-        )
-
-        barsRedirectHeader.fold(
-          when(method = POST, uri = "/verify/personal")
-            .withRequestBody(barsRequest)
-            .thenReturn(barsStatus, barsBody)
-        )(rdr =>
-          when(method = POST, uri = "/verify/personal")
-            .withRequestBody(barsRequest)
-            .thenReturn(barsStatus, Map(LOCATION -> rdr))
-        )
-
-
-        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
+        val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(expectedRedirect)
-      }
-
-      def handleBarsWithNoRedirects(scenarioName: String,
-                                    barsStatus: Int,
-                                    barsBody: String,
-                                    expectedRedirect: String): Unit =
-        handleForBarsResponse(
-          scenarioName = scenarioName,
-          barsStatus = barsStatus,
-          barsBody = barsBody,
-          expectedRedirect = expectedRedirect,
-          barsRedirectHeader = None
-        )
-
-      val checkFailedRoute: String = controllers.bars.routes.BarsCheckFailedController.onPageLoad().url
-      val requestErrorsRoute: String = controllers.bars.routes.BarsRequestErrorsController.onPageLoad().url
-
-      "BARS returns an error status" should {
-        Seq(
-          ("BARS returns 500 status", INTERNAL_SERVER_ERROR, "n/a", checkFailedRoute, None),
-          ("BARS returns 404 status", NOT_FOUND, "n/a", checkFailedRoute, None),
-          ("BARS returns 403 status", FORBIDDEN, "n/a", checkFailedRoute, None),
-          ("BARS returns 400 status", BAD_REQUEST, "n/a", checkFailedRoute, None),
-          ("BARS returns 301 status", MOVED_PERMANENTLY, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns 303 status", SEE_OTHER, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns 307 status", TEMPORARY_REDIRECT, "n/a", checkFailedRoute, Some("url")),
-          ("BARS returns unhandled status", IM_A_TEAPOT, "n/a", checkFailedRoute, None)
-        ).foreach(handleForBarsResponse)
-      }
-
-      "BARS returns a success response" should {
-        def barsResponse(isWellFormatted: String = "yes",
-                         accountExists: String = "yes",
-                         nameMatches: String = "yes",
-                         nonStandard: String = "no",
-                         sortCodeFound: String = "yes",
-                         supportsDirectCredit: String = "yes"): String =
-          s"""
-             |{
-             | "accountNumberIsWellFormatted": "$isWellFormatted",
-             | "accountExists": "$accountExists",
-             | "nameMatches": "$nameMatches",
-             | "accountName": "name",
-             | "nonStandardAccountDetailsRequiredForBacs": "$nonStandard",
-             | "sortCodeIsPresentOnEISCD": "$sortCodeFound",
-             | "sortCodeSupportsDirectDebit": "yes",
-             | "sortCodeSupportsDirectCredit": "$supportsDirectCredit",
-             | "sortCodeBankName": "bank name",
-             | "iban": "iban"
-             |}
-          """.stripMargin
-
-        val errorsBarsBody: String = barsResponse(
-          accountExists = "error",
-          nameMatches = "error",
-          sortCodeFound = "error",
-          supportsDirectCredit = "error"
-        )
-
-        val indeterminateBarsBody: String = barsResponse(
-          accountExists = "indeterminate",
-          nameMatches = "indeterminate"
-        )
-
-        val multipleRequestErrorsBarsBody: String = barsResponse(
-          supportsDirectCredit = "no",
-          nonStandard = "yes"
-        )
-
-        val mixedErrorsBarsBody: String = barsResponse(
-          supportsDirectCredit = "no",
-          nonStandard = "yes",
-          sortCodeFound = "error"
-        )
-
-        Seq(
-          ("Account doesn't support direct credit", OK, barsResponse(supportsDirectCredit = "no"), requestErrorsRoute),
-          ("Sort code not found", OK, barsResponse(sortCodeFound = "no"), requestErrorsRoute),
-          ("Extra info required", OK, barsResponse(nonStandard = "yes"), requestErrorsRoute),
-          ("Name doesn't match", OK, barsResponse(nameMatches = "no"), requestErrorsRoute),
-          ("Account not found", OK, barsResponse(accountExists = "no"), requestErrorsRoute),
-          ("Failed modulus check", OK, barsResponse(isWellFormatted = "no"), requestErrorsRoute),
-          ("Field errors", OK, errorsBarsBody, checkFailedRoute),
-          ("Result indeterminate", OK, indeterminateBarsBody, checkFailedRoute),
-          ("Multiple request errors", OK, multipleRequestErrorsBarsBody, requestErrorsRoute),
-          ("Mixed errors", OK, mixedErrorsBarsBody, checkFailedRoute)
-        ).foreach(handleBarsWithNoRedirects)
+        redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
       }
     }
   }
 
   "POST /change-bank-details" when {
-    "errors in request" should {
-      "load page with correct back links" in {
-        def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
-          method = "POST",
-          path = "/low-earners-pensions-payment/change-bank-details"
-        )
-          .withSession(SessionKeys.authToken -> "auth token")
-          .withFormUrlEncodedBody(data: _*)
 
+    def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
+      method = "POST",
+      path = "/low-earners-pensions-payment/change-bank-details"
+    )
+      .withSession(SessionKeys.authToken -> "auth token")
+      .withFormUrlEncodedBody(data: _*)
+
+    "errors exist in supplied data" should {
+      "load page with errors and CYA back link" in {
         mockAuthSuccess()
 
-        val app: Application = applicationWithUserAnswers(userAnswersWithLepp)
+        val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         val formData: Seq[(String, String)] = Seq(
           "bankDetails.accountName" -> "Taxwell Payer",
@@ -384,6 +254,28 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         formWithData.errors should not be empty
         status(result) shouldBe BAD_REQUEST
         contentAsString(result) shouldEqual view(formWithData, formViewModel)(requestWithFormData, messages).toString
+      }
+    }
+
+    "a valid request is submitted" should {
+      "redirect to the CYA page" in {
+        mockAuthSuccess()
+
+        val formData: Seq[(String, String)] = Seq(
+          "bankDetails.accountName" -> "Taxwell Payer",
+          "bankDetails.sortCode" -> "11-22-33",
+          "bankDetails.accountNumber" -> "12345678",
+          "bankDetails.rollNumber" -> "1234/678"
+        )
+
+        val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
+
+        val result: Future[Result] = route(app, request(formData: _*)).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(routes.CheckYourAnswersController.onPageLoad().url)
       }
     }
   }

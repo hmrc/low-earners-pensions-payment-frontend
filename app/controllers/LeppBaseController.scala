@@ -91,7 +91,7 @@ trait SessionDataHandling { this: LeppBaseController =>
     }
   }
 
-  def handleForCyaPage(f: BlockFor[(LeppSummary, BankAccountDetails)]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
+  def handleWithBankDetails(f: BlockFor[(LeppSummary, BankAccountDetails)]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
     import req.userAnswers
 
     (userAnswers.get(DashboardPage), userAnswers.get(WhatAreYourBankDetailsPage)) match {
