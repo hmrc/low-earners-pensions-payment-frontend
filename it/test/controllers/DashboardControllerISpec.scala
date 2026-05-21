@@ -29,8 +29,10 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testControllerAuth(request)
-    testSessionDataHandling(request)
+    testUserAnswersHandling(
+      request = request,
+      withLeppDataHandlingTest = false
+    )
     
     //TODO - Add real tests when backend integration is added.
   }

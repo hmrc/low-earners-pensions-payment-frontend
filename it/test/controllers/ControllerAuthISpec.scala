@@ -132,7 +132,6 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
   )
 
   Seq(
-    "/low-earners-pensions-payment/dashboard",
     "/low-earners-pensions-payment/bank-details",
     "/low-earners-pensions-payment/check-your-answers"
   ).foreach(url =>

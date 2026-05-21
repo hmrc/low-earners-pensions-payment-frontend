@@ -39,6 +39,7 @@ import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
 import views.html.{CheckYourAnswersView, ErrorTemplate}
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
@@ -308,29 +309,37 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
 
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
-          items = Seq(
+          availableItems = Some(Seq(
             LeppItem(
+              id = "id-1",
               taxYear = 2025,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              status = Available
+              status = Available,
+              claimDate = None
             ),
             LeppItem(
+              id = "id-2",
               taxYear = 2026,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              status = Available
-            ),
+              status = Available,
+              claimDate = None
+            )
+          )),
+          paidItems = Some(Seq(
             LeppItem(
+              id = "id-3",
               taxYear = 2024,
               contributions = 1000,
               taxRate = 20,
               entitlement = 200,
-              status = Paid
+              status = Paid,
+              claimDate = Some(LocalDate.of(2025, 1, 1))
             )
-          )
+          ))
         )
 
         val userAnswers: UserAnswers = UserAnswers(

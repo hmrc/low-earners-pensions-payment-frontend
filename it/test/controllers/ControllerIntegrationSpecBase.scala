@@ -17,7 +17,7 @@
 package controllers
 
 import common.{AuthSupport, IntegrationSpecBase}
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus._
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
@@ -174,7 +174,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
           expectedResult = "wipe user answers and redirect to Dashboard page",
           request = request,
           isSubmittedOpt = Some(true),
-          expectedRedirect = routes.TempLeppController.onPageLoad().url
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
       }
     }
@@ -187,7 +187,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
           scenario = "LeppSummary is required and is missing from user answers",
           expectedResult = "redirect to Dashboard page",
           leppSummaryOpt = None,
-          expectedRedirect = routes.TempLeppController.onPageLoad().url
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
       }
       if (withBankDetailsHandlingTest) {

@@ -32,7 +32,7 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details-check-failed"
     ).withSession(SessionKeys.authToken -> "auth token")
-    
+
     testUserAnswersHandling(
       request = request,
       withBankDetailsHandlingTest = true
@@ -41,7 +41,7 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
-        lazy val application: Application = applicationWithUserAnswers(userAnswers)
+        lazy val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -52,3 +52,4 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
       }
     }
   }
+}
