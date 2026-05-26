@@ -160,7 +160,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         Future.failed(new RuntimeException("TEST_ERROR"))
       )
     }
-  
+
   private def dataTest[A: Writeable](scenario: String,
                                      expectedResult: String,
                                      request: FakeRequest[A],
@@ -170,6 +170,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
                                      expectedRedirect: String): Unit =
     s"$scenario" must {
       s"$expectedResult" in {
+
         lazy val leppSummaryJson: JsObject = leppSummaryOpt.fold(JsObject.empty)(
           leppSummary => Json.obj("leppSummary" -> Json.toJson(leppSummary))
         )

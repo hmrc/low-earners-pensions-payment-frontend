@@ -19,6 +19,7 @@ package controllers.bars
 import common.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
 import play.api.Application
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -33,14 +34,11 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/bank-details-check-failed"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    testUserAnswersHandling(
-      request = request,
-      withBankDetailsHandlingTest = true
-    )
-
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
+        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+          response = Json.obj("attempts" -> 1))
         lazy val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
