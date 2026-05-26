@@ -60,8 +60,8 @@ class BarsLockoutActionRefiner @Inject()(
       }
     }.recover { case e =>
       
-      println(
-        s"[BarsLockoutActionRefiner] failed to retrieve BarsVerifyStatus for nino=${request.user.nino.toString} - reason:${e.getMessage}"
+      logger.error(
+        s"[BarsLockoutActionRefiner] failed to retrieve BarsVerifyStatus for nino=${request.user.nino.toString}, reason:${e.getMessage}"
       )
       Left(InternalServerError)
     }
