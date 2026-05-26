@@ -39,6 +39,7 @@ class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
   extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling {
   
   def onPageLoad(): Action[AnyContent] = handleWithLeppData { implicit request => _ =>
+
     Future.successful(BadRequest(view(viewModel(NormalMode, BarsRequestErrorsPage))))
   }
 }

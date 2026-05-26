@@ -25,7 +25,7 @@ import scala.util.Random
 trait AuthSupport extends WireMockMethods {
   val authoriseUri: String = "/auth/authorise"
   val nino: String = validNino()
-  
+
   val authRequestJson: JsValue = Json.parse(
     """
       |{

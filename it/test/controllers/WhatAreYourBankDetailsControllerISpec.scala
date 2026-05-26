@@ -79,6 +79,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         mockAuthSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
+        
         val application: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -107,6 +108,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       mockAuthSuccess()
       mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
         response = Json.obj("attempts" -> 1))
+      
       val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
       lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -235,6 +237,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         mockAuthSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
+
         val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
 
         val formData: Seq[(String, String)] = Seq(
@@ -273,7 +276,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         mockAuthSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
-        
+
         val formData: Seq[(String, String)] = Seq(
           "bankDetails.accountName" -> "Taxwell Payer",
           "bankDetails.sortCode" -> "11-22-33",

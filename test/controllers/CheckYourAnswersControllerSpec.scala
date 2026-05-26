@@ -43,7 +43,7 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
   "CheckYourAnswerController" - {
-
+    
     trait Test(barsVerifyCount: Int = 1) {
       val mockBarsService: BarsService = mock[BarsService]
       val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
@@ -91,7 +91,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "should redirect correctly for BARS request error result" in new Test {
         when(mockBarsConnector.update(BarVerifyStatusId(nino)))
           .thenReturn(Future(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
-        
+
         mockBars(Future.successful(Left(ErrorWrapper(
           value = BarsErrorResult(status = BAD_REQUEST, code = "BARS_REQUEST_ERRORS"),
           correlationId = testCorrelationId

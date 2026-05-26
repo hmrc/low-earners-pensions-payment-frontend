@@ -34,6 +34,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val correlationId: CorrelationId = CorrelationId("X-id")
+
   "GET /confirmation" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
@@ -49,10 +50,6 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
-        val json = BarsVerifyStatusResponse(
-          attempts = NumberOfBarsVerifyAttempts.zero,
-          lockoutExpiryDateTime = None
-        )
         
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))

@@ -63,7 +63,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         mockAuthSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
-        
+
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -254,6 +254,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         mockBarsSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
+
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -288,6 +289,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         mockBarsSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
+
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
@@ -319,7 +321,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         mockBarsSuccess()
         mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
           response = Json.obj("attempts" -> 1))
-        
+
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
           availableItems = Some(Seq(

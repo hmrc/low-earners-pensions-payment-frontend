@@ -89,7 +89,6 @@ class LeppBaseControllerSpec extends SpecBase {
       ))
     )
     
-    
     class DummyController(identifierAction: IdentifierAction,
                           data: DataRetrievalAction,
                           val controllerComponents: MessagesControllerComponents = mockCc)
