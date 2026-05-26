@@ -107,7 +107,9 @@ class BarsServiceSpec extends SpecBase {
         serviceResult mustBe a[Left[_, _]]
         
         val err: ErrorResult = serviceResult.swap.getOrElse(dummyErrorWrapper).value
-        err mustBe BarsErrorResult(INTERNAL_SERVER_ERROR, "NAME_MATCHES_ERROR")
+        err.status mustBe INTERNAL_SERVER_ERROR
+        err.code mustBe "BARS_CHECK_FAILED"
+        err.errorsOpt.getOrElse(Nil).map(_.code) must contain("NAME_MATCHES_ERROR")
       }
       
       "should handle for successful BARS response with both error types" in new Test {
@@ -148,8 +150,7 @@ class BarsServiceSpec extends SpecBase {
         )))
         val serviceResult: Either[ErrorWrapper, SuccessWrapper[BarsResponse]] = await(result.value)
         serviceResult mustBe a[Left[_, _]]
-        serviceResult.swap.getOrElse(dummyErrorWrapper).value mustBe 
-          BarsErrorResult(IM_A_TEAPOT, "TEAPOT_TIME")
+        serviceResult.swap.getOrElse(dummyErrorWrapper).value mustBe BarsErrorResult(IM_A_TEAPOT, "TEAPOT_TIME")
       }
     }
   }

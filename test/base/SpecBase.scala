@@ -41,6 +41,7 @@ import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
+import models.nps.ClaimStatus.Paid
 import models.userAnswers.UserAnswers
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -84,16 +85,17 @@ trait SpecBase
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
+  val nino: String = "AA123456C"
   val userAnswersId: String = "id"
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction()
+  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(nino = nino)
 
   val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
-  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(mockBarsConnector, 1)
+  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(1)
   
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
@@ -204,8 +206,7 @@ trait SpecBase
     value = dummyBarsResponse,
     correlationId = testCorrelationId
   )
-
-
+  
   private val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
     responseTimestamp = Some("2023-06-27 09:12:28"),
     calculationSequenceNumber = 123,
@@ -221,7 +222,7 @@ trait SpecBase
   private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
     claimSequenceNumber = 123,
     entitlementAmount = Some(10.56),
-    claimStatus = "CANCELLED",
+    claimStatus = Paid,
     inSelfAssessment = true,
     calculationDate = Some("2023-06-27"),
     claimDate = Some("2023-06-27"),
@@ -230,7 +231,7 @@ trait SpecBase
     originalAmount = Some(10.56)
   )
 
-  private val calculation: LowEarnersCalculation = LowEarnersCalculation(
+  val calculation: LowEarnersCalculation = LowEarnersCalculation(
     lowEarnersClaimDetails = claimDetails,
     lowEarnersDataDetails = dataDetails
   )

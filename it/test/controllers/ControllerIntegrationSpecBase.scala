@@ -17,10 +17,9 @@
 package controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import common.{IntegrationSpecBase, WireMockMethods}
-import config.AppConfig
+import common.{AuthSupport, IntegrationSpecBase}
 import connectors.barsLockout.model.{BarVerifyStatusId, BarsUpdateVerifyStatusParams}
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
 import play.api.http.Status.SEE_OTHER
@@ -31,76 +30,100 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.NormalMode
 
-import java.net.URLEncoder
 import java.time.temporal.ChronoUnit.HOURS
 import java.time.*
 import scala.concurrent.Future
 
-trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMethods {
+trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport {
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
-    items = Seq(
+    availableItems = Some(Seq(
       LeppItem(
+        id = "A-25-1",
         taxYear = 2025,
         contributions = 1000,
         taxRate = 20,
         entitlement = 200,
-        status = Available
+        status = Available,
+        claimDate = None
+      )
+    )),
+    paidItems = Some(Seq(
+      LeppItem(
+        id = "P-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Paid,
+        claimDate = None
+      )
+    )),
+    suspendedItems = Some(Seq(
+      LeppItem(
+        id = "S-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Suspended,
+        claimDate = None
+      )
+    )),
+    cancelledItems = Some(Seq(
+      LeppItem(
+        id = "C-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Cancelled,
+        claimDate = None
       )
     )
-  )
+    ))
 
   val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-    accountName = "name",
-    accountNumber = "number",
-    sortCode = "sortcode",
-    rollNumber = Some("rollNumber")
+    accountName = "Taxwell Payer",
+    accountNumber = "12345678",
+    sortCode = "112233",
+    rollNumber = Some("1234678")
   )
 
-  val userAnswers: UserAnswers = UserAnswers(
-    id = "1",
+  val emptyUserAnswers = UserAnswers(
+    id = "some-id",
+    data = JsObject.empty,
+    lastUpdated = Instant.MIN
+  )
+
+  val userAnswersWithLeppSummary: UserAnswers = emptyUserAnswers.copy(
     data = Json.obj(
-      "leppSummary" -> Json.toJson(summaryModel),
-      "bankDetails" -> Json.toJson(bankAccountDetails)
+      "leppSummary" -> Json.toJson(summaryModel)
     )
   )
 
   val initialLocalDate: LocalDate = LocalDate.parse("2020-12-25")
   val clock: Clock = Clock.fixed(initialLocalDate.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneId.of("Z"))
   val expectedLockout: Instant = Instant.now(clock).plus(24, HOURS)
-  val nino: String = validNino()
   
   private val authoriseUri: String = "/auth/authorise"
 
-  private val authRequestJson: JsValue = Json.parse(
-    """
-      |{
-      | "authorise": [
-      |   {
-      |      "identifiers": [],
-      |      "state": "Activated",
-      |      "enrolment": "HMRC-PI"
-      |   }
-      | ],
-      | "retrieve": [
-      |   "internalId",
-      |   "nino",
-      |   "confidenceLevel",
-      |   "authorisedEnrolments"
-      | ]
-      |}
-    """.stripMargin
+  val userAnswersWithBankDetails: UserAnswers = emptyUserAnswers.copy(
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel),
+      "bankDetails" -> Json.toJson(bankAccountDetails)
+    )
   )
 
-  private val ptaEnrolment: JsValue = Json.parse(
-    """
-      |{
-      | "state": "Activated",
-      | "key": "HMRC-PI"
-      |}
-    """.stripMargin
+  val userAnswersWithExistingSubmission: UserAnswers = UserAnswers(
+    id = "1",
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel),
+      "bankDetails" -> Json.toJson(bankAccountDetails),
+      "isSubmitted" -> JsBoolean(true)
+    )
   )
-
+  
   def mockAuthSuccess(nino: String = nino): StubMapping = {
     val authResponseJson: JsObject =
       Json.obj("confidenceLevel" -> 250) ++
@@ -113,10 +136,10 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
       .thenReturn(status = OK, body = authResponseJson)
   }
 
-  def mockBarsAction(url: String,
+  def mockBarsLockoutAction(url: String,
                       status: Int = OK,
-                      response: JsValue): StubMapping = {
-
+                      response: JsObject): StubMapping = {
+    
     when(method = POST, uri = url)
       .withRequestBody(Json.toJson(BarsUpdateVerifyStatusParams(BarVerifyStatusId(nino))))
       .thenReturn(status = status, body = response)
@@ -137,102 +160,34 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
       lazy val result: Future[Result] = route(application, request).getOrElse(
         Future.failed(new RuntimeException("TEST_ERROR"))
       )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
     }
-
-  private def handleForAuthRedirect[A: Writeable](request: FakeRequest[A])
-                                                 (scenarioName: String,
-                                                  internalIdOpt: Option[String],
-                                                  ninoOpt: Option[String],
-                                                  confidenceLevel: Int,
-                                                  enrolments: Seq[JsValue],
-                                                  expectedRedirect: String): Unit =
-    s"return expected result for scenario - $scenarioName" in {
-      val authResponseJson: JsObject =
-        Json.obj("confidenceLevel" -> confidenceLevel) ++
-          ninoOpt.map(nino => Json.obj("nino" -> nino)).getOrElse(JsObject.empty) ++
-          internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty) ++
-          Json.obj("authorisedEnrolments" -> JsArray(enrolments))
-
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = OK, body = authResponseJson)
-
-      val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result).getOrElse("N/A") shouldBe expectedRedirect
-    }
-
-  def testControllerAuth[A: Writeable](request: FakeRequest[A]): Unit = {
-    "user authorisation is run" when {
-      "an authorisation error occurs" should {
-        val config: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
-        val loginUrl: String = config.loginUrl + "?continue=" + URLEncoder.encode(
-          config.loginContinueUrl,
-          "UTF-8"
+    
+  private def dataTest[A: Writeable](scenario: String,
+                                     expectedResult: String,
+                                     request: FakeRequest[A],
+                                     leppSummaryOpt: Option[LeppSummary] = Some(summaryModel),
+                                     bankDetailsOpt: Option[BankAccountDetails] = Some(bankAccountDetails),
+                                     isSubmittedOpt: Option[Boolean] = None,
+                                     expectedRedirect: String): Unit =
+    s"$scenario" must {
+      s"$expectedResult" in {
+        
+        lazy val leppSummaryJson: JsObject = leppSummaryOpt.fold(JsObject.empty)(
+          leppSummary => Json.obj("leppSummary" -> Json.toJson(leppSummary))
         )
 
-        Seq(
-          ("InvalidBearerToken", loginUrl),
-          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
-        ).foreach((error, redirect) => handleForAuthError(request, error, redirect))
-      }
-
-      "authorisation request succeeds" should {
-        val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
-        val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
-
-        Seq(
-          ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
-        ).foreach(
-          (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(request)(sn, id, nino, cl, enrls, rdr)
-        )
-      }
-    }
-  }
-
-  def testSessionDataHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "an LEPP submission has already been made for the current session" should {
-      "wipe user answers and redirect to dashboard page" in {
-        mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
+        lazy val bankDetailsJson: JsObject = bankDetailsOpt.fold(JsObject.empty)(
+          bankDetails => Json.obj("bankDetails" -> Json.toJson(bankDetails))
         )
 
-        val bankAccountDetails: BankAccountDetails = BankAccountDetails(
-          accountName = "name",
-          accountNumber = "number",
-          sortCode = "sortcode",
-          rollNumber = Some("rollNumber")
+        lazy val isSubmittedJson: JsObject = isSubmittedOpt.fold(JsObject.empty)(
+          isSubmitted => Json.obj("isSubmitted" -> JsBoolean(isSubmitted))
         )
 
-        val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = Json.obj(
-            "leppSummary" -> Json.toJson(summaryModel),
-            "bankDetails" -> Json.toJson(bankAccountDetails),
-            "isSubmitted" -> JsBoolean(true)
-          )
+        lazy val userAnswers = UserAnswers(
+          id = "some-id",
+          data = leppSummaryJson ++ bankDetailsJson ++ isSubmittedJson,
+          lastUpdated = Instant.MIN
         )
 
         lazy val application: Application = applicationWithUserAnswers(userAnswers)
@@ -241,67 +196,57 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with WireMockMet
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
+        mockAuthSuccess()
+        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+          response = Json.obj("attempts" -> 1))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(expectedRedirect)
       }
     }
-  }
 
-  def testLeppDataHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "LEPP data cannot be found in the session" should {
-      "redirect to dashboard page" in {
-        mockAuthSuccess()
-        
-        lazy val application: Application = applicationWithUserAnswers(
-          UserAnswers(
-            id = "1",
-            data = JsObject.empty
-          )
+  def testUserAnswersHandling[A: Writeable](request: FakeRequest[A],
+                                            withLeppDataHandlingTest: Boolean = true,
+                                            withBankDetailsHandlingTest: Boolean = false,
+                                            submissionShouldExist: Boolean = false): Unit = {
+    def existingSubmissionHandlingTest(): Unit = {
+      if (submissionShouldExist) {
+        dataTest(
+          scenario = "an existing submission is required and missing from user answers",
+          expectedResult = "redirect to CheckYourAnswers page",
+          request = request,
+          isSubmittedOpt = None,
+          expectedRedirect = routes.CheckYourAnswersController.onPageLoad().url
         )
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
+      } else {
+        dataTest(
+          scenario = "an existing submission has already been made",
+          expectedResult = "wipe user answers and redirect to Dashboard page",
+          request = request,
+          isSubmittedOpt = Some(true),
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.TempLeppController.onPageLoad().url)
       }
     }
-  }
 
-  def testBankDetailsHandling[A: Writeable](request: FakeRequest[A]): Unit = {
-    "bank details cannot be found in the session" should {
-      "redirect to dashboard page" in {
-        mockAuthSuccess()
-
-        val summaryModel: LeppSummary = LeppSummary(
-          currentLock = 67,
-          items = Seq(
-            LeppItem(
-              taxYear = 2025,
-              contributions = 1000,
-              taxRate = 20,
-              entitlement = 200,
-              status = Available
-            )
-          )
+    "checking user answers" when {
+      existingSubmissionHandlingTest()
+      if (withLeppDataHandlingTest) {
+        dataTest(
+          request = request,
+          scenario = "LeppSummary is required and is missing from user answers",
+          expectedResult = "redirect to Dashboard page",
+          leppSummaryOpt = None,
+          expectedRedirect = routes.DashboardController.onPageLoad().url
         )
-
-        lazy val application: Application = applicationWithUserAnswers(
-          UserAnswers(
-            id = "1",
-            data = JsObject(Seq(
-              "leppSummary" -> Json.toJson(summaryModel)
-            ))
-          )
+      }
+      if (withBankDetailsHandlingTest) {
+        dataTest(
+          request = request,
+          scenario = "BankDetails are required and are missing from user answers",
+          expectedResult = "redirect to BankDetails page",
+          bankDetailsOpt = None,
+          expectedRedirect = routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url
         )
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
       }
     }
   }

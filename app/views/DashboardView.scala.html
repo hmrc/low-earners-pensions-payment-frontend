@@ -1,0 +1,49 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.userAnswers.LeppSummary
+@import views.html.components._
+@import views.html.components.dashboard._
+@import viewmodels.govuk._
+@import viewmodels.formPages.FormPageViewModel
+
+@this(
+    layout: templates.Layout,
+    heading: h1,
+    availablePaymentsSection: available_payments_section,
+    paymentHistorySection: payment_history_section
+)
+
+@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("dashboard.title")),
+    backLinkUrl = backLinkUrl,
+    fullWidthContent = true
+) {
+    @heading("dashboard.heading")
+
+    @availablePaymentsSection(
+        leppSummary: LeppSummary,
+        tableRef = "dashboard_table_available_payments",
+        continueUrl = continueUrl
+    )
+
+    @paymentHistorySection(
+        leppSummary: LeppSummary,
+        tableRef = "dashboard_table_payment_history"
+    )
+}

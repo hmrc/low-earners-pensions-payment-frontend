@@ -1,0 +1,61 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.userAnswers.{LeppSummary, LeppItem, LeppItemStatus}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components._
+@import java.time.LocalDate
+@import viewmodels.dashboard.DashboardUtils
+
+@this(
+ table: GovukTable,
+ insetText: GovukInsetText,
+ heading: h1,
+ statusElement: status_element,
+ linkElement: link_element,
+ contactLinkElement: contact_link_element
+)
+
+@(leppSummary: LeppSummary, tableRef: String)(implicit messages: Messages)
+
+@cancelledInsetContent = {
+ <p>
+  @messages("dashboard.paymentHistory.cancelledInset.start")
+  <strong class="govuk-!-font-weight-bold">@leppSummary.cancelledItems.getOrElse(Nil).length</strong>
+  @messages("dashboard.paymentHistory.cancelledInset.end")
+  @contactLinkElement()
+ </p>
+}
+
+@if(leppSummary.hasPaymentHistory){
+ @if(leppSummary.cancelledItems.nonEmpty) {
+  @insetText(InsetTextViewModel(cancelledInsetContent))
+ }
+
+ @table(TableViewModel(
+  caption = messages("dashboard.paymentHistory.heading"),
+  rows =  DashboardUtils.tableRows(tableRef, leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
+  columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action")),
+  tableRef = tableRef
+ ))
+
+ @if(leppSummary.paidItems.nonEmpty) {
+  @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
+ }
+} else {
+ @heading(msgKey = messages("dashboard.paymentHistory.heading"), headerSize = "m")
+ <p class = "govuk-body">@messages("dashboard.paymentHistory.noneAvailable")</p>
+}

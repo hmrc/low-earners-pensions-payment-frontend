@@ -31,9 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class BarsLeppBaseControllerSpec extends SpecBase {
   private trait Test(count: Int) {
     private val userAnswers: UserAnswers = UserAnswers("1")
-    val mockAuth: IdentifierAction = FakeIdentifierAction()
+    val mockAuth: IdentifierAction = FakeIdentifierAction(nino = nino)
     private val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
-    private val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(mockBarsConnector, count)
+    private val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(count)
     private val mockSessionService: SessionCacheService = mock[SessionCacheService]
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
@@ -65,7 +65,7 @@ class BarsLeppBaseControllerSpec extends SpecBase {
       }
 
       "should not bars refiner when authorisation fails" in new Test(1) {
-        override val mockAuth = FakeIdentifierAction(true)
+        override val mockAuth = FakeIdentifierAction(true, nino)
         
         val result: Future[Result] = controller.handle(
           _ => Future.successful(ImATeapot("Teapot time"))
@@ -82,7 +82,7 @@ class BarsLeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(bars.routes.BarsLockoutController.barsLockout.url)
+        redirectLocation(result) mustBe Some(bars.routes.BarsLockoutController.onPageLoad().url)
       }
     }
   }

@@ -16,23 +16,30 @@
 
 package controllers.actions
 
+import com.google.inject.ImplementedBy
 import connectors.barsLockout.BarsVerifyStatusConnector
 import connectors.barsLockout.model.BarVerifyStatusId
 import controllers.actions.request.LockedOutJourneyRequest
+import models.CorrelationId
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result, Results}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.IdGenerator
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@ImplementedBy(classOf[BarsLockedOutJourneyActionRefiner])
+trait BarsLockedOutJourneyAction extends ActionRefiner[IdentifierRequest, LockedOutJourneyRequest]
+
 @Singleton
 class BarsLockedOutJourneyActionRefiner @Inject() (
-  barsVerifyStatusConnector: BarsVerifyStatusConnector
+  barsVerifyStatusConnector: BarsVerifyStatusConnector,
+  idGenerator: IdGenerator
 )(implicit ec: ExecutionContext)
-    extends ActionRefiner[IdentifierRequest, LockedOutJourneyRequest]
+    extends BarsLockedOutJourneyAction
     with Logging
     with Results {
 
@@ -41,7 +48,7 @@ class BarsLockedOutJourneyActionRefiner @Inject() (
   ): Future[Either[Result, LockedOutJourneyRequest[A]]] = {
 
     implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
+    implicit val correlationId: CorrelationId = CorrelationId(idGenerator.getCorrelationId)
     barsVerifyStatusConnector.status(BarVerifyStatusId.from(request.user.nino)).map { status =>
       status.lockoutExpiryDateTime match {
         case Some(expiry) =>

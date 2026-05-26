@@ -28,4 +28,7 @@ package object govuk {
       with LabelFluency
       with SummaryListFluency
       with InsetTextFluency
+      with TableRowFluency
+      with TableFluency
+      with TagFluency
 }

@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.*
@@ -42,12 +42,10 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
     )
 
   protected[controllers] def submitUrl(mode: Mode, page: Page): Call = page match {
-    case WhatYouWillNeedPage => routes.WhatYouWillNeedController.onPageLoad()
-    case DashboardPage => routes.TempLeppController.onSubmit()
     case WhatAreYourBankDetailsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case BarsRequestErrorsPage => routes.WhatAreYourBankDetailsController.onSubmit(mode)
     case CheckYourAnswersPage => routes.CheckYourAnswersController.onSubmit()
-    case _ => routes.TempLeppController.onPageLoad()
+    case _ => routes.DashboardController.onPageLoad()
   }
 
   protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {
@@ -94,7 +92,7 @@ trait SessionDataHandling {
     }
   }
 
-  def handleForCyaPage(f: BlockFor[(LeppSummary, BankAccountDetails)]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
+  def handleWithBankDetails(f: BlockFor[(LeppSummary, BankAccountDetails)]): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
     import req.userAnswers
 
     (userAnswers.get(DashboardPage), userAnswers.get(WhatAreYourBankDetailsPage)) match {

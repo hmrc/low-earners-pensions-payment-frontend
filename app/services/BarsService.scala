@@ -47,7 +47,6 @@ class BarsService @Inject()(connector: BarsConnector) {
           }
 
           val errorResult: BarsErrorResult = errorResults match {
-            case err :: Nil => err
             case errs if errs.exists(_.status == INTERNAL_SERVER_ERROR) =>
               BarsErrorResult(INTERNAL_SERVER_ERROR, "BARS_CHECK_FAILED", Some(errs))
             case errs =>

@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{Actions, BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
 import play.api.mvc.{Action, AnyContent, Result}
 

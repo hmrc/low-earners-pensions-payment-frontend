@@ -23,8 +23,6 @@ import java.time.Instant
 final case class BarsVerifyStatusResponse(attempts: NumberOfBarsVerifyAttempts, lockoutExpiryDateTime: Option[Instant])
 
 object BarsVerifyStatusResponse {
-
-  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  
   implicit val format: OFormat[BarsVerifyStatusResponse] = Json.format
-
 }

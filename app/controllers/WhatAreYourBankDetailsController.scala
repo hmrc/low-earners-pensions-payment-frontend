@@ -17,9 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import connectors.barsLockout.BarsVerifyStatusConnector
-import connectors.barsLockout.model.BarVerifyStatusId
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction, Actions}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -28,7 +26,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.*
-import utils.{CorrelationIdOptional, Logging}
+import utils.Logging
 import viewmodels.Mode
 import views.html.WhatAreYourBankDetailsView
 
@@ -39,62 +37,36 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  barsLockout: BarsLockoutAction,
                                                  getData: DataRetrievalAction,
                                                  val sessionService: SessionCacheService,
-                                                 correlationIdHandler: CorrelationIdOptional,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
-                                                 barsService: BarsService,
                                                  navigator: Navigator,
-                                                 barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
-    req.userAnswers.get(WhatAreYourBankDetailsPage) match {
-      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
-      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
-    }
+  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>
+    _ =>
+      req.userAnswers.get(WhatAreYourBankDetailsPage) match {
+        case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
+        case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+      }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>_ =>
-    correlationIdHandler.handleCorrelationId(req)(implicit cid =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(
-            view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
-          )),
-          answer => {
-            barsService.checkBankAccountDetails(
-              barsRequest = answer.toBarsRequest
-            ).biSemiflatMap(
-              err =>
-                if (err.value.status == BAD_REQUEST) {
-                  barsVerifyStatusConnector
-                    .update(BarVerifyStatusId.from(req.user.nino)).map { verifyStatus =>
-                                                              verifyStatus.lockoutExpiryDateTime
-                                                                .map { expiry =>
-                                                                  Redirect(controllers.bars.routes.BarsLockoutController.barsLockout)
-                                                                }
-                    } recover { case e =>
-                    logger.error("[WhatAreYourBankDetailsController][onSubmit] ",
-                      "updated failed for:" +
-                        s" ${req.user.nino.nino}", e
-                    )
-                  }
-                  Future.successful(Redirect(controllers.bars.routes.BarsRequestErrorsController.onPageLoad()))
-                } else {
-                  Future.successful(Redirect(controllers.bars.routes.BarsCheckFailedController.onPageLoad()))
-                },
-              _ => for {
-                updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
-                _ <- sessionService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
-            ).merge
-          }
-        )
-    )
+  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req => _ =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(
+          view(formWithErrors, viewModel(mode, WhatAreYourBankDetailsPage))
+        )),
+        answer => {
+          for {
+            updatedAnswers <- Future.fromTry(req.userAnswers.set(WhatAreYourBankDetailsPage, answer))
+            _ <- sessionService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage(WhatAreYourBankDetailsPage, mode))
+        }
+      )
   }
 }

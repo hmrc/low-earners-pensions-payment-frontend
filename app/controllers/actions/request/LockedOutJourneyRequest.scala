@@ -17,7 +17,6 @@
 package controllers.actions.request
 
 import connectors.barsLockout.model.NumberOfBarsVerifyAttempts
-import models.bars.ReturnUrl
 import models.requests.IdentifierRequest
 
 import java.time.Instant

@@ -20,8 +20,10 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import connectors.PlaceholderBackendConnector
+import connectors.barsLockout.BarsVerifyStatusConnector
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -37,7 +39,6 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import utils.DateTime
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
   with Matchers
@@ -49,7 +50,8 @@ class IntegrationSpecBase extends AnyWordSpec
   with ResultExtractors
   with HeaderNames
   with Status
-  with HttpClientV2Support {
+  with HttpClientV2Support
+  with BeforeAndAfterEach {
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
   
@@ -59,6 +61,7 @@ class IntegrationSpecBase extends AnyWordSpec
   
   // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
   val fakeConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
+  val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
@@ -67,7 +70,9 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.bars.host" -> wireMockHost,
         "microservice.services.bars.env"  -> "local",
         "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.auth.host" -> wireMockHost
+        "microservice.services.auth.host" -> wireMockHost,
+        "microservice.services.lepp-backend.port" -> wireMockPort,
+        "microservice.services.lepp-backend.host" -> wireMockHost
       )
       .build()
   }
@@ -98,12 +103,4 @@ class IntegrationSpecBase extends AnyWordSpec
         .withRequestBody(equalTo(requestBody))
         .willReturn(response)
     )
-
-  def validNino(prefix: String = "AA"): String = {
-    val num = Random.nextInt(1000000)
-    val suffix = "A"
-    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
-
-    prefix + f"$str$num%06d$suffix".drop(prefix.length)
-  }
 }

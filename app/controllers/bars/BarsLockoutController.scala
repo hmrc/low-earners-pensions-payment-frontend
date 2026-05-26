@@ -36,8 +36,8 @@ class BarsLockoutController @Inject()(
     extends FrontendController(mcc)
     with I18nSupport {
 
-  val barsLockout: Action[AnyContent]   = (identify andThen barsLockedOutJourneyAction).async  { implicit request =>
-    val returnUrl = controllers.routes.TempLeppController.onPageLoad().url
+  def onPageLoad(): Action[AnyContent]   = (identify andThen barsLockedOutJourneyAction).async  { implicit request =>
+    val returnUrl = controllers.routes.DashboardController.onPageLoad().url
 
     Future.successful(Ok(barsLockoutView(request.barsLockoutExpiryTime, returnUrl)))
   }

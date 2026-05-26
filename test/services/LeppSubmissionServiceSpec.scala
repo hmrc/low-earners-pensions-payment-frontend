@@ -22,7 +22,7 @@ import connectors.{ConnectorResponse, PlaceholderBackendConnector}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
 import models.{CorrelationId, ResponseWrapper}
 import org.mockito.ArgumentMatchers
@@ -73,7 +73,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
             )
           )))
         )
-          
+
         val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(submitClaimResult.value)
 
         result mustBe a[Right[_, _]]
@@ -113,40 +113,77 @@ class LeppSubmissionServiceSpec extends SpecBase {
         mockSingleClaim(
           EitherT(Future.failed(RuntimeException("ERROR")))
         )
-        
+
         assertThrows[RuntimeException](
           await(submitClaimResult.value)
         )
       }
     }
-    
+
     "submitMultiple" - {
       val leppSummary: LeppSummary = LeppSummary(
-        currentLock = 1,
-        items = Seq(
+        currentLock = 67,
+        availableItems = Some(Seq(
           LeppItem(
+            id = "A-25-1",
             taxYear = 2024,
-            contributions = 100,
+            contributions = 1000,
             taxRate = 20,
-            entitlement = 20,
-            status = Available
+            entitlement = 200,
+            status = Available,
+            claimDate = None
           ),
           LeppItem(
+            id = "A-25-1",
             taxYear = 2025,
-            contributions = 200,
+            contributions = 1000,
             taxRate = 20,
-            entitlement = 40,
-            status = Available
+            entitlement = 200,
+            status = Available,
+            claimDate = None
           )
-        )
+        )),
+        paidItems = Some(Seq(
+          LeppItem(
+            id = "P-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Paid,
+            claimDate = None
+          )
+        )),
+        suspendedItems = Some(Seq(
+          LeppItem(
+            id = "S-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Suspended,
+            claimDate = None
+          )
+        )),
+        cancelledItems = Some(Seq(
+          LeppItem(
+            id = "C-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 20,
+            entitlement = 200,
+            status = Cancelled,
+            claimDate = None
+          )
+        ))
       )
-      
+
       "handle as expected when all submissions complete successfully" in new Test {
+        val req1 = SubmitLeppRequest(currentLowEarnersOptimisticLock = 67, taxYear = 2024, accountDetails = bankDetails)
+
         when(
           mockConnector.submitLepp(
-            request = ArgumentMatchers.eq(
-              SubmitLeppRequest(currentLowEarnersOptimisticLock = 1, taxYear = 2024, accountDetails = bankDetails)
-            )
+            request = ArgumentMatchers.eq(req1)
           )(
             hc = any(),
             ec = any(),
@@ -155,17 +192,16 @@ class LeppSubmissionServiceSpec extends SpecBase {
         ).thenReturn(
           EitherT(Future.successful(Right(
             SuccessWrapper(
-              value = SubmitLeppResponse(2),
+              value = SubmitLeppResponse(BigInt(68)),
               correlationId = testCorrelationId
             )
           )))
         )
-        
+
+        val req2: SubmitLeppRequest = req1.copy(currentLowEarnersOptimisticLock = 68, taxYear = 2025)
+
         when(
-          mockConnector.submitLepp(
-            request = ArgumentMatchers.eq(
-              SubmitLeppRequest(currentLowEarnersOptimisticLock = 2, taxYear = 2025, accountDetails = bankDetails)
-            )
+          mockConnector.submitLepp(request = ArgumentMatchers.eq(req2)
           )(
             hc = any(),
             ec = any(),
@@ -174,7 +210,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         ).thenReturn(
           EitherT(Future.successful(Right(
             SuccessWrapper(
-              value = SubmitLeppResponse(3),
+              value = SubmitLeppResponse(69),
               correlationId = testCorrelationId
             )
           )))
@@ -184,18 +220,16 @@ class LeppSubmissionServiceSpec extends SpecBase {
           leppSummary = leppSummary,
           accountDetails = bankDetails
         )
-        
+
         val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(futureResult.value)
         result mustBe a[Right[_, _]]
-        result.getOrElse(dummySuccessResponse).value mustBe SubmitLeppResponse(3)
+        result.getOrElse(dummySuccessResponse).value mustBe SubmitLeppResponse(69)
       }
-      
+
       "handle as expected when a submission fails" in new Test {
         when(
           mockConnector.submitLepp(
-            request = ArgumentMatchers.eq(
-              SubmitLeppRequest(currentLowEarnersOptimisticLock = 1, taxYear = 2024, accountDetails = bankDetails)
-            )
+            request = ArgumentMatchers.any()
           )(
             hc = any(),
             ec = any(),

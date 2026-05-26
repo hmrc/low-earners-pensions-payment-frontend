@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import play.api.i18n.I18nSupport

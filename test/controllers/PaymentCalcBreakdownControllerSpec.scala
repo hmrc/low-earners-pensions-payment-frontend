@@ -28,22 +28,26 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
 
   val summaryModel: LeppSummary = LeppSummary(
     currentLock = 67,
-    Seq(
+    availableItems = Some(Seq(
       LeppItem(
+        id = "id1",
         taxYear = 2025,
         contributions = 1000,
         taxRate = 20,
         entitlement = 200,
-        status = Available
+        status = Available,
+        claimDate = None
       ),
       LeppItem(
+        id = "id2",
         taxYear = 2026,
         contributions = 750,
         taxRate = 20,
         entitlement = 150,
-        status = Available
+        status = Available,
+        claimDate = None
       )
-    )
+    ))
   )
   
   "Payment calculation breakdown controller" - {
@@ -74,7 +78,7 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.TempLeppController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
       }
     }
   }

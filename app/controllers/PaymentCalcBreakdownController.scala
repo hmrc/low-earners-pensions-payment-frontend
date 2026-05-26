@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.userAnswers.LeppSummary
 import navigation.Navigator
 import pages.*
@@ -26,14 +26,13 @@ import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                getData: DataRetrievalAction,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)
-                                              (implicit ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>

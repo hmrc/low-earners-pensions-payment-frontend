@@ -17,33 +17,39 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.Paid
 import play.api.libs.json.*
+
+import java.time.LocalDate
 
 class LeppItemSpec extends SpecBase {
   "LeppItem" - {
     val model: LeppItem = LeppItem(
+      id = "A-24-1",
       taxYear = 2024,
       contributions = 1000,
       taxRate = 20,
       entitlement = 200,
-      status = Available
+      status = Paid,
+      claimDate = Some(LocalDate.of(2025, 11, 30))
+    )
+
+    val json: JsValue = Json.parse(
+      """
+        |{
+        | "id": "A-24-1",
+        | "taxYear": 2024,
+        | "contributions": 1000.00,
+        | "taxRate": 20.00,
+        | "entitlement": 200.00,
+        | "status": "Paid",
+        | "claimDate": "2025-11-30"
+        |}
+       """.stripMargin
     )
     
     "reads" - {
       "should return a JsSuccess for valid JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "taxYear": 2024,
-            | "contributions": 1000.00,
-            | "taxRate": 20.00,
-            | "entitlement": 200.00,
-            | "status": "Available"
-            |}
-           """.stripMargin
-        )
-        
         json.validate[LeppItem] mustBe a[JsSuccess[_]]
         json.as[LeppItem] mustBe model
       }
@@ -55,19 +61,41 @@ class LeppItemSpec extends SpecBase {
     
     "writes" - {
       "should produce the expected JSON" in {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "taxYear": 2024,
-            | "contributions": 1000.00,
-            | "taxRate": 20.00,
-            | "entitlement": 200.00,
-            | "status": "Available"
-            |}
-           """.stripMargin
-        )
-        
         Json.toJson(model) mustBe json
+      }
+    }
+
+    "formattedEntitlement" - {
+      "should return the expected value for a whole pounds number" in {
+        model.formattedEntitlement mustBe "£200"
+      }
+
+      "should return the expected value for a number with decimals" in {
+        model.copy(entitlement = 200.1).formattedEntitlement mustBe "£200.10"
+      }
+    }
+
+    "formattedContributions" - {
+      "should return the expected value for a whole pounds number" in {
+        model.formattedContributions mustBe "£1,000"
+      }
+
+      "should return the expected value for a number with decimals" in {
+        model.copy(contributions = 200.1).formattedContributions mustBe "£200.10"
+      }
+    }
+    
+    "apply" - {
+      "should correctly construct from NPS model" in {
+        LeppItem(2025, calculation, 1) mustBe LeppItem(
+          id = "P-2025-1",
+          taxYear = 2025,
+          contributions = 10.56,
+          taxRate = 10.56,
+          entitlement = 10.56,
+          status = Paid,
+          claimDate = Some(LocalDate.of(2023, 6, 27))
+        )
       }
     }
   }

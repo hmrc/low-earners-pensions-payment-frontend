@@ -16,18 +16,39 @@
 
 package models.userAnswers
 
+import models.nps.LowEarnersCalculation
 import play.api.libs.json.{Json, OFormat}
+import utils.CurrencyFormats
 
-case class LeppItem(taxYear: Int,
+import java.time.LocalDate
+
+case class LeppItem(id: String, 
+                    taxYear: Int,
                     contributions: BigDecimal,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
-                    status: LeppItemStatus){
-  
-  def taxYearString = s"6 April ${taxYear-1} to 5 April $taxYear"
+                    status: LeppItemStatus,
+                    claimDate: Option[LocalDate]) {
+  val formattedEntitlement: String = CurrencyFormats.format(entitlement)
+  val formattedContributions: String = CurrencyFormats.format(contributions)
 }
 
-
 object LeppItem {
+  def apply(taxYear: Int, calculation: LowEarnersCalculation, index: Int): LeppItem = {
+    val leppStatus: LeppItemStatus = calculation.lowEarnersClaimDetails.claimStatus.toLeppItemStatus
+    val id: String = s"${leppStatus.toString.take(1)}-$taxYear-$index" 
+    
+    LeppItem(
+      id = id,
+      taxYear = taxYear,
+      contributions = calculation.lowEarnersDataDetails.netPayContributionsTotal.getOrElse(0),
+      taxRate = calculation.lowEarnersDataDetails.basicRatePercentage.getOrElse(0),
+      entitlement = calculation.lowEarnersClaimDetails.entitlementAmount.getOrElse(0),
+      status = calculation.lowEarnersClaimDetails.claimStatus.toLeppItemStatus,
+      claimDate = calculation.lowEarnersClaimDetails.claimDate.map(LocalDate.parse(_))
+    )
+  }
+  
+  
   implicit val format: OFormat[LeppItem] = Json.format[LeppItem]
 }

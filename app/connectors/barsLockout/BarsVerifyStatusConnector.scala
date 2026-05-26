@@ -27,17 +27,21 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
 
+import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 
 class BarsVerifyStatusConnector @Inject()(httpClient: HttpClientV2,
                                 config: AppConfig) {
-  
-  def status(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[BarsVerifyStatusResponse] =
+
+  def status(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext,
+                                    correlationId: CorrelationId): Future[BarsVerifyStatusResponse] = {
+    val statusUrl = config.verifyStatus
     httpClient
-      .post(url"${config.verifyStatus}")
-      .setHeader((correlationIdKey, "correlationId"))
+      .post(URI.create(statusUrl).toURL)
+      .setHeader((correlationIdKey, correlationId.value))
       .withBody(Json.toJson(BarsUpdateVerifyStatusParams(id)))
       .execute[BarsVerifyStatusResponse]
+  }
 
   def update(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext,
                                     correlationId: CorrelationId): Future[BarsVerifyStatusResponse] =

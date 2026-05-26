@@ -26,7 +26,6 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
-@SuppressWarnings(Array("org.wartremover.warts.Any"))
 abstract class Repo[ID, A: ClassTag](
   collectionName:   String,
   mongoComponent:   MongoComponent,

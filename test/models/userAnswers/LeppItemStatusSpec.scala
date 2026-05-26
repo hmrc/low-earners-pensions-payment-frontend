@@ -18,7 +18,6 @@ package models.userAnswers
 
 import base.SpecBase
 import models.userAnswers.LeppItemStatus.*
-import play.api.libs.json.{JsError, JsString}
 
 class LeppItemStatusSpec extends SpecBase {
   "LeppItemStatus" - {
@@ -27,21 +26,32 @@ class LeppItemStatusSpec extends SpecBase {
         ("Available", Available),
         ("Paid", Paid),
         ("Suspended", Suspended),
-        ("Cancelled", Cancelled)
+        ("Cancelled", Cancelled),
+        ("Unsupported", Unsupported)
       ).foreach(enumReadsTest[LeppItemStatus])
-      
-      "should return a JsError for an unsupported value" in {
-        JsString("Deceased").validate[LeppItemStatus] mustBe a[JsError]
-      }
     }
-    
+
     "writes" - {
       Seq(
         (Available, "Available"),
         (Paid, "Paid"),
         (Suspended, "Suspended"),
-        (Cancelled, "Cancelled")
+        (Cancelled, "Cancelled"),
+        (Unsupported, "Unsupported")
       ).foreach(enumWritesTest[LeppItemStatus])
+    }
+
+    "toHtmlClass" - {
+      Seq(
+        (Available, "govuk-tag--blue"),
+        (Paid, "govuk-tag--green"),
+        (Suspended, "govuk-tag--yellow"),
+        (Cancelled, "govuk-tag--red"),
+        (Unsupported, "")
+      ).foreach((status, expectedHtmlClass) =>
+        s"for status: ${status.toString} should return a class of: $expectedHtmlClass" in {
+          status.getHtmlClass mustBe expectedHtmlClass
+        })
     }
   }
 
