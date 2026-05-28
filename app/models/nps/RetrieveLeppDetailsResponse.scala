@@ -18,10 +18,11 @@ package models.nps
 
 import play.api.libs.json.{Json, Reads}
 
-case class RetrieveClaimsResponse(currentLowEarnersOptimisticLock: BigInt,
-                                  identifier: String,
-                                  lowEarnersDetailsList: Seq[LowEarnersDetails])
+case class RetrieveLeppDetailsResponse(currentLowEarnersOptimisticLock: BigInt,
+                                       identifier: String,
+                                       lowEarnersDetailsList: Seq[LowEarnersDetails])
 
-object RetrieveClaimsResponse {
-  implicit val format: Reads[RetrieveClaimsResponse] = Json.reads[RetrieveClaimsResponse]
+object RetrieveLeppDetailsResponse {
+  //TODO - we should add some tests for the NPS model JSON formats.
+  implicit val format: Reads[RetrieveLeppDetailsResponse] = Json.reads[RetrieveLeppDetailsResponse]
 }

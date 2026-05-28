@@ -16,7 +16,7 @@
 
 package models.userAnswers
 
-import models.nps.RetrieveClaimsResponse
+import models.nps.RetrieveLeppDetailsResponse
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.{Json, OFormat}
 import utils.CurrencyFormats
@@ -43,7 +43,7 @@ case class LeppSummary(currentLock: BigInt,
 object LeppSummary {
   def notEmptySeq[A](seq: Seq[A]): Option[Seq[A]] = if (seq.nonEmpty) Some(seq) else None
 
-  def apply(retrieveClaimsResponse: RetrieveClaimsResponse): LeppSummary = {
+  def apply(retrieveClaimsResponse: RetrieveLeppDetailsResponse): LeppSummary = {
     import retrieveClaimsResponse.*
 
     val leppItems: Seq[LeppItem] = lowEarnersDetailsList.flatMap(details =>
