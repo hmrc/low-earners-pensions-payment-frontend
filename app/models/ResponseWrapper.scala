@@ -27,3 +27,9 @@ enum ResponseWrapper[T] {
   case SuccessWrapper[S](value: S, correlationId: CorrelationId) extends ResponseWrapper[S]
   case ErrorWrapper(value: ErrorResult, correlationId: CorrelationId) extends ResponseWrapper[ErrorResult]
 }
+
+object ResponseWrapper {
+  implicit class SuccessWrapperOps[S](successWrapper: SuccessWrapper[S]) {
+    def map[R](mapFunc: S => R) = new SuccessWrapper[R](mapFunc(successWrapper.value), successWrapper.correlationId)
+  }
+}
