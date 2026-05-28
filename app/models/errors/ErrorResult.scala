@@ -16,7 +16,7 @@
 
 package models.errors
 
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{FORBIDDEN, INTERNAL_SERVER_ERROR}
 import play.api.libs.json.*
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
@@ -64,5 +64,5 @@ object ErrorResult {
         })
 
   val failedToParseError: ErrorResult = ServiceErrorResult(INTERNAL_SERVER_ERROR, "FAILED_TO_PARSE_DOWNSTREAM_RESPONSE")
-  val internalError: ErrorResult = ServiceErrorResult(INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR")
+  val notEligibleError: ErrorResult = ServiceErrorResult(FORBIDDEN, "USER_NOT_ELIGIBLE")
 }
