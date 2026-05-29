@@ -62,6 +62,7 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
 import java.net.URLEncoder
 import scala.reflect.ClassTag
+import scala.util.Random
 
 trait SpecBase
   extends AnyFreeSpec
@@ -81,6 +82,14 @@ trait SpecBase
     with HeaderNames
     with Status
     with ResultExtractors {
+
+  def generateNino(prefix: String = "AA"): String = {
+    val num = Random.nextInt(1000000)
+    val suffix = "C"
+    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
+
+    prefix + f"$str$num%06d$suffix".drop(prefix.length)
+  }
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
