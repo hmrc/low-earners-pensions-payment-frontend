@@ -36,6 +36,7 @@ GET    /confirmation                        controllers.SubmitConfirmationContro
 GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()
 GET     /account/timeout                    controllers.auth.AuthController.sessionTimeout()
 GET     /unauthorised                       controllers.auth.UnauthorisedController.onPageLoad()
+GET     /ineligible                         controllers.auth.IneligibleController.onPageLoad()
 GET     /we-could-not-confirm-your-details  controllers.auth.IvUpliftFailureController.onPageLoad(journeyId: Option[String])
 GET     /service-timeout-idle               controllers.auth.SessionTimeoutController.onPageLoad()
 

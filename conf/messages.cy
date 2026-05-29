@@ -8,6 +8,13 @@ unauthorised.guidance.preform = If you think you need access to this service, yo
 unauthorised.guidance.formLink = request it through the feedback form
 unauthorised.guidance.postform = . We will respond to you within 5 working days.
 
+# Ineligible page
+ineligible.title = You are not eligible to access this service
+ineligible.heading = You are not eligible to access this service
+ineligible.guidance.preform = If you believe this is wrong you may
+ineligible.guidance.formLink = contact us (opens in a new link)
+ineligible.guidance.postform = . We will respond to you within 5 working days.
+
 # Uplift failure page
 ivUpliftFailure.title = There''s a problem
 ivUpliftFailure.p1 = You cannot access this service. This may be because:
