@@ -542,5 +542,15 @@ class LeppSummarySpec extends SpecBase {
         model.hasPaymentHistory mustBe false
       }
     }
+    
+    "isNonEmpty" - {
+      "should return false for an LeppSummary containing no available or historic items" in {
+        LeppSummary(currentLock = 3, availableItems = None).isNonEmpty mustBe false
+      }
+
+      "should return true for an LeppSummary containing available or historic items" in {
+        model.isNonEmpty mustBe true
+      }
+    }
   }
 }

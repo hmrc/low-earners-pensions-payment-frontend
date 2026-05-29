@@ -38,6 +38,8 @@ case class LeppSummary(currentLock: BigInt,
   
   val paymentHistoryItems: Seq[LeppItem] = Seq(cancelledItems, paidItems).flatten.flatten
   val hasPaymentHistory: Boolean = paymentHistoryItems.nonEmpty
+  
+  val isNonEmpty: Boolean = hasAvailablePayments || hasPaymentHistory
 }
 
 object LeppSummary {
