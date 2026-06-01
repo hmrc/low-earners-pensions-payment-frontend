@@ -17,13 +17,10 @@
 package utils
 
 import com.google.inject.Singleton
- import models.CorrelationId
- import models.errors.ErrorResult.ServiceErrorResult
- import play.api.http.Status.BAD_REQUEST
- import play.api.mvc.{Request, Result}
+import models.CorrelationId
+import play.api.mvc.Request
 
- import java.util.UUID
- import scala.concurrent.Future
+import java.util.UUID
 
 @Singleton
 class CorrelationIdHandler {

@@ -23,7 +23,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.auth.{IneligibleView, UnauthorisedView}
+import views.html.auth.IneligibleView
 
 class IneligibleViewSpec extends SpecBase {
 
