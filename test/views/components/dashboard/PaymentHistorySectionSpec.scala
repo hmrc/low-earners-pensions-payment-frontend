@@ -18,8 +18,8 @@ package views.components.dashboard
 
 import base.SpecBase
 import models.*
-import models.userAnswers.{LeppItem, LeppItemStatus, LeppSummary}
 import models.userAnswers.LeppItemStatus.*
+import models.userAnswers.{LeppItem, LeppItemStatus, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements

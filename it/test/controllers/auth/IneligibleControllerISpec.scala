@@ -16,7 +16,6 @@
 
 package controllers.auth
 
-import base.SpecBase
 import controllers.ControllerIntegrationSpecBase
 import play.api.Application
 import play.api.mvc.{AnyContentAsEmpty, Result}

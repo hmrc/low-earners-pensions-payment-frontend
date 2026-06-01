@@ -26,15 +26,14 @@ import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
 import models.nps.RetrieveLeppDetailsResponse
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.mockito.stubbing
+import org.mockito.{ArgumentMatchers, stubbing}
 import org.mockito.stubbing.OngoingStubbing
 import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class LeppRetrievalServiceSpec extends SpecBase {
   

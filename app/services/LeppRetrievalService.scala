@@ -22,9 +22,9 @@ import connectors.{ConnectorResponse, LeppRetrievalConnector}
 import models.ResponseWrapper.ErrorWrapper
 import models.errors.ErrorResult
 import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
-import play.api.http.Status.*
 import models.userAnswers.LeppSummary
 import models.{CorrelationId, ResponseWrapper}
+import play.api.http.Status.*
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 

@@ -17,7 +17,7 @@
 package controllers
 
 import common.{AuthSupport, IntegrationSpecBase}
-import models.userAnswers.LeppItemStatus._
+import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.Application
 import play.api.http.Status.SEE_OTHER

@@ -16,8 +16,6 @@
 
 package controllers
 
-import base.SpecBase
-import controllers.ControllerIntegrationSpecBase
 import play.api.Application
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest

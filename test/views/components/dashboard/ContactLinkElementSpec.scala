@@ -30,7 +30,7 @@ class ContactLinkElementSpec extends SpecBase {
     "should return the expected HTML element" in new Setup {
       val element: Document = view()
       element.html() must include("For more information,")
-      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" href="/">contact us (opens in new tab)</a>""")
+      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" href="/">contact us (opens in new tab).</a>""")
     }
   }
   trait Setup {
