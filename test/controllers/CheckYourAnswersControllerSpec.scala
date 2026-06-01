@@ -32,7 +32,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.ImATeapot
 import play.api.test.Helpers.stubMessagesControllerComponents
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 import views.html.{CheckYourAnswersView, ErrorTemplate}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,7 +48,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         identify = FakeIdentifierAction(),
         getData = FakeDataRetrievalAction(emptyUserAnswers),
         view = mock[CheckYourAnswersView],
-        correlationIdHandler = mock[CorrelationIdOptional],
+        correlationIdHandler = mock[CorrelationIdHandler],
         barsService = mockBarsService,
         leppSubmissionService = mock[LeppSubmissionService],
         navigator = mock[Navigator],

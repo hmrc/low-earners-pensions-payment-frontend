@@ -28,7 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.{CheckYourAnswersView, ErrorTemplate}
@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            getData: DataRetrievalAction,
                                            view: CheckYourAnswersView,
-                                           correlationIdHandler: CorrelationIdOptional,
+                                           correlationIdHandler: CorrelationIdHandler,
                                            barsService: BarsService,
                                            leppSubmissionService: LeppSubmissionService,
                                            navigator: Navigator,
@@ -60,23 +60,23 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
   }
 
   def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req => (leppData, bankDetails) =>
-    correlationIdHandler.handleCorrelationId(req) { implicit cid =>
-      handleWithBars(bankDetails)(() => {
-        val result: EitherT[Future, ErrorWrapper, Result] = for {
-          _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
-          updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
-          _ <- EitherT.right(sessionService.save(updatedUserAnswers))
-        } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
+    implicit val cid: CorrelationId = correlationIdHandler.getCorrelationId(req)
+    
+    handleWithBars(bankDetails)(() => {
+      val result: EitherT[Future, ErrorWrapper, Result] = for {
+        _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
+        updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
+        _ <- EitherT.right(sessionService.save(updatedUserAnswers))
+      } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
 
-        result.leftSemiflatMap(_ =>
-          for {
-            _ <- sessionService.clear(req.userAnswers)
-          } yield InternalServerError(errorView("title", "heading", "message")),
-          //TODO - Need to write content for this page
-          //TODO - should probably implement ClearCacheController like in MPE
-        ).merge
-      })
-    }
+      result.leftSemiflatMap(_ =>
+        for {
+          _ <- sessionService.clear(req.userAnswers)
+        } yield InternalServerError(errorView("title", "heading", "message")),
+        //TODO - Need to write content for this page
+        //TODO - should probably implement ClearCacheController like in MPE
+      ).merge
+    })
   }
 
   protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])

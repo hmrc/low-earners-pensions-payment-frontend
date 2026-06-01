@@ -16,23 +16,30 @@
 
 package controllers
 
+import cats.data.EitherT
+import com.google.inject.{Inject, Singleton}
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import models.userAnswers.LeppItemStatus.*
-import models.userAnswers.{LeppItem, LeppSummary}
+import models.ResponseWrapper.ErrorWrapper
+import models.errors.ErrorResult.notEligibleError
+import models.requests.DataRequest
+import models.userAnswers.LeppSummary
+import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
 import pages.DashboardPage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SessionCacheService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{LeppRetrievalService, SessionCacheService}
+import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.DashboardView
 
-import java.time.LocalDate
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class DashboardController @Inject()(identify: IdentifierAction,
                                     getData: DataRetrievalAction,
+                                    correlationIdHandler: CorrelationIdHandler,
+                                    leppRetrievalService: LeppRetrievalService,
                                     val sessionService: SessionCacheService,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
@@ -41,63 +48,28 @@ class DashboardController @Inject()(identify: IdentifierAction,
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
   
   def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    val tempData: LeppSummary = LeppSummary(
-      currentLock = 67,
-      availableItems = Some(Seq(
-        LeppItem(
-          id = "A-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      )),
-      paidItems = Some(Seq(
-        LeppItem(
-          id = "P-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Paid,
-          claimDate = Some(LocalDate.of(2025, 1, 1))
-        )
-      )),
-      suspendedItems = Some(Seq(
-        LeppItem(
-          id = "S-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Suspended,
-          claimDate = None
-        )
-      )),
-      cancelledItems = Some(Seq(
-        LeppItem(
-          id = "C-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Cancelled,
-          claimDate = None
-        )
-      )
-    ))
+    implicit val cid: CorrelationId = correlationIdHandler.getCorrelationId(request)
     
-    for {
-      updatedAnswers <- Future.fromTry(request.userAnswers.set(DashboardPage, tempData))
-      _ <- sessionService.save(updatedAnswers)
+    val result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
+      leppSummary <- leppRetrievalService.retrieveLeppDetails(request.user.nino)
+      updatedAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
+      _ <- EitherT.right(sessionService.save(updatedAnswers))
     } yield {
       Ok(view(
-        tempData,
-        Some(backLinkUrl(NormalMode, DashboardPage).url),
-        navigator.nextPage(DashboardPage, NormalMode).url
+        leppSummary = leppSummary.value,
+        backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
+        continueUrl = navigator.nextPage(DashboardPage, NormalMode).url
       ))
+    }
+    
+    result.leftMap(mapErrors).merge 
+  }
+  
+  private def mapErrors[A](err: ErrorWrapper)
+                          (implicit request: DataRequest[A]): Result = {
+    err.value match {
+      case `notEligibleError` => Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
+      case _ => Redirect(controllers.routes.SomethingWentWrongController.onPageLoad())
     }
   }
 }

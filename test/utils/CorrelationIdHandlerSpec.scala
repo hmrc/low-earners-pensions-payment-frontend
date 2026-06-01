@@ -26,39 +26,19 @@ import scala.concurrent.Future
 
 class CorrelationIdHandlerSpec extends SpecBase {
   "CorrelationIdHandler" - {
-    "handle" - {
-      val block: CorrelationId => Future[Result] = id => Future.successful(Ok(id.value))
+    "getCorrelationId" - {
+      val correlationIdHandler: CorrelationIdHandler = new CorrelationIdHandler {
+        override protected[utils] def generateCorrelationId: CorrelationId = CorrelationId("generated-id")
+      }
       
-      def idToRequest(idOpt: Option[String]) = idOpt.fold(FakeRequest())(
-        id => FakeRequest().withHeaders("correlationId" -> id)
-      )
-      
-      "should invoke block when correlation ID exists and is mandatory" in {
-        val result: Future[Result] = new CorrelationIdMandatory().handleCorrelationId(idToRequest(Some("id")))(block)
-        status(result) mustBe OK
-        contentAsString(result) must include("id")
+      "should generate ID when it does not exist in request headers" in {
+        correlationIdHandler.getCorrelationId(FakeRequest()) mustBe CorrelationId("generated-id")
       }
 
-      "should invoke block when correlation ID exists and is optional" in {
-        val result: Future[Result] = new CorrelationIdOptional().handleCorrelationId(idToRequest(Some("id")))(block)
-        status(result) mustBe OK
-        contentAsString(result) must include("id")
-      }
-
-      "should return error when correlation ID is required and doesn't exist" in {
-        val result: Future[Result] = new CorrelationIdMandatory().handleCorrelationId(idToRequest(None))(block)
-        status(result) mustBe BAD_REQUEST
-        contentAsString(result) must include("CORRELATION_ID_HEADER_MISSING")
-      }
-
-      "should generate ID and invoke block when correlation ID is optional and doesn't exist" in {
-        val handler: CorrelationIdOptional =  new CorrelationIdOptional() {
-          override protected[utils] def generateCorrelationId: CorrelationId = CorrelationId("generatedId")
-        }
-        
-        val result: Future[Result] = handler.handleCorrelationId(idToRequest(None))(block)
-        status(result) mustBe OK
-        contentAsString(result) must include("generatedId")
+      "should return ID form request headers when it exists" in {
+        correlationIdHandler.getCorrelationId(
+          FakeRequest().withHeaders("correlationId" -> "some-id")
+        ) mustBe CorrelationId("some-id")
       }
     }
   }

@@ -48,7 +48,9 @@
   tableRef = tableRef
  ))
 
- @availableSummarySection(leppSummary.totalEntitlementString, continueUrl)
+ @if(leppSummary.availableItems.nonEmpty) {
+  @availableSummarySection(leppSummary.totalEntitlementString, continueUrl)
+ }
 
 } else {
  @heading(msgKey = messages("dashboard.availablePayments.heading"), headerSize = "m")
