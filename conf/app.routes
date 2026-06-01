@@ -40,6 +40,8 @@ GET     /ineligible                         controllers.auth.IneligibleControlle
 GET     /we-could-not-confirm-your-details  controllers.auth.IvUpliftFailureController.onPageLoad(journeyId: Option[String])
 GET     /service-timeout-idle               controllers.auth.SessionTimeoutController.onPageLoad()
 
-# Session actions
+# Error page
+GET     /something-went-wrong               controllers.SomethingWentWrongController.onPageLoad()
 
+# Session actions
 GET     /refresh-session                    controllers.KeepAliveController.keepAlive()

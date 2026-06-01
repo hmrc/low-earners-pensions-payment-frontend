@@ -15,6 +15,10 @@ ineligible.guidance.preform = If you believe this is wrong you may
 ineligible.guidance.formLink = contact us (opens in a new link)
 ineligible.guidance.postform = . We will respond to you within 5 working days.
 
+# Something went wrong page
+somethingWentWrong.heading = Sorry, there is a problem with the service
+somethingWentWrong.p1 = You can try again later.
+
 # Uplift failure page
 ivUpliftFailure.title = There''s a problem
 ivUpliftFailure.p1 = You cannot access this service. This may be because:
