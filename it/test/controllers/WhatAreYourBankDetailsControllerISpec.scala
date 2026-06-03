@@ -50,34 +50,11 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
-   
-    testUserAnswersHandling(request = request)
 
-    "existing user answers are found" should {
-      "return view with filled answers" in {
+    "with valid payment details" should {
+      "return bank details view" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
-          response = Json.obj("attempts" -> 1))
-        
-        val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
-        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-        val filledForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
-
-        status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(filledForm, formViewModel)(request, messages).toString
-      }
-    }
-
-    "existing user answers are not found" should {
-      "return blank view" in {
-        mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         
         val application: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
@@ -93,6 +70,23 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         contentAsString(result) shouldEqual view(form, formViewModel)(request, messages).toString
       }
     }
+
+    "user locked out for too many BARS attempts" should {
+      "return bank details view" in {
+        mockAuthSuccess()
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z"))
+
+        val application: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(bars.routes.BarsLockoutController.onPageLoad().url)
+      }
+    }
   }
 
   "GET /change-bank-details" when {
@@ -101,12 +95,12 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
       path = "/low-earners-pensions-payment/change-bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
-    "page is loaded should include the correct back link" in {
+    "page is loaded should pre-populate bank details and navigation links with edit mode" in {
       val backUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
 
       mockAuthSuccess()
-      mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+      mockBarsVerifyStatus(status = OK,
         response = Json.obj("attempts" -> 1))
       
       val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
@@ -138,9 +132,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
-
-    testUserAnswersHandling(request = request())
-
+    
     "errors exist in supplied data" should {
       def testErrorScenario(scenarioName: String,
                             accountName: Option[String],
@@ -148,7 +140,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
                             accountNumber: Option[String],
                             rollNumber: Option[String]): Unit = s"handle correctly for scenario - $scenarioName" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         
         val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
@@ -201,7 +193,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "a valid request is submitted" should {
       "redirect to the CYA page" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         
         val formData: Seq[(String, String)] = Seq(
@@ -235,7 +227,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "errors exist in supplied data" should {
       "load page with errors and CYA back link" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
 
         val app: Application = applicationWithUserAnswers(userAnswersWithLeppSummary)
@@ -274,7 +266,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
     "a valid request is submitted" should {
       "redirect to the CYA page" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
 
         val formData: Seq[(String, String)] = Seq(

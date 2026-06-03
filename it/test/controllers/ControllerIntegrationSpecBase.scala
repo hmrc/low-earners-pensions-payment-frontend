@@ -18,20 +18,13 @@ package controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.{AuthSupport, IntegrationSpecBase}
-import connectors.barsLockout.model.{BarVerifyStatusId, BarsUpdateVerifyStatusParams}
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
-import play.api.Application
-import play.api.http.Status.SEE_OTHER
-import play.api.http.Writeable
 import play.api.libs.json.*
-import play.api.mvc.Result
-import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.NormalMode
-import java.time.temporal.ChronoUnit.HOURS
+
 import java.time.*
-import scala.concurrent.Future
+import java.time.temporal.ChronoUnit.HOURS
 
 trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport {
   val summaryModel: LeppSummary = LeppSummary(
@@ -135,118 +128,18 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
       .thenReturn(status = OK, body = authResponseJson)
   }
 
-  def mockBarsLockoutAction(url: String,
-                      status: Int = OK,
+  def mockBarsVerifyStatus(status: Int = OK,
                       response: JsObject): StubMapping = {
     
-    when(method = POST, uri = url)
-      .withRequestBody(Json.toJson(BarsUpdateVerifyStatusParams(BarVerifyStatusId(nino))))
+    when(method = GET, uri = "/low-earners-pensions-payment/bars/verify/status")
       .thenReturn(status = status, body = response)
   }
 
-  private def handleForAuthError[A: Writeable](request: FakeRequest[A],
-                                               error: String,
-                                               expectedRedirect: String): Unit =
-    s"return expected result for auth error - $error" in {
-      val errorString = s"""MDTP detail=\"$error\""""
+  def mockBarsUpdateStatus(status: Int = OK,
+                           response: JsObject): StubMapping = {
 
-      when(method = POST, uri = authoriseUri)
-        .withRequestBody(authRequestJson)
-        .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> errorString))
-
-      lazy val application: Application = fakeApplication()
-
-      lazy val result: Future[Result] = route(application, request).getOrElse(
-        Future.failed(new RuntimeException("TEST_ERROR"))
-      )
-    }
-
-  private def dataTest[A: Writeable](scenario: String,
-                                     expectedResult: String,
-                                     request: FakeRequest[A],
-                                     leppSummaryOpt: Option[LeppSummary] = Some(summaryModel),
-                                     bankDetailsOpt: Option[BankAccountDetails] = Some(bankAccountDetails),
-                                     isSubmittedOpt: Option[Boolean] = None,
-                                     expectedRedirect: String): Unit =
-    s"$scenario" must {
-      s"$expectedResult" in {
-
-        lazy val leppSummaryJson: JsObject = leppSummaryOpt.fold(JsObject.empty)(
-          leppSummary => Json.obj("leppSummary" -> Json.toJson(leppSummary))
-        )
-
-        lazy val bankDetailsJson: JsObject = bankDetailsOpt.fold(JsObject.empty)(
-          bankDetails => Json.obj("bankDetails" -> Json.toJson(bankDetails))
-        )
-
-        lazy val isSubmittedJson: JsObject = isSubmittedOpt.fold(JsObject.empty)(
-          isSubmitted => Json.obj("isSubmitted" -> JsBoolean(isSubmitted))
-        )
-
-        lazy val userAnswers = UserAnswers(
-          id = "some-id",
-          data = leppSummaryJson ++ bankDetailsJson ++ isSubmittedJson,
-          lastUpdated = Instant.MIN
-        )
-
-        lazy val application: Application = applicationWithUserAnswers(userAnswers)
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
-          response = Json.obj("attempts" -> 1))
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(expectedRedirect)
-      }
-    }
-
-  def testUserAnswersHandling[A: Writeable](request: FakeRequest[A],
-                                            withLeppDataHandlingTest: Boolean = true,
-                                            withBankDetailsHandlingTest: Boolean = false,
-                                            submissionShouldExist: Boolean = false): Unit = {
-    def existingSubmissionHandlingTest(): Unit = {
-      if (submissionShouldExist) {
-        dataTest(
-          scenario = "an existing submission is required and missing from user answers",
-          expectedResult = "redirect to CheckYourAnswers page",
-          request = request,
-          isSubmittedOpt = None,
-          expectedRedirect = routes.CheckYourAnswersController.onPageLoad().url
-        )
-      } else {
-        dataTest(
-          scenario = "an existing submission has already been made",
-          expectedResult = "wipe user answers and redirect to Dashboard page",
-          request = request,
-          isSubmittedOpt = Some(true),
-          expectedRedirect = routes.DashboardController.onPageLoad().url
-        )
-      }
-    }
-
-    "checking user answers" when {
-      existingSubmissionHandlingTest()
-      if (withLeppDataHandlingTest) {
-        dataTest(
-          request = request,
-          scenario = "LeppSummary is required and is missing from user answers",
-          expectedResult = "redirect to Dashboard page",
-          leppSummaryOpt = None,
-          expectedRedirect = routes.DashboardController.onPageLoad().url
-        )
-      }
-      if (withBankDetailsHandlingTest) {
-        dataTest(
-          request = request,
-          scenario = "BankDetails are required and are missing from user answers",
-          expectedResult = "redirect to BankDetails page",
-          bankDetailsOpt = None,
-          expectedRedirect = routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url
-        )
-      }
-    }
+    when(method = POST, uri = "/low-earners-pensions-payment/bars/verify/update")
+      .withRequestBody(JsObject.empty)
+      .thenReturn(status = status, body = response)
   }
 }

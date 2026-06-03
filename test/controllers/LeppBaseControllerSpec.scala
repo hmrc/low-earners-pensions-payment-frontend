@@ -93,8 +93,7 @@ class LeppBaseControllerSpec extends SpecBase {
                           data: DataRetrievalAction,
                           val controllerComponents: MessagesControllerComponents = mockCc)
       extends LeppBaseController(identifierAction, data) with SessionDataHandling {
-      
-      override val sessionService: SessionCacheService = mockSessionService
+
       override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
     
@@ -157,7 +156,7 @@ class LeppBaseControllerSpec extends SpecBase {
   
   "SessionDataHandling" - {
     "handleWithSubmissionCheck" - {
-      "should wipe user answers when data has been submitted" in new Test {
+      "should redirect to clear cache controller when data has already submitted" in new Test {
         when(
           mockSessionService.save(userAnswers = ArgumentMatchers.any())(
             hc = ArgumentMatchers.any(),
@@ -174,8 +173,8 @@ class LeppBaseControllerSpec extends SpecBase {
           req => Future.successful(ImATeapot(req.userAnswers.data))
         )(FakeRequest())
         
-        status(result) mustBe IM_A_TEAPOT
-        contentAsJson(result) mustBe JsObject.empty
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
 
       "should not wipe user answers when data has not been submitted" in new Test {
@@ -249,7 +248,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
     }
     
@@ -322,7 +321,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
     }
     

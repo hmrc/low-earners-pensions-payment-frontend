@@ -40,8 +40,8 @@ GET     /we-could-not-confirm-your-details  controllers.auth.IvUpliftFailureCont
 GET     /service-timeout-idle               controllers.auth.SessionTimeoutController.onPageLoad()
 
 # Session actions
-
-GET     /refresh-session                    controllers.KeepAliveController.keepAlive()
+GET         /refresh-session                controllers.KeepAliveController.keepAlive()
+GET         /clear-cache                    controllers.ClearCacheController.onPageLoad()
 
 # BARs lockout
 GET         /bars-lockout                   controllers.bars.BarsLockoutController.onPageLoad()

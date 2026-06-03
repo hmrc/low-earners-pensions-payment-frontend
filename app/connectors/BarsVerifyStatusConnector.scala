@@ -14,41 +14,37 @@
  * limitations under the License.
  */
 
-package connectors.barsLockout
+package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
-import connectors.barsLockout.model.{BarVerifyStatusId, BarsUpdateVerifyStatusParams, BarsVerifyStatusResponse}
 import models.CorrelationId
-import play.api.libs.json.Json
+import models.barsLockout.BarsVerifyStatusResponse
+import play.api.libs.json.JsObject
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
 
-import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 
 class BarsVerifyStatusConnector @Inject()(httpClient: HttpClientV2,
                                 config: AppConfig) {
 
-  def status(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext,
-                                    correlationId: CorrelationId): Future[BarsVerifyStatusResponse] = {
-    val statusUrl = config.verifyStatus
+  def status()(implicit hc: HeaderCarrier, ec: ExecutionContext,
+                                    correlationId: CorrelationId): Future[BarsVerifyStatusResponse] = 
     httpClient
-      .post(URI.create(statusUrl).toURL)
+      .get(url"${config.verifyStatus}")
       .setHeader((correlationIdKey, correlationId.value))
-      .withBody(Json.toJson(BarsUpdateVerifyStatusParams(id)))
       .execute[BarsVerifyStatusResponse]
-  }
 
-  def update(id: BarVerifyStatusId)(implicit hc: HeaderCarrier, ec: ExecutionContext,
+  def update()(implicit hc: HeaderCarrier, ec: ExecutionContext,
                                     correlationId: CorrelationId): Future[BarsVerifyStatusResponse] =
     httpClient
       .post(url"${config.updateStatus}")
       .setHeader((correlationIdKey, correlationId.value))
-      .withBody(Json.toJson(BarsUpdateVerifyStatusParams(id)))
+      .withBody(JsObject.empty)
       .execute[BarsVerifyStatusResponse]
 
 }

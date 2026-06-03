@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.bars
 
 import base.SpecBase
 import models.userAnswers.LeppItemStatus.Available
@@ -27,7 +27,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import views.html.PaymentCalcBreakdownView
 
-class PaymentCalcBreakdownViewSpec extends SpecBase {
+class BarsLockoutViewSpec extends SpecBase {
 
   val leppItem: LeppItem = LeppItem(
     id = "id-1",

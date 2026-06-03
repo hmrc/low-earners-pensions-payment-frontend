@@ -18,63 +18,17 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{BarsLockoutAction, FakeBarsLockoutAction}
-import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
-import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
+import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
+import pages.{DashboardPage, WhatAreYourBankDetailsPage}
 import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import viewmodels.NormalMode
 
 class SubmitConfirmationControllerSpec extends SpecBase {
 
   "Submit confirmation controller" - {
-    val summaryModel: LeppSummary = LeppSummary(
-      currentLock = 67,
-      availableItems = Some(Seq(
-        LeppItem(
-          id = "A-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      )),
-      paidItems = Some(Seq(
-        LeppItem(
-          id = "P-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Paid,
-          claimDate = None
-        )
-      )),
-      suspendedItems = Some(Seq(
-        LeppItem(
-          id = "S-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Suspended,
-          claimDate = None
-        )
-      )),
-      cancelledItems = Some(Seq(
-        LeppItem(
-          id = "C-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Cancelled,
-          claimDate = None
-        )
-      )
-      ))
 
     val bankAccountDetails: BankAccountDetails = BankAccountDetails(
       accountName = "name",
@@ -106,6 +60,25 @@ class SubmitConfirmationControllerSpec extends SpecBase {
       }
     }
 
+    "must redirect to checkYourAnswers controller if the submission is not yet done" in {
+
+      val nonSubmissionUserAnswers: UserAnswers =
+        emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
+          .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
+          
+      val application = applicationBuilder(userAnswers = nonSubmissionUserAnswers).build()
+
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.SubmitConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.onPageLoad().url)
+      }
+    }
+
     "must redirect to BARS lockout controller when bars check limit exceeds" in {
 
       val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(3)
@@ -120,6 +93,23 @@ class SubmitConfirmationControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(bars.routes.BarsLockoutController.onPageLoad().url)
+      }
+    }
+
+    "must redirect to bank details controller when banks details are empty" in {
+      val noBankDetailsUserAnswers: UserAnswers =
+        emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
+        
+      val application = applicationBuilder(userAnswers = noBankDetailsUserAnswers).build()
+
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.SubmitConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
       }
     }
   }

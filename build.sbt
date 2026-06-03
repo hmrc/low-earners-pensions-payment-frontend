@@ -44,7 +44,7 @@ lazy val microservice = Project("low-earners-pensions-payment-frontend", file(".
       "-Wconf:src=routes/.*:s",
       "-Wconf:msg=unused import&src=html/.*:s"
     ),
-    libraryDependencies ++= AppDependencies(),
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     retrieveManaged := true,
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat)

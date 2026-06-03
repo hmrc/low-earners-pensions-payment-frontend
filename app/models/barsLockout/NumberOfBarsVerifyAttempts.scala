@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connectors.barsLockout.model
+package models.barsLockout
 
 import play.api.libs.json.{Format, Json}
 

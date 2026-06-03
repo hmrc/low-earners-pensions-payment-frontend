@@ -22,20 +22,9 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.language.LanguageUtils
 
 import java.time.format.DateTimeFormatter
-import java.time.{DayOfWeek, Instant, ZoneId}
-import java.util.Locale
+import java.time.{Instant, ZoneId}
 
 object Formatters {
-
-  private val WeekDaysInWelsh = Map(
-    DayOfWeek.MONDAY    -> "dydd Llun",
-    DayOfWeek.TUESDAY   -> "dydd Mawrth",
-    DayOfWeek.WEDNESDAY -> "dydd Mercher",
-    DayOfWeek.THURSDAY  -> "dydd Iau",
-    DayOfWeek.FRIDAY    -> "dydd Gwener",
-    DayOfWeek.SATURDAY  -> "dydd Sadwrn",
-    DayOfWeek.SUNDAY    -> "dydd Sul"
-  )
 
   def fullDateTime(dt: Instant, messages: Messages, languageUtils: LanguageUtils)(implicit
     requestHeader: RequestHeader
@@ -44,15 +33,8 @@ object Formatters {
     val date          = zonedDateTime.toLocalDate
     val time          = zonedDateTime.toLocalTime
     val lang          = languageUtils.getCurrentLang(requestHeader).code
-
-    val day        = lang match {
-      case "cy" => WeekDaysInWelsh(date.getDayOfWeek)
-      case _    =>
-        date.getDayOfWeek.toString
-          .split(' ')
-          .map(day => day.charAt(0).toString + day.slice(1, day.length).toLowerCase(Locale.UK))
-          .mkString(" ")
-    }
+    val day           = messages(date.getDayOfWeek.toString)
+     
     val dateString = s"$day ${date.getDayOfMonth.toString} ${messages(date.getMonth.toString)} ${date.getYear.toString}"
     val timeString = DateTimeFormatter
       .ofPattern("h:mma")

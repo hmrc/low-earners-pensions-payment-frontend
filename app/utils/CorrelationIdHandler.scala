@@ -18,23 +18,18 @@ package utils
 
  import com.google.inject.Singleton
  import models.CorrelationId
- import models.errors.ErrorResult.ServiceErrorResult
- import play.api.http.Status.BAD_REQUEST
- import play.api.mvc.{Request, Result}
+ import play.api.mvc.Request
 
  import java.util.UUID
- import scala.concurrent.Future
 
 sealed class CorrelationIdHandler(correlationIdMandatory: Boolean) {
   protected[utils] def generateCorrelationId: CorrelationId = CorrelationId(UUID.randomUUID().toString)
   
-  def handleCorrelationId[A](request: Request[A])(block: CorrelationId => Future[Result]): Future[Result] =
+  def handleCorrelationId[A](request: Request[A]): CorrelationId =
     request.headers.get(Constants.correlationIdKey) match {
-    case Some(value) => block(CorrelationId(value))
-    case None if correlationIdMandatory => Future.successful(
-      ServiceErrorResult(BAD_REQUEST, "CORRELATION_ID_HEADER_MISSING").toResult
-    )
-    case _ => block(generateCorrelationId)
+    case Some(value) => CorrelationId(value)
+    case None if correlationIdMandatory => CorrelationId("CORRELATION_ID_HEADER_MISSING")
+    case None => generateCorrelationId
   }
 }
 

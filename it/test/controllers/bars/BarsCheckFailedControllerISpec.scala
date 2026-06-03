@@ -37,7 +37,7 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         lazy val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 

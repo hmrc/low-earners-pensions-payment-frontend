@@ -16,8 +16,7 @@
 
 package controllers.actions
 
-import connectors.barsLockout.model.NumberOfBarsVerifyAttempts
-import controllers.actions.request.BarsVerifiedRequest
+import models.barsLockout.BarsVerifiedRequest
 import models.requests.IdentifierRequest
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
@@ -32,7 +31,7 @@ class FakeBarsLockoutAction(count: Int) extends BarsLockoutAction {
       Future.successful(Left(Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad().url)))
     }
     else{
-      Future.successful(Right(BarsVerifiedRequest(request, NumberOfBarsVerifyAttempts(count))))
+      Future.successful(Right(BarsVerifiedRequest(request)))
     }
       
   }

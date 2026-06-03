@@ -16,29 +16,42 @@
 
 package controllers.bars
 
-import controllers.actions.{BarsLockedOutJourneyActionRefiner, IdentifierAction}
+import connectors.BarsVerifyStatusConnector
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.CorrelationId
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import views.html.bars.BarsLockout
+import utils.CorrelationIdOptional
+import views.html.bars.BarsLockoutView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class BarsLockoutController @Inject()(
                                      identify: IdentifierAction,
-                                     barsLockedOutJourneyAction: BarsLockedOutJourneyActionRefiner,
-                                     barsLockoutView: BarsLockout,
+                                     getData: DataRetrievalAction,
+                                     barsLockoutView: BarsLockoutView,
+                                     barsVerifyStatusConnector: BarsVerifyStatusConnector,
+                                     correlationIdHandler: CorrelationIdOptional,
                                      mcc:             MessagesControllerComponents
-)(implicit languageUtils: LanguageUtils)
+)(implicit ec: ExecutionContext, languageUtils: LanguageUtils)
     extends FrontendController(mcc)
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent]   = (identify andThen barsLockedOutJourneyAction).async  { implicit request =>
-    val returnUrl = controllers.routes.DashboardController.onPageLoad().url
-
-    Future.successful(Ok(barsLockoutView(request.barsLockoutExpiryTime, returnUrl)))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    implicit val correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(request)
+    barsVerifyStatusConnector.status() map { status =>
+      status.lockoutExpiryDateTime match {
+        case Some(value) =>
+          Ok(barsLockoutView(value, controllers.routes.DashboardController.onPageLoad().url))
+        case None =>
+          throw new RuntimeException(
+            "Unexpected condition. This controller should only be called when service is locked out"
+          )
+      }
+    }
   }
 }

@@ -18,8 +18,7 @@ package controllers
 
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import connectors.barsLockout.BarsVerifyStatusConnector
-import connectors.barsLockout.model.BarVerifyStatusId
+import connectors.BarsVerifyStatusConnector
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.userAnswers.BankAccountDetails
@@ -29,7 +28,6 @@ import pages.CheckYourAnswersPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{CorrelationIdOptional, Logging}
 import viewmodels.NormalMode
@@ -64,9 +62,10 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       ))
   }
 
-  def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req => (leppData, bankDetails) =>
-    correlationIdHandler.handleCorrelationId(req) { implicit cid =>
-      handleWithBars(bankDetails, req.user.nino)(() => {
+  def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req =>
+    (leppData, bankDetails) =>
+      implicit val correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(req)
+      handleWithBars(bankDetails)(() => {
         val result: EitherT[Future, ErrorWrapper, Result] = for {
           _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
           updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
@@ -81,10 +80,9 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
           //TODO - should probably implement ClearCacheController like in MPE
         ).merge
       })
-    }
   }
 
-  protected[controllers] def handleWithBars(bankDetails: BankAccountDetails, nino: Nino)(f: () => Future[Result])
+  protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])
                                            (implicit hc: HeaderCarrier,
                                             ec: ExecutionContext,
                                             cid: CorrelationId): Future[Result] =
@@ -93,15 +91,13 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       .leftMap {
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
           barsVerifyStatusConnector
-            .update(BarVerifyStatusId.from(nino)).map { verifyStatus =>
+            .update().map { _ =>
               logger.info("[CheckYourAnswersController][handleWithBars] ",
-                "Bars VerifyStatus update successful for:" +
-                  s" ${nino.nino}" 
+                s"Bars VerifyStatus update successful for correlationId : $cid" 
               )
             } recover { case e =>
             logger.error("[CheckYourAnswersController][handleWithBars] ",
-              "Bars VerifyStatus update failed for:" +
-                s" ${nino.nino}", e
+              s"Bars VerifyStatus update failed for: correlationId : $cid"
             )
           }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())

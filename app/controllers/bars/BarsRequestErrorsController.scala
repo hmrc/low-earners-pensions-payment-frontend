@@ -22,7 +22,6 @@ import controllers.{BarsLeppBaseController, SessionDataHandling}
 import pages.BarsRequestErrorsPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SessionCacheService
 import viewmodels.NormalMode
 import views.html.bars.BarsRequestErrorsView
 
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
                                             barsLockout: BarsLockoutAction,
                                             getData: DataRetrievalAction,
-                                            val sessionService: SessionCacheService,
                                             view: BarsRequestErrorsView,
                                             val controllerComponents: MessagesControllerComponents)
                                            (implicit val ec: ExecutionContext)

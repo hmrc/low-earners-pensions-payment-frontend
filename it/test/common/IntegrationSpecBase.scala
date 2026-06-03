@@ -19,11 +19,9 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import connectors.PlaceholderBackendConnector
-import connectors.barsLockout.BarsVerifyStatusConnector
+import connectors.{BarsVerifyStatusConnector, PlaceholderBackendConnector}
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -50,8 +48,7 @@ class IntegrationSpecBase extends AnyWordSpec
   with ResultExtractors
   with HeaderNames
   with Status
-  with HttpClientV2Support
-  with BeforeAndAfterEach {
+  with HttpClientV2Support {
 
   val parsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
   
@@ -101,6 +98,12 @@ class IntegrationSpecBase extends AnyWordSpec
       post(urlEqualTo(url))
         .withHeader("Content-Type", equalTo("application/json"))
         .withRequestBody(equalTo(requestBody))
+        .willReturn(response)
+    )
+
+  def stubGet(url: String, response: ResponseDefinitionBuilder): StubMapping =
+    wireMockServer.stubFor(
+      get(urlEqualTo(url))
         .willReturn(response)
     )
 }

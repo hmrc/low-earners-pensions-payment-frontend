@@ -18,24 +18,26 @@ package controllers
 
 import base.SpecBase
 import cats.data.EitherT
-import connectors.ConnectorResponse
-import connectors.barsLockout.BarsVerifyStatusConnector
-import connectors.barsLockout.model.{BarVerifyStatusId, BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
+import connectors.{BarsVerifyStatusConnector, ConnectorResponse}
 import controllers.actions.{FakeBarsLockoutAction, FakeDataRetrievalAction, FakeIdentifierAction}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.BarsResponse
+import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import models.errors.ErrorResult.BarsErrorResult
-import models.userAnswers.BankAccountDetails
+import models.userAnswers.{BankAccountDetails, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
-import play.api.mvc.Result
+import pages.{CheckYourAnswersPage, DashboardPage, WhatAreYourBankDetailsPage}
+import play.api.Application
 import play.api.mvc.Results.ImATeapot
-import play.api.test.Helpers.stubMessagesControllerComponents
+import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.test.FakeRequest
+import play.api.test.Helpers.{GET, route, running, stubMessagesControllerComponents, writeableOf_AnyContentAsEmpty}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
-import uk.gov.hmrc.domain.Nino
 import utils.CorrelationIdOptional
+import viewmodels.NormalMode
 import views.html.{CheckYourAnswersView, ErrorTemplate}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -81,15 +83,66 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         sortCode = "112233",
         rollNumber = Some("1234678")
       )
-      
-      lazy val result: Future[Result] = controller.handleWithBars(bankAccountDetails, Nino(nino))(
-        f = () => Future.successful(ImATeapot("Teapot time"))
-      )
     }
 
+    "onPageLoad" - {
+      "should return OK and the correct view for a GET" in new Test {
+        val userAnswers: UserAnswers =
+          emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
+            .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
+            
+        val application: Application = applicationBuilder(userAnswers = userAnswers).build()
+
+        running(application) {
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+            FakeRequest(GET, controllers.routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+      
+      "should return to bank details page when no bank details exist" in new Test {
+        val userAnswers: UserAnswers =
+          emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
+
+        val application: Application = applicationBuilder(userAnswers = userAnswers).build()
+
+        running(application) {
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+            FakeRequest(GET, controllers.routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
+        }
+      }
+
+      "should return to clear cache controller when submission was already completed" in new Test {
+        val userAnswers: UserAnswers =
+          emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
+            .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
+            .set(page = CheckYourAnswersPage, value = true).success.value
+
+        val application: Application = applicationBuilder(userAnswers = userAnswers).build()
+
+        running(application) {
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+            FakeRequest(GET, controllers.routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
+        }
+      }
+    }
+    
     "handleWithBars" - {
       "should redirect correctly for BARS request error result" in new Test {
-        when(mockBarsConnector.update(BarVerifyStatusId(nino)))
+        when(mockBarsConnector.update())
           .thenReturn(Future(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
 
         mockBars(Future.successful(Left(ErrorWrapper(
@@ -97,8 +150,12 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           correlationId = testCorrelationId
         ))))
 
+        val result: Future[Result] = controller.handleWithBars(bankAccountDetails)(
+          f = () => Future.successful(ImATeapot("Teapot time"))
+        )
+        
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bars.routes.BarsRequestErrorsController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(bars.routes.BarsRequestErrorsController.onPageLoad().url)
       }
       
       "should redirect correctly for BARS check failed error result" in new Test {
@@ -107,8 +164,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           correlationId = testCorrelationId
         ))))
 
+        val result: Future[Result] = controller.handleWithBars(bankAccountDetails)(
+          f = () => Future.successful(ImATeapot("Teapot time"))
+        )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bars.routes.BarsCheckFailedController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(bars.routes.BarsCheckFailedController.onPageLoad().url)
       }
 
       "should redirect correctly for any other BARS error result" in new Test {
@@ -116,9 +176,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           value = BarsErrorResult(status = IM_A_TEAPOT, code = "TEAPOT_TIME"),
           correlationId = testCorrelationId
         ))))
-
+        val result: Future[Result] = controller.handleWithBars(bankAccountDetails)(
+          f = () => Future.successful(ImATeapot("Teapot time"))
+        )
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bars.routes.BarsCheckFailedController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(bars.routes.BarsCheckFailedController.onPageLoad().url)
       }
 
       "should execute block for successful BARS response" in new Test {
@@ -126,7 +188,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           value = testBarsResponse,
           correlationId = testCorrelationId
         ))))
-
+        val result: Future[Result] = controller.handleWithBars(bankAccountDetails)(
+          f = () => Future.successful(ImATeapot("Teapot time"))
+        )
         status(result) mustBe IM_A_TEAPOT
         contentAsString(result) mustBe "Teapot time"
       }

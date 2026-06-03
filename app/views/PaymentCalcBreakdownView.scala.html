@@ -26,7 +26,7 @@
     insetText: GovukInsetText
 )
 
-@(paymentSummary: LeppSummary, continueUrl: String)(implicit request: Request[_], messages: Messages)
+@(paymentSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @taxYearString(item: LeppItem) = @{
     messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")
@@ -59,11 +59,21 @@
     </p>
     <p class="govuk-body">@messages("breakdown.p3")</p>
 
-    <a href="@continueUrl"
-       role="button"
-       draggable="false"
-       class="govuk-button govuk-button--continue"
-       data-module="govuk-button">
-        @messages("site.continue")
-    </a>
+    @if(barsLockFlag){
+        <a href="@routes.DashboardController.onPageLoad().url"
+           role="button"
+           draggable="false"
+           class="govuk-button govuk-button--continue"
+           data-module="govuk-button">
+            @messages("bars.lockout.go-to-dashboard")
+        </a>
+    } else {
+        <a href="@continueUrl"
+           role="button"
+           draggable="false"
+           class="govuk-button govuk-button--continue"
+           data-module="govuk-button">
+            @messages("site.continue")
+        </a>
+    }
 }

@@ -19,7 +19,6 @@ package controllers
 import common.IntegrationSpecBase
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
 
 class DashboardControllerISpec extends ControllerIntegrationSpecBase {
@@ -28,11 +27,6 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
-
-    testUserAnswersHandling(
-      request = request,
-      withLeppDataHandlingTest = false
-    )
     
     //TODO - Add real tests when backend integration is added.
   }

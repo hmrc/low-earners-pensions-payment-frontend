@@ -16,7 +16,6 @@
 
 @import play.api.mvc.RequestHeader
 @import uk.gov.hmrc.play.language.LanguageUtils
-@import controllers.actions.request.LockedOutJourneyRequest
 @import views.html.components._
 @import java.time.Instant
 @import utils.Formatters
@@ -25,7 +24,7 @@
     heading: h1
 )
 
-@(lockoutExpires: Instant, returnUrl: String)(implicit request: LockedOutJourneyRequest[_], messages: Messages, languageUtils: LanguageUtils, requestHeader: RequestHeader)
+@(lockoutExpires: Instant, returnUrl: String)(implicit messages: Messages, languageUtils: LanguageUtils, requestHeader: RequestHeader)
 
 @expiryTimeString = @{ Formatters.fullDateTime(lockoutExpires, messages, languageUtils)(requestHeader) }
 
@@ -37,6 +36,6 @@
 
     <p id="lockout" class="govuk-body">@{Html(messages("bars.lockout.p2", expiryTimeString))}</p>
 
-    <a id="return-to" class="govuk-button" data-module="govuk-button" href="@returnUrl">@messages("bars.lockout.go-to-tax-account")</a>
+    <a id="return-to" class="govuk-link" href="@returnUrl">@messages("bars.lockout.go-to-dashboard")</a>
 
 }

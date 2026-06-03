@@ -32,6 +32,15 @@ import scala.concurrent.Future
 
 class ControllerAuthISpec extends ControllerIntegrationSpecBase {
 
+  val config: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
+  val loginUrl: String = config.loginUrl + "?continue=" + URLEncoder.encode(
+    config.loginContinueUrl,
+    "UTF-8"
+  )
+
+  val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
+  val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
+
   private def handleForAuthError[A: Writeable](request: FakeRequest[A],
                                                error: String,
                                                expectedRedirect: String): Unit =
@@ -82,68 +91,51 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
     }
   }
 
-  def testAuthForRequest[A: Writeable](request: FakeRequest[A]): Unit = {
-    "authorisation request fails" should {
-      val config: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
-      val loginUrl: String = config.loginUrl + "?continue=" + URLEncoder.encode(
-        config.loginContinueUrl,
-        "UTF-8"
-      )
-
-      Seq(
-        ("InvalidBearerToken", loginUrl),
-        ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
-      ).foreach((error, redirect) => handleForAuthError(request, error, redirect))
-    }
-
-    "authorisation request returns a successful response containing issues" should {
-      val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
-      val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
-
-      Seq(
-        ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-        ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
-        ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-        ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
-      ).foreach(
-        (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(request)(sn, id, nino, cl, enrls, rdr)
-      )
-    }
+  "Auth request for GET endpoints" should {
+    Seq(
+      "/low-earners-pensions-payment/start",
+      "/low-earners-pensions-payment/dashboard",
+      "/low-earners-pensions-payment/breakdown",
+      "/low-earners-pensions-payment/bank-details",
+      "/low-earners-pensions-payment/bank-details-check-failed",
+      "/low-earners-pensions-payment/bank-details-check-errors",
+      "/low-earners-pensions-payment/check-your-answers",
+      "/low-earners-pensions-payment/confirmation",
+    ).foreach(url =>
+      s"for GET of url: $url" when {
+        Seq(
+          ("InvalidBearerToken", loginUrl),
+          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+        ).foreach((error, redirect) => handleForAuthError(
+          FakeRequest(
+            method = "GET",
+            path = url
+          ).withSession(SessionKeys.authToken -> "auth token"), error, redirect
+        )
+        )
+      })
   }
 
-  Seq(
-    "/low-earners-pensions-payment/start",
-    "/low-earners-pensions-payment/dashboard",
-    "/low-earners-pensions-payment/breakdown",
-    "/low-earners-pensions-payment/bank-details",
-    "/low-earners-pensions-payment/bank-details-check-failed",
-    "/low-earners-pensions-payment/bank-details-check-errors",
-    "/low-earners-pensions-payment/check-your-answers",
-    "/low-earners-pensions-payment/confirmation",
-  ).foreach(url =>
-    s"for GET of url: $url" when {
-      testAuthForRequest(
-        FakeRequest(
-          method = "GET",
-          path = url
-        ).withSession(SessionKeys.authToken -> "auth token")
-      )
-    }
-  )
-
-  Seq(
-    "/low-earners-pensions-payment/bank-details",
-    "/low-earners-pensions-payment/check-your-answers"
-  ).foreach(url =>
-    s"for POST of url: $url" when {
-      testAuthForRequest(
-        FakeRequest(
-          method = "POST",
-          path = url
+  "Auth request for POST endpoints" should {
+    Seq(
+      "/low-earners-pensions-payment/bank-details",
+      "/low-earners-pensions-payment/check-your-answers"
+    ).foreach(url =>
+      s"for POST of url: $url" when {
+        Seq(
+          ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
+          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
+          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
+          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
+        ).foreach(
+          (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(FakeRequest(
+            method = "POST",
+            path = url
+          )
+            .withSession(SessionKeys.authToken -> "auth token")
+            .withFormUrlEncodedBody())(sn, id, nino, cl, enrls, rdr)
         )
-          .withSession(SessionKeys.authToken -> "auth token")
-          .withFormUrlEncodedBody()
-      )
-    }
-  )
+      }
+    )
+  }
 }

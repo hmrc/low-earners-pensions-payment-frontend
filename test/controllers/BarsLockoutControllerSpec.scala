@@ -18,35 +18,30 @@ package controllers
 
 import base.SpecBase
 import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
-import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
+import java.time.Instant
 import scala.concurrent.Future
 
-class PaymentCalcBreakdownControllerSpec extends SpecBase {
-  
-  "Payment calculation breakdown controller" - {
-    "must return OK and the breakdown view for a GET having data in the cache" in {
+class BarsLockoutControllerSpec extends SpecBase {
+
+  "BarsLockoutController" - {
+    "must return OK and the lockout view for exceeding BARS attempts" in {
       when(mockBarsConnector.status()(
         ArgumentMatchers.any(),
         ArgumentMatchers.any(),
         ArgumentMatchers.any()
-      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
-      
-      val userAnswers = emptyUserAnswers.copy(
-        data = Json.obj(
-          "leppSummary" -> Json.toJson(summaryModel)
-        ))
-      val application = applicationBuilder(userAnswers).build()
+      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(3), Some(Instant.now()))))
+
+      val application = applicationBuilder(emptyUserAnswers).build()
 
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad().url)
+          FakeRequest(GET, bars.routes.BarsLockoutController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -54,22 +49,21 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to dashboard page when no summary data in the cache" in {
+    "must throw exception when request hit BARS controller without locked out" in {
       val application = applicationBuilder().build()
       when(mockBarsConnector.status()(
         ArgumentMatchers.any(),
         ArgumentMatchers.any(),
         ArgumentMatchers.any()
       )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
-      
+
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad().url)
+          FakeRequest(GET, bars.routes.BarsLockoutController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
+        assertThrows[RuntimeException](status(result))
       }
     }
   }

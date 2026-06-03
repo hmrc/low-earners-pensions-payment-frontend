@@ -17,7 +17,6 @@
 package controllers
 
 import common.IntegrationSpecBase
-import connectors.barsLockout.model.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import models.CorrelationId
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
@@ -40,18 +39,12 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
       method = "GET",
       path = "/low-earners-pensions-payment/confirmation"
     ).withSession(SessionKeys.authToken -> "auth token")
-    
-    testUserAnswersHandling(
-      request = request,
-      withBankDetailsHandlingTest = true,
-      submissionShouldExist = true
-    )
 
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
         
-        mockBarsLockoutAction(url = "/low-earners-pensions-payment/bars/verify/status", status = OK,
+        mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         
         val application: Application = applicationWithUserAnswers(userAnswersWithExistingSubmission)

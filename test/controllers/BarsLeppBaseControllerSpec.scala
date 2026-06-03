@@ -17,14 +17,12 @@
 package controllers
 
 import base.SpecBase
-import connectors.barsLockout.BarsVerifyStatusConnector
 import controllers.actions.*
 import models.userAnswers.UserAnswers
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{DefaultActionBuilder, MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesControllerComponents
-import services.SessionCacheService
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,9 +30,7 @@ class BarsLeppBaseControllerSpec extends SpecBase {
   private trait Test(count: Int) {
     private val userAnswers: UserAnswers = UserAnswers("1")
     val mockAuth: IdentifierAction = FakeIdentifierAction(nino = nino)
-    private val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
     private val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(count)
-    private val mockSessionService: SessionCacheService = mock[SessionCacheService]
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
 
@@ -46,7 +42,6 @@ class BarsLeppBaseControllerSpec extends SpecBase {
                           val controllerComponents: MessagesControllerComponents = mockCc)
       extends BarsLeppBaseController(identifierAction, data, barsLockoutAction) with SessionDataHandling {
       
-      override val sessionService: SessionCacheService = mockSessionService
       override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
     

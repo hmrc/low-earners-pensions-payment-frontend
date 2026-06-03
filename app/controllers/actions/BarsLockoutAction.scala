@@ -17,16 +17,15 @@
 package controllers.actions
 
 import com.google.inject.ImplementedBy
-import connectors.barsLockout.BarsVerifyStatusConnector
-import connectors.barsLockout.model.BarVerifyStatusId
-import controllers.actions.request.BarsVerifiedRequest
+import connectors.BarsVerifyStatusConnector
 import models.CorrelationId
+import models.barsLockout.BarsVerifiedRequest
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result, Results}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.IdGenerator
+import utils.CorrelationIdOptional
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,24 +36,24 @@ trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedReq
 @Singleton
 class BarsLockoutActionRefiner @Inject()(
   barsVerifyStatusConnector: BarsVerifyStatusConnector,
-  idGenerator: IdGenerator
+  correlationIdHandler: CorrelationIdOptional
 )(implicit ec: ExecutionContext)
     extends BarsLockoutAction
     with Logging
     with Results {
 
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    implicit val correlationId: CorrelationId = CorrelationId(idGenerator.getCorrelationId)
-    barsVerifyStatusConnector.status(BarVerifyStatusId.from(request.user.nino)).map { status =>
+    given headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(request.request)
+  
+    barsVerifyStatusConnector.status().map { status =>
       status.lockoutExpiryDateTime match {
         case Some(_) =>
           Left(Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad()))
         case None =>
           Right(
             new BarsVerifiedRequest(
-              request = request,
-              numberOfBarsVerifyAttempts = status.attempts,
+              request = request
             )
           )
       }

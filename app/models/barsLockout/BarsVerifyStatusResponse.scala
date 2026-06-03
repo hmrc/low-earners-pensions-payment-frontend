@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package connectors.barsLockout.model
+package models.barsLockout
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, OFormat}
 
-final case class BarsUpdateVerifyStatusParams(id: BarVerifyStatusId)
+import java.time.Instant
 
-object BarsUpdateVerifyStatusParams {
-  implicit val format: Format[BarsUpdateVerifyStatusParams] = Json.format
+final case class BarsVerifyStatusResponse(attempts: NumberOfBarsVerifyAttempts, lockoutExpiryDateTime: Option[Instant])
+
+object BarsVerifyStatusResponse {
+  
+  implicit val format: OFormat[BarsVerifyStatusResponse] = Json.format
 }

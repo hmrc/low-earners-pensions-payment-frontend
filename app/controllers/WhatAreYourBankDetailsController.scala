@@ -54,7 +54,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req => _ =>
+  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit req =>
     form
       .bindFromRequest()
       .fold(

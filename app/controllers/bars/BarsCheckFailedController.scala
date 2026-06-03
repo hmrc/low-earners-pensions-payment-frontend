@@ -21,7 +21,6 @@ import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAc
 import controllers.{BarsLeppBaseController, SessionDataHandling}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SessionCacheService
 import views.html.bars.BarsCheckFailedView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +29,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BarsCheckFailedController @Inject()(identify: IdentifierAction,
                                           barsLockout: BarsLockoutAction,
                                           getData: DataRetrievalAction,
-                                          val sessionService: SessionCacheService,
                                           view: BarsCheckFailedView,
                                           val controllerComponents: MessagesControllerComponents)
                                          (implicit val ec: ExecutionContext)
