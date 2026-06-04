@@ -41,7 +41,7 @@ import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
-import models.nps.ClaimStatus.{Paid => NpsPaid}
+import models.nps.ClaimStatus.Paid as NpsPaid
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}
@@ -66,6 +66,7 @@ import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
 import scala.reflect.ClassTag
+import scala.util.Random
 
 trait SpecBase
   extends AnyFreeSpec
@@ -88,7 +89,16 @@ trait SpecBase
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
-  val nino: String = "AA123456C"
+  val nino: String = generateNino()
+
+  def generateNino(prefix: String = "AA"): String = {
+    val num = Random.nextInt(1000000)
+    val suffix = "C"
+    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
+
+    prefix + f"$str$num%06d$suffix".drop(prefix.length)
+  }
+  
   val userAnswersId: String = "id"
 
   def getFormPageViewModel(onSubmit: Call, backLinkUrl: String): FormPageViewModel =
@@ -248,13 +258,13 @@ trait SpecBase
     lowEarnersCalculations = Seq(calculation)
   )
 
-  val retrieveResponse: RetrieveClaimsResponse = RetrieveClaimsResponse(
+  val retrieveResponse: RetrieveLeppDetailsResponse = RetrieveLeppDetailsResponse(
     currentLowEarnersOptimisticLock = 123,
     identifier = "id",
     lowEarnersDetailsList = Seq(details)
   )
 
-  val leppResponse: ResponseWrapper[RetrieveClaimsResponse] = SuccessWrapper(
+  val leppResponse: ResponseWrapper[RetrieveLeppDetailsResponse] = SuccessWrapper(
     value = retrieveResponse,
     correlationId = testCorrelationId
   )

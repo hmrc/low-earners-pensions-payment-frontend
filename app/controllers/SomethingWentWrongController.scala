@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package utils
+package controllers
 
- import com.google.inject.Singleton
- import models.CorrelationId
- import play.api.mvc.Request
-
- import java.util.UUID
+import com.google.inject.{Inject, Singleton}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.SomethingWentWrongView
 
 @Singleton
-class CorrelationIdHandler {
-  protected[utils] def generateCorrelationId: CorrelationId = CorrelationId(UUID.randomUUID().toString)
+class SomethingWentWrongController @Inject()(val controllerComponents: MessagesControllerComponents,
+                                             view: SomethingWentWrongView)
+  extends FrontendBaseController with I18nSupport:
 
-  def getCorrelationId[A](request: Request[A]): CorrelationId =
-    request.headers.get(Constants.correlationIdKey) match {
-      case Some(value) => CorrelationId(value)
-      case _ => generateCorrelationId
-    }
-}
+  def onPageLoad(): Action[AnyContent] = Action:
+    implicit request => InternalServerError(view())

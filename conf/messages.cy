@@ -8,6 +8,17 @@ unauthorised.guidance.preform = If you think you need access to this service, yo
 unauthorised.guidance.formLink = request it through the feedback form
 unauthorised.guidance.postform = . We will respond to you within 5 working days.
 
+# Ineligible page
+ineligible.title = You are not eligible to access this service
+ineligible.heading = You are not eligible to access this service
+ineligible.guidance.preform = If you believe this is wrong you may
+ineligible.guidance.formLink = contact us (opens in a new link)
+ineligible.guidance.postform = . We will respond to you within 5 working days.
+
+# Something went wrong page
+somethingWentWrong.heading = Sorry, there is a problem with the service
+somethingWentWrong.p1 = You can try again later.
+
 # Uplift failure page
 ivUpliftFailure.title = There''s a problem
 ivUpliftFailure.p1 = You cannot access this service. This may be because:
@@ -171,7 +182,7 @@ submitted.on = Submitted on
 # BARS lockout page
 bars.lockout.title = You’ve tried to confirm your bank details too many times
 bars.lockout.p2 = You can try again after {0} to confirm your bank details.
-bars.lockout.go-to-tax-account = Go to tax account
+bars.lockout.go-to-dashboard = Return to the payments
 
 # Months
 JANUARY = January
@@ -187,13 +198,13 @@ OCTOBER = October
 NOVEMBER = November
 DECEMBER = December
 
-MONDAY = dydd Llun
-TUESDAY = "dydd Mawrth
-WEDNESDAY = dydd Mercher
-THURSDAY = dydd Iau
-FRIDAY   = dydd Gwener
-SATURDAY = dydd Sadwrn
-SUNDAY   = dydd Sul
+MONDAY = Monday
+TUESDAY = Tuesday
+WEDNESDAY = Wednesday
+THURSDAY = Thursday
+FRIDAY   = Friday
+SATURDAY = Saturday
+SUNDAY   = Sunday
 
 journeyRecovery.startAgain.title = Sorry, there is a problem with the service
 journeyRecovery.startAgain.heading = Sorry, there is a problem with the service

@@ -29,7 +29,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{CorrelationIdOptional, Logging}
+import utils.{CorrelationIdHandler, Logging}
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.{CheckYourAnswersView, ErrorTemplate}
@@ -41,7 +41,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            barsLockout: BarsLockoutAction,
                                            getData: DataRetrievalAction,
                                            view: CheckYourAnswersView,
-                                           correlationIdHandler: CorrelationIdOptional,
+                                           correlationIdHandler: CorrelationIdHandler,
                                            barsService: BarsService,
                                            leppSubmissionService: LeppSubmissionService,
                                            navigator: Navigator,
@@ -64,7 +64,8 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
 
   def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req =>
     (leppData, bankDetails) =>
-      implicit val correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(req)
+      implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
+      
       handleWithBars(bankDetails)(() => {
         val result: EitherT[Future, ErrorWrapper, Result] = for {
           _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)

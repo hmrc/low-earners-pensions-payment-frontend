@@ -23,7 +23,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 import views.html.bars.BarsLockoutView
 
 import javax.inject.{Inject, Singleton}
@@ -31,18 +31,18 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class BarsLockoutController @Inject()(
-                                     identify: IdentifierAction,
-                                     getData: DataRetrievalAction,
-                                     barsLockoutView: BarsLockoutView,
-                                     barsVerifyStatusConnector: BarsVerifyStatusConnector,
-                                     correlationIdHandler: CorrelationIdOptional,
-                                     mcc:             MessagesControllerComponents
+                                       identify: IdentifierAction,
+                                       getData: DataRetrievalAction,
+                                       barsLockoutView: BarsLockoutView,
+                                       barsVerifyStatusConnector: BarsVerifyStatusConnector,
+                                       correlationIdHandler: CorrelationIdHandler,
+                                       mcc:             MessagesControllerComponents
 )(implicit ec: ExecutionContext, languageUtils: LanguageUtils)
     extends FrontendController(mcc)
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    implicit val correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(request)
+    implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request)
     barsVerifyStatusConnector.status() map { status =>
       status.lockoutExpiryDateTime match {
         case Some(value) =>

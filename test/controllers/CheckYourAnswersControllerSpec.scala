@@ -36,7 +36,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, route, running, stubMessagesControllerComponents, writeableOf_AnyContentAsEmpty}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.{CheckYourAnswersView, ErrorTemplate}
 
@@ -55,7 +55,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         barsLockout = FakeBarsLockoutAction(barsVerifyCount),
         getData = FakeDataRetrievalAction(emptyUserAnswers),
         view = mock[CheckYourAnswersView],
-        correlationIdHandler = mock[CorrelationIdOptional],
+        correlationIdHandler = mock[CorrelationIdHandler],
         barsService = mockBarsService,
         leppSubmissionService = mock[LeppSubmissionService],
         navigator = mock[Navigator],

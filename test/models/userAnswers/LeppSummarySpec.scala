@@ -259,7 +259,7 @@ class LeppSummarySpec extends SpecBase {
           )
         )
 
-        val retrieveResponse: RetrieveClaimsResponse = RetrieveClaimsResponse(
+        val retrieveResponse: RetrieveLeppDetailsResponse = RetrieveLeppDetailsResponse(
           currentLowEarnersOptimisticLock = 123,
           identifier = "id",
           lowEarnersDetailsList = Seq(

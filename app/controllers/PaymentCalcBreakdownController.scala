@@ -24,7 +24,7 @@ import navigation.Navigator
 import pages.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
@@ -34,14 +34,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                getData: DataRetrievalAction,
                                                barsVerifyStatusConnector: BarsVerifyStatusConnector,
-                                               correlationIdHandler: CorrelationIdOptional,
+                                               correlationIdHandler: CorrelationIdHandler,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
-    implicit val correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(request.request)
+    implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
     barsVerifyStatusConnector.status() map { status =>
       (request.userAnswers.get(DashboardPage), status.lockoutExpiryDateTime) match {
         case (Some(value), Some(_)) => Ok(paymentCalcBreakdownView(value, navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url, true))

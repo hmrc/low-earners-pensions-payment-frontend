@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package utils
+package controllers.auth
 
- import com.google.inject.Singleton
- import models.CorrelationId
- import play.api.mvc.Request
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.auth.IneligibleView
 
- import java.util.UUID
+import javax.inject.Inject
 
-@Singleton
-class CorrelationIdHandler {
-  protected[utils] def generateCorrelationId: CorrelationId = CorrelationId(UUID.randomUUID().toString)
+class IneligibleController @Inject()(val controllerComponents: MessagesControllerComponents,
+                                     view: IneligibleView)
+  extends FrontendBaseController with I18nSupport:
 
-  def getCorrelationId[A](request: Request[A]): CorrelationId =
-    request.headers.get(Constants.correlationIdKey) match {
-      case Some(value) => CorrelationId(value)
-      case _ => generateCorrelationId
-    }
-}
+  def onPageLoad(): Action[AnyContent] = Action:
+    implicit request => Forbidden(view())

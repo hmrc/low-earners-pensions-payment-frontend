@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package models.bars
+package models.nps
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, Reads}
 
-final case class ReturnUrl(value: String) extends AnyVal
+case class RetrieveLeppDetailsResponse(currentLowEarnersOptimisticLock: BigInt,
+                                  identifier: String,
+                                  lowEarnersDetailsList: Seq[LowEarnersDetails])
 
-object ReturnUrl {
-  given Format[ReturnUrl] = Json.valueFormat[ReturnUrl]
+object RetrieveLeppDetailsResponse {
+  implicit val format: Reads[RetrieveLeppDetailsResponse] = Json.reads[RetrieveLeppDetailsResponse]
 }

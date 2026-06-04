@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package utils
+@import config.AppConfig
 
- import com.google.inject.Singleton
- import models.CorrelationId
- import play.api.mvc.Request
+@this(
+    layout: templates.Layout,
+    appConfig: AppConfig
+)
 
- import java.util.UUID
+@()(implicit request: Request[_], messages: Messages)
 
-@Singleton
-class CorrelationIdHandler {
-  protected[utils] def generateCorrelationId: CorrelationId = CorrelationId(UUID.randomUUID().toString)
+@layout(
+pageTitle = titleNoForm(messages("ineligible.title")),
+timeout   = false,
+showSignOut  = true
+) {
 
-  def getCorrelationId[A](request: Request[A]): CorrelationId =
-    request.headers.get(Constants.correlationIdKey) match {
-      case Some(value) => CorrelationId(value)
-      case _ => generateCorrelationId
-    }
+<h1 class="govuk-heading-xl">@messages("ineligible.heading")</h1>
+
+<p class="govuk-body">@messages("ineligible.guidance.preform")
+ <a class="govuk-link" href="@appConfig.contactFrontendUrl">@messages("ineligible.guidance.formLink")</a>
+ @messages("ineligible.guidance.postform")</p>
 }

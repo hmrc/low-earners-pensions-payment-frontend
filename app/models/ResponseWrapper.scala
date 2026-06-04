@@ -22,8 +22,14 @@ import uk.gov.hmrc.http.HttpResponse
 enum ResponseWrapper[T] {
   val value: T
   val correlationId: CorrelationId
-  
+
   case HttpResponseWrapper(value: HttpResponse, correlationId: CorrelationId) extends ResponseWrapper[HttpResponse]
   case SuccessWrapper[S](value: S, correlationId: CorrelationId) extends ResponseWrapper[S]
   case ErrorWrapper(value: ErrorResult, correlationId: CorrelationId) extends ResponseWrapper[ErrorResult]
+}
+
+object ResponseWrapper {
+  implicit class SuccessWrapperOps[S](successWrapper: SuccessWrapper[S]) {
+    def map[R](mapFunc: S => R) = new SuccessWrapper[R](mapFunc(successWrapper.value), successWrapper.correlationId)
+  }
 }

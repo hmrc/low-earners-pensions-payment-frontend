@@ -22,35 +22,19 @@ import play.api.test.FakeRequest
 
 class CorrelationIdHandlerSpec extends SpecBase {
   "CorrelationIdHandler" - {
-    "handle" - {
-      
-      def idToRequest(idOpt: Option[String]) = idOpt.fold(FakeRequest())(
-        id => FakeRequest().withHeaders("correlationId" -> id)
-      )
-      
-      "should invoke block when correlation ID exists and is mandatory" in {
-        val correlationId: CorrelationId = new CorrelationIdMandatory().handleCorrelationId(idToRequest(Some("id")))
-        correlationId mustBe CorrelationId("id")
+    "getCorrelationId" - {
+      val correlationIdHandler: CorrelationIdHandler = new CorrelationIdHandler {
+        override protected[utils] def generateCorrelationId: CorrelationId = CorrelationId("generated-id")
       }
 
-      "should invoke block when correlation ID exists and is optional" in {
-        val correlationId: CorrelationId = new CorrelationIdOptional().handleCorrelationId(idToRequest(Some("id")))
-
-        correlationId mustBe CorrelationId("id")
+      "should generate ID when it does not exist in request headers" in {
+        correlationIdHandler.getCorrelationId(FakeRequest()) mustBe CorrelationId("generated-id")
       }
 
-      "should return error when correlation ID is required and doesn't exist" in {
-        val correlationId: CorrelationId =  new CorrelationIdMandatory().handleCorrelationId(idToRequest(None))
-        correlationId mustBe CorrelationId("CORRELATION_ID_HEADER_MISSING")
-      }
-
-      "should generate ID and invoke block when correlation ID is optional and doesn't exist" in {
-        val handler: CorrelationIdOptional =  new CorrelationIdOptional() {
-          override protected[utils] def generateCorrelationId: CorrelationId = CorrelationId("generatedId")
-        }
-
-        val correlationId: CorrelationId = handler.handleCorrelationId(idToRequest(None))
-        correlationId mustBe CorrelationId("generatedId")
+      "should return ID form request headers when it exists" in {
+        correlationIdHandler.getCorrelationId(
+          FakeRequest().withHeaders("correlationId" -> "some-id")
+        ) mustBe CorrelationId("some-id")
       }
     }
   }

@@ -26,7 +26,7 @@ import play.api.mvc.*
 import play.api.mvc.Results.{Ok, Redirect}
 import play.api.test.Helpers.{redirectLocation, status, *}
 import play.api.test.{FakeHeaders, FakeRequest}
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,7 +53,7 @@ class BarsLockoutActionSpec extends SpecBase {
 
         val barsAction = new BarsLockoutActionRefiner(
           barsVerifyStatusConnector = mockBarsConnector,
-          correlationIdHandler = CorrelationIdOptional()
+          correlationIdHandler = CorrelationIdHandler()
         )
 
         val result = barsAction.invokeBlock(identifierRequest,
@@ -81,7 +81,7 @@ class BarsLockoutActionSpec extends SpecBase {
 
         val barsAction = new BarsLockoutActionRefiner(
           barsVerifyStatusConnector = mockBarsConnector,
-          correlationIdHandler = CorrelationIdOptional()
+          correlationIdHandler = CorrelationIdHandler()
         )
 
         val result = barsAction.invokeBlock(identifierRequest,

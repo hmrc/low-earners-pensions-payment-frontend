@@ -19,13 +19,13 @@ package connectors.httpHandlers
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper}
 import models.errors.ErrorResult
 import models.errors.ErrorResult.ServiceErrorResult
-import models.nps.RetrieveClaimsResponse
+import models.nps.RetrieveLeppDetailsResponse
 import play.api.http.Status.*
 import utils.ErrorCodes
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 
-trait LeppHttpHandler extends HttpHandler[RetrieveClaimsResponse]{
-  
+trait LeppHttpHandler extends HttpHandler[RetrieveLeppDetailsResponse]{
+
   override val errorMap: ErrorResult => ErrorResult = err => ServiceErrorResult(err.status, err.code)
 
   override def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult = {

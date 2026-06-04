@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.nps
+@import views.html.components._
 
-import play.api.libs.json.{Json, Reads}
+@this(
+ layout: templates.Layout,
+ heading: h1
+)
 
-case class RetrieveClaimsResponse(currentLowEarnersOptimisticLock: BigInt,
-                                  identifier: String,
-                                  lowEarnersDetailsList: Seq[LowEarnersDetails])
+@()(implicit request: Request[_], messages: Messages)
 
-object RetrieveClaimsResponse {
-  implicit val format: Reads[RetrieveClaimsResponse] = Json.reads[RetrieveClaimsResponse]
+@layout(pageTitle = titleNoForm(messages("somethingWentWrong.heading"))) {
+    @heading(messages("somethingWentWrong.heading"))
+    <p class="govuk-body">@messages("somethingWentWrong.p1")</p>
 }
+

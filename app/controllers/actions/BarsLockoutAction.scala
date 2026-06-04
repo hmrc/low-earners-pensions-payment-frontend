@@ -25,7 +25,7 @@ import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result, Results}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.CorrelationIdOptional
+import utils.CorrelationIdHandler
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedReq
 @Singleton
 class BarsLockoutActionRefiner @Inject()(
   barsVerifyStatusConnector: BarsVerifyStatusConnector,
-  correlationIdHandler: CorrelationIdOptional
+  correlationIdHandler: CorrelationIdHandler
 )(implicit ec: ExecutionContext)
     extends BarsLockoutAction
     with Logging
@@ -44,7 +44,7 @@ class BarsLockoutActionRefiner @Inject()(
 
   override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
     given headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    given correlationId: CorrelationId = correlationIdHandler.handleCorrelationId(request.request)
+    given correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
   
     barsVerifyStatusConnector.status().map { status =>
       status.lockoutExpiryDateTime match {
