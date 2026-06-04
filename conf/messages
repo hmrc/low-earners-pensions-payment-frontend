@@ -49,6 +49,7 @@ dashboard.availablePayments.totalAvailableText.start = You have a total of
 dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
 dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
 dashboard.availablePayments.button.acceptPayments = Accept payments
+dashboard.availablePayments.button.viewPayments = View payments
 dashboard.availablePayments.suspendedInset = Your payments are suspended.
 dashboard.paymentHistory.heading = Payment history
 dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
@@ -138,9 +139,7 @@ checkYourAnswers.hiddenText.rollNumber = change-roll-number
 confirmation.title = We''ve received your bank details
 confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
-confirmation.what-next.opt1 = View your payment history or accept another payment
-confirmation.what-next.opt2.sec1 = Tell us what you think of this service
-confirmation.what-next.opt2.sec2 = (takes 30 seconds)
+confirmation.what-next.opt1 = View your payments
 confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 
 # Timeout dialogue

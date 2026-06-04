@@ -18,7 +18,7 @@
 
 @this()
 
-@(entitlement: String, continueUrl: String)(implicit messages: Messages)
+@(entitlement: String, continueUrl: String, barsLockFlag: Boolean)(implicit messages: Messages)
 
 <p class = "govuk-body">
  @messages("dashboard.availablePayments.totalAvailableText.start")
@@ -32,7 +32,11 @@
    draggable="false"
    class="govuk-button govuk-button--continue"
    data-module="govuk-button">
- @messages("dashboard.availablePayments.button.acceptPayments")
+ @if(barsLockFlag){
+  @messages("dashboard.availablePayments.button.viewPayments")
+ } else {
+  @messages("dashboard.availablePayments.button.acceptPayments")
+ }
 </a>
 
 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" style="margin-top: 4px;">

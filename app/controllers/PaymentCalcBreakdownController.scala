@@ -43,10 +43,11 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
     implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
     barsVerifyStatusConnector.status() map { status =>
-      (request.userAnswers.get(DashboardPage), status.lockoutExpiryDateTime) match {
-        case (Some(value), Some(_)) => Ok(paymentCalcBreakdownView(value, navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url, true))
-        case (Some(value), _) => Ok(paymentCalcBreakdownView(value, navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url))
-        case (None, _) => DashboardPage.asRedirect
+      request.userAnswers.get(DashboardPage) match {
+        case Some(value) => Ok(paymentCalcBreakdownView(value,
+          navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
+          status.lockoutExpiryDateTime.nonEmpty))
+        case None => DashboardPage.asRedirect
       }
     }
   }

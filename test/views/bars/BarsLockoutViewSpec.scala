@@ -17,28 +17,19 @@
 package views.bars
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
-import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.i18n.Messages
+import play.api.i18n.{DefaultLangs, Messages, MessagesApi}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.PaymentCalcBreakdownView
+import uk.gov.hmrc.play.language.LanguageUtils
+import utils.Formatters
+import views.html.bars.BarsLockoutView
+
+import java.time.Instant
 
 class BarsLockoutViewSpec extends SpecBase {
-
-  val leppItem: LeppItem = LeppItem(
-    id = "id-1",
-    taxYear = 2025,
-    contributions = 1000,
-    taxRate = 20,
-    entitlement = 200,
-    status = Available,
-    claimDate = None
-  )
-  val summary = LeppSummary(1, Some(Seq(leppItem)))
   
   "view" - {
 
@@ -49,35 +40,25 @@ class BarsLockoutViewSpec extends SpecBase {
     }
 
     "display correct guidance and text" in new Setup {
-      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.heading", summary.totalEntitlementString)
-
-      view.html.contains(messages(app)("breakdown.p1"))
-      view.text.contains(messages(app)("breakdown.u1"))
-      view.text.contains(messages(app)("breakdown.l1"))
-      view.text.contains(messages(app)("breakdown.l2"))
-      view.text.contains(messages(app)("breakdown.l3"))
-    }
-
-    "display continue link when not locked out" in new Setup {
-      view.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
-        messages(app)("site.continue")
-    }
-
-    "display back to dashboard link when locked out" in new Setup(true) {
-      
-      view.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
+      view.html.contains(messages(app)("bars.lockout.p2", s"$time"))
+      view.getElementById("return-to").text() mustBe
         messages(app)("bars.lockout.go-to-dashboard")
     }
   }
 
-  trait Setup(barsLock: Boolean = false) {
+  trait Setup() {
 
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
+    implicit val msgApi: MessagesApi = messageApi(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
+    implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
+    
+    val instant: Instant = Instant.now()
+    val time: String = Formatters.fullDateTime(instant, msg, languageUtils)
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", barsLock).body
+      app.injector.instanceOf[BarsLockoutView].apply(instant, "some-url").body
     )
   }
 }

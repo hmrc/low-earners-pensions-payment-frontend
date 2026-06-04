@@ -65,8 +65,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
 
     "display back to dashboard link when locked out" in new Setup(true) {
       
-      view.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
-        messages(app)("bars.lockout.go-to-dashboard")
+      view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
     }
   }
 

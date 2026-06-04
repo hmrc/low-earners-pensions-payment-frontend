@@ -27,7 +27,7 @@
     paymentHistorySection: payment_history_section
 )
 
-@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String)(implicit request: Request[_], messages: Messages)
+@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String, barsLockFlag: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("dashboard.title")),
@@ -39,7 +39,8 @@
     @availablePaymentsSection(
         leppSummary: LeppSummary,
         tableRef = "dashboard_table_available_payments",
-        continueUrl = continueUrl
+        continueUrl = continueUrl,
+        barsLockFlag = barsLockFlag
     )
 
     @paymentHistorySection(

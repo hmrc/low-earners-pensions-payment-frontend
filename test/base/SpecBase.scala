@@ -106,7 +106,8 @@ trait SpecBase
     
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  def messageApi(app: Application) = app.injector.instanceOf[MessagesApi]
+  def messages(app: Application): Messages = messageApi(app).preferred(FakeRequest())
 
   val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(nino = nino)
 

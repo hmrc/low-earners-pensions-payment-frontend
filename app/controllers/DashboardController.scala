@@ -18,6 +18,7 @@ package controllers
 
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
+import connectors.BarsVerifyStatusConnector
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.ResponseWrapper.ErrorWrapper
 import models.errors.ErrorResult.notEligibleError
@@ -37,6 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DashboardController @Inject()(identify: IdentifierAction,
                                     getData: DataRetrievalAction,
+                                    barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                     correlationIdHandler: CorrelationIdHandler,
                                     leppRetrievalService: LeppRetrievalService,
                                     val sessionService: SessionCacheService,
@@ -53,11 +55,13 @@ class DashboardController @Inject()(identify: IdentifierAction,
       leppSummary <- leppRetrievalService.retrieveLeppDetails(request.user.nino)
       updatedAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
       _ <- EitherT.right(sessionService.save(updatedAnswers))
+      barsStatus <- EitherT.right(barsVerifyStatusConnector.status())
     } yield {
       Ok(view(
         leppSummary = leppSummary.value,
         backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
-        continueUrl = navigator.nextPage(DashboardPage, NormalMode).url
+        continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
+        barsLockFlag = barsStatus.lockoutExpiryDateTime.nonEmpty
       ))
     }
 

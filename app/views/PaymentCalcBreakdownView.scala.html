@@ -60,13 +60,8 @@
     <p class="govuk-body">@messages("breakdown.p3")</p>
 
     @if(barsLockFlag){
-        <a href="@routes.DashboardController.onPageLoad().url"
-           role="button"
-           draggable="false"
-           class="govuk-button govuk-button--continue"
-           data-module="govuk-button">
-            @messages("bars.lockout.go-to-dashboard")
-        </a>
+        <p class="govuk-body"><a id="barsLockFlag" class="govuk-link"
+            href="@routes.DashboardController.onPageLoad()">@messages("bars.lockout.go-to-dashboard")</a></p>
     } else {
         <a href="@continueUrl"
            role="button"

@@ -61,6 +61,8 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       )
 
       mockAuthSuccess()
+      mockBarsVerifyStatus(status = OK,
+        response = Json.obj("attempts" -> 1))
       status(result) shouldBe resultStatus
       resultBodyOpt.foreach(body => contentAsString(result) shouldBe body)
       redirectLocation(result) shouldBe redirectUrlOpt
@@ -238,8 +240,10 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
         )
 
         mockAuthSuccess()
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
         status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl).toString
+        contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, false).toString
       }
     }
   }
