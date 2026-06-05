@@ -8,6 +8,17 @@ unauthorised.guidance.preform = If you think you need access to this service, yo
 unauthorised.guidance.formLink = request it through the feedback form
 unauthorised.guidance.postform = . We will respond to you within 5 working days.
 
+# Ineligible page
+ineligible.title = You are not eligible to access this service
+ineligible.heading = You are not eligible to access this service
+ineligible.guidance.preform = If you believe this is wrong you may
+ineligible.guidance.formLink = contact us (opens in a new link)
+ineligible.guidance.postform = . We will respond to you within 5 working days.
+
+# Something went wrong page
+somethingWentWrong.heading = Sorry, there is a problem with the service
+somethingWentWrong.p1 = You can try again later.
+
 # Uplift failure page
 ivUpliftFailure.title = There''s a problem
 ivUpliftFailure.p1 = You cannot access this service. This may be because:
@@ -38,6 +49,7 @@ dashboard.availablePayments.totalAvailableText.start = You have a total of
 dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
 dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
 dashboard.availablePayments.button.acceptPayments = Accept payments
+dashboard.availablePayments.button.viewPayments = View payments
 dashboard.availablePayments.suspendedInset = Your payments are suspended.
 dashboard.paymentHistory.heading = Payment history
 dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
@@ -127,9 +139,7 @@ checkYourAnswers.hiddenText.rollNumber = change-roll-number
 confirmation.title = We''ve received your bank details
 confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
-confirmation.what-next.opt1 = View your payment history or accept another payment
-confirmation.what-next.opt2.sec1 = Tell us what you think of this service
-confirmation.what-next.opt2.sec2 = (takes 30 seconds)
+confirmation.what-next.opt1 = View your payments
 confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 
 # Timeout dialogue
@@ -167,3 +177,35 @@ site.print = Print this page
 site.acceptAndSubmit = Submit
 error.title.prefix = Error:
 submitted.on = Submitted on
+
+# BARS lockout page
+bars.lockout.title = You’ve tried to confirm your bank details too many times
+bars.lockout.p2 = You can try again after {0} to confirm your bank details.
+bars.lockout.go-to-dashboard = Return to the payments
+
+# Months
+JANUARY = January
+FEBRUARY = February
+MARCH = March
+APRIL = April
+MAY = May
+JUNE = June
+JULY = July
+AUGUST = August
+SEPTEMBER = September
+OCTOBER = October
+NOVEMBER = November
+DECEMBER = December
+
+MONDAY = Monday
+TUESDAY = Tuesday
+WEDNESDAY = Wednesday
+THURSDAY = Thursday
+FRIDAY   = Friday
+SATURDAY = Saturday
+SUNDAY   = Sunday
+
+journeyRecovery.startAgain.title = Sorry, there is a problem with the service
+journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
+journeyRecovery.try.again = You can try again later or
+journeyRecovery.contact = contact us for help with pension scheme queries

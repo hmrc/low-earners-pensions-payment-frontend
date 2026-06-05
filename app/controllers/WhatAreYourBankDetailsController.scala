@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -26,6 +26,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.*
+import utils.Logging
 import viewmodels.Mode
 import views.html.WhatAreYourBankDetailsView
 
@@ -33,6 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
+                                                 barsLockout: BarsLockoutAction,
                                                  getData: DataRetrievalAction,
                                                  val sessionService: SessionCacheService,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
@@ -40,7 +42,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
 
   private val form: Form[BankAccountDetails] = formProvider()
 
@@ -52,7 +54,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req => _ =>
+  def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit req =>
     form
       .bindFromRequest()
       .fold(

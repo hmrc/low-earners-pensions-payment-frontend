@@ -37,8 +37,8 @@ class WhatYouWillNeedController @Inject()(identify: IdentifierAction,
                                          (implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
-  val start: Action[AnyContent] = Action { implicit request =>
-    Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad())
+  val start: Action[AnyContent] = handle { implicit request =>
+    Future.successful(Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad()))
   }
 
   def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>

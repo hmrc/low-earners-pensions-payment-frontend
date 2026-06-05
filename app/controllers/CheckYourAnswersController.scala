@@ -18,7 +18,8 @@ package controllers
 
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import connectors.BarsVerifyStatusConnector
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
@@ -28,7 +29,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.CorrelationIdOptional
+import utils.{CorrelationIdHandler, Logging}
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.{CheckYourAnswersView, ErrorTemplate}
@@ -37,17 +38,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
+                                           barsLockout: BarsLockoutAction,
                                            getData: DataRetrievalAction,
                                            view: CheckYourAnswersView,
-                                           correlationIdHandler: CorrelationIdOptional,
+                                           correlationIdHandler: CorrelationIdHandler,
                                            barsService: BarsService,
                                            leppSubmissionService: LeppSubmissionService,
                                            navigator: Navigator,
                                            errorView: ErrorTemplate,
                                            val sessionService: SessionCacheService,
+                                           barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                            val controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
 
   def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit req =>
     (_, bankDetails) =>
@@ -59,8 +62,10 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       ))
   }
 
-  def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req => (leppData, bankDetails) =>
-    correlationIdHandler.handleCorrelationId(req) { implicit cid =>
+  def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req =>
+    (leppData, bankDetails) =>
+      implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
+      
       handleWithBars(bankDetails)(() => {
         val result: EitherT[Future, ErrorWrapper, Result] = for {
           _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
@@ -76,7 +81,6 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
           //TODO - should probably implement ClearCacheController like in MPE
         ).merge
       })
-    }
   }
 
   protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])
@@ -87,6 +91,16 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       .checkBankAccountDetails(bankDetails.toBarsRequest)
       .leftMap {
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
+          barsVerifyStatusConnector
+            .update().map { _ =>
+              logger.info("[CheckYourAnswersController][handleWithBars] ",
+                s"Bars VerifyStatus update successful for correlationId : $cid" 
+              )
+            } recover { case e =>
+            logger.error("[CheckYourAnswersController][handleWithBars] ",
+              s"Bars VerifyStatus update failed for: correlationId : $cid"
+            )
+          }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())
         case err =>
           Redirect(bars.routes.BarsCheckFailedController.onPageLoad())

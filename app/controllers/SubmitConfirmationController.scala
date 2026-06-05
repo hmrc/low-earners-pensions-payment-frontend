@@ -16,10 +16,9 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SessionCacheService
 import utils.{DateTime, DateTimeFormats}
 import views.html.SubmitConfirmationView
 
@@ -27,14 +26,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmitConfirmationController @Inject()(identify: IdentifierAction,
+                                             barsLockout: BarsLockoutAction,
                                              getData: DataRetrievalAction,
-                                             val sessionService: SessionCacheService,
                                              val controllerComponents: MessagesControllerComponents,
                                              confirmationView: SubmitConfirmationView,
                                              dateTime: DateTime)
                                             (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling:
+  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling:
 
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
+    
     Future.successful(Ok(confirmationView(DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))))
   }

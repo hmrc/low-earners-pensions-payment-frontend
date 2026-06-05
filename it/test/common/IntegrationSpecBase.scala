@@ -19,7 +19,7 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import connectors.PlaceholderBackendConnector
+import connectors.{BarsVerifyStatusConnector, PlaceholderBackendConnector}
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -58,6 +58,7 @@ class IntegrationSpecBase extends AnyWordSpec
   
   // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
   val fakeConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
+  val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
@@ -66,7 +67,9 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.bars.host" -> wireMockHost,
         "microservice.services.bars.env"  -> "local",
         "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.auth.host" -> wireMockHost
+        "microservice.services.auth.host" -> wireMockHost,
+        "microservice.services.lepp-backend.port" -> wireMockPort,
+        "microservice.services.lepp-backend.host" -> wireMockHost
       )
       .build()
   }
@@ -78,7 +81,9 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.bars.host" -> wireMockHost,
         "microservice.services.bars.env" -> "local",
         "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.auth.host" -> wireMockHost
+        "microservice.services.auth.host" -> wireMockHost,
+        "microservice.services.lepp-backend.port" -> wireMockPort,
+        "microservice.services.lepp-backend.host" -> wireMockHost
       )
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),
@@ -93,6 +98,12 @@ class IntegrationSpecBase extends AnyWordSpec
       post(urlEqualTo(url))
         .withHeader("Content-Type", equalTo("application/json"))
         .withRequestBody(equalTo(requestBody))
+        .willReturn(response)
+    )
+
+  def stubGet(url: String, response: ResponseDefinitionBuilder): StubMapping =
+    wireMockServer.stubFor(
+      get(urlEqualTo(url))
         .willReturn(response)
     )
 }

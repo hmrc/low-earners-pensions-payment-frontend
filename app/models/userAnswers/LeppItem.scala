@@ -49,6 +49,5 @@ object LeppItem {
     )
   }
   
-  
   implicit val format: OFormat[LeppItem] = Json.format[LeppItem]
 }

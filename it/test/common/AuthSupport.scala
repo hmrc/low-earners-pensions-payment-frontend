@@ -24,6 +24,7 @@ import scala.util.Random
 
 trait AuthSupport extends WireMockMethods {
   val authoriseUri: String = "/auth/authorise"
+  val nino: String = validNino()
 
   val authRequestJson: JsValue = Json.parse(
     """
@@ -65,7 +66,7 @@ trait AuthSupport extends WireMockMethods {
   def mockAuthSuccess(): StubMapping = {
     val authResponseJson: JsObject =
       Json.obj("confidenceLevel" -> 250) ++
-        Json.obj("nino" -> validNino()) ++
+        Json.obj("nino" -> nino) ++
         Json.obj("internalId" -> "anId") ++
         Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment)))
 

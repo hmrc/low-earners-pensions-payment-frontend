@@ -18,8 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
-import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
-import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
+import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import pages.*
@@ -36,65 +35,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class LeppBaseControllerSpec extends SpecBase {
   private trait Test {
     val userAnswers: UserAnswers = UserAnswers("1")
-    val mockAuth: IdentifierAction = FakeIdentifierAction()
+    val mockAuth: IdentifierAction = FakeIdentifierAction(nino = nino)
     val mockSessionService: SessionCacheService = mock[SessionCacheService]
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
-
-    val summaryModel: LeppSummary = LeppSummary(
-      currentLock = 67,
-      availableItems = Some(Seq(
-        LeppItem(
-          id = "A-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      )),
-      paidItems = Some(Seq(
-        LeppItem(
-          id = "P-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Paid,
-          claimDate = None
-        )
-      )),
-      suspendedItems = Some(Seq(
-        LeppItem(
-          id = "S-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Suspended,
-          claimDate = None
-        )
-      )),
-      cancelledItems = Some(Seq(
-        LeppItem(
-          id = "C-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Cancelled,
-          claimDate = None
-        )
-      ))
-    )
     
-    class DummyController(id: IdentifierAction,
+    class DummyController(identifierAction: IdentifierAction,
                           data: DataRetrievalAction,
                           val controllerComponents: MessagesControllerComponents = mockCc)
-      extends LeppBaseController(id, data) with SessionDataHandling {
-      
-      override val sessionService: SessionCacheService = mockSessionService
+      extends LeppBaseController(identifierAction, data) with SessionDataHandling {
+
       override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
     
@@ -143,7 +93,7 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       "should not invoke block when authorisation fails" in new Test {
-        override val mockAuth = FakeIdentifierAction(true)
+        override val mockAuth = FakeIdentifierAction(true, nino)
         
         val result: Future[Result] = controller.handle(
           _ => Future.successful(ImATeapot("Teapot time"))
@@ -157,7 +107,7 @@ class LeppBaseControllerSpec extends SpecBase {
   
   "SessionDataHandling" - {
     "handleWithSubmissionCheck" - {
-      "should wipe user answers when data has been submitted" in new Test {
+      "should redirect to clear cache controller when data has already submitted" in new Test {
         when(
           mockSessionService.save(userAnswers = ArgumentMatchers.any())(
             hc = ArgumentMatchers.any(),
@@ -174,8 +124,8 @@ class LeppBaseControllerSpec extends SpecBase {
           req => Future.successful(ImATeapot(req.userAnswers.data))
         )(FakeRequest())
         
-        status(result) mustBe IM_A_TEAPOT
-        contentAsJson(result) mustBe JsObject.empty
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
 
       "should not wipe user answers when data has not been submitted" in new Test {
@@ -249,7 +199,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
     }
     
@@ -272,8 +222,6 @@ class LeppBaseControllerSpec extends SpecBase {
         val result: Future[Result] = controller.handleWithBankDetails(
           _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
-
-        println(userAnswers.get(DashboardPage))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
@@ -324,7 +272,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
       }
     }
     
@@ -347,8 +295,6 @@ class LeppBaseControllerSpec extends SpecBase {
         val result: Future[Result] = controller.handleForConfirmationPage(
           _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
-
-        println(userAnswers.get(DashboardPage))
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)

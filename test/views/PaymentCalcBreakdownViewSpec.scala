@@ -57,16 +57,26 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.text.contains(messages(app)("breakdown.l2"))
       view.text.contains(messages(app)("breakdown.l3"))
     }
+
+    "display continue link when not locked out" in new Setup {
+      view.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
+        messages(app)("site.continue")
+    }
+
+    "display back to dashboard link when locked out" in new Setup(true) {
+      
+      view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
+    }
   }
 
-  trait Setup {
+  trait Setup(barsLock: Boolean = false) {
 
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url").body
+      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", barsLock).body
     )
   }
 }

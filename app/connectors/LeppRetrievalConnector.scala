@@ -20,7 +20,8 @@ import cats.data.EitherT
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
-import models.nps.RetrieveClaimsResponse
+import models.CorrelationId
+import models.nps.RetrieveLeppDetailsResponse
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -29,25 +30,21 @@ import utils.Logging
 
 import scala.concurrent.ExecutionContext
 
-class LeppConnector @Inject() (config: AppConfig,
-                               httpClient: HttpClientV2)
-    extends LeppHttpHandler with Logging {
+class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClientV2) extends LeppHttpHandler with Logging {
 
-  def getPaymentDetails(nino: Nino)(implicit
-                                    hc: HeaderCarrier,
-                                    ec: ExecutionContext,
-                                    correlationId: String
-  ): ConnectorResponse[RetrieveClaimsResponse] = {
-
+  def retrieveLeppDetails(nino: Nino)(implicit hc: HeaderCarrier,
+                                      ec: ExecutionContext,
+                                      correlationId: CorrelationId): ConnectorResponse[RetrieveLeppDetailsResponse] = {
     val getPaymentDetailsUrl = url"${config.getPaymentsUrl}"
-    val methodLoggingContext: String = "getPaymentDetails"
+    val methodLoggingContext: String = "retrieveLeppDetails"
 
     logger.info(methodLoggingContext, s"Calling NPS for the payment details with correlationId - $correlationId")
 
-    EitherT(httpClient
-      .get(getPaymentDetailsUrl)
-      .setHeader((correlationIdKey, correlationId))
-      .execute[DownstreamResponse[RetrieveClaimsResponse]]
+    EitherT(
+      httpClient
+        .get(getPaymentDetailsUrl)
+        .setHeader((correlationIdKey, correlationId))
+        .execute[DownstreamResponse[RetrieveLeppDetailsResponse]]
     )
   }
 }

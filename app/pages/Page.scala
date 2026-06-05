@@ -25,7 +25,8 @@ import scala.language.implicitConversions
 
 trait Page {
   def route(mode: Mode): Call
-  def asRedirect: Future[Result] = Future.successful(Redirect(route(NormalMode)))
+  def asFutureRedirect: Future[Result] = Future.successful(Redirect(route(NormalMode)))
+  def asRedirect: Result = Redirect(route(NormalMode))
 }
 
 object Page {

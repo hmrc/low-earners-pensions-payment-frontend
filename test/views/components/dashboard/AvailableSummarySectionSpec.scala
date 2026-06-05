@@ -28,21 +28,29 @@ import views.html.components.dashboard.available_summary_section
 class AvailableSummarySectionSpec extends SpecBase {
 
   "available_summary_section" - {
-    "should produce expected HTML element" in new Setup {
-      val html: String = view("£100.11", "/href").html
-      html must include("""<strong class="govuk-!-font-weight-bold">£100.11</strong>""")
-      html must include("To accept these payments, you need to provide us with your bank details.")
-      html must include("""<a href="/href"""")
+    "should produce expected HTML element if not locked" in new Setup() {
+      val summaryView: Document = view("£100.11", "/href", false)
+      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£100.11</strong>""")
+      summaryView.html must include("To accept these payments, you need to provide us with your bank details.")
+      summaryView.html must include("""<a href="/href"""")
+      summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
+        messages(app)("dashboard.availablePayments.button.acceptPayments")
+    }
+
+    "display 'view payments' button when locked out" in new Setup() {
+      val summaryView: Document = view("£100.11", "/href", true)
+      summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
+        messages(app)("dashboard.availablePayments.button.viewPayments")
     }
   }
 
-  trait Setup {
+  trait Setup() {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    def view(entitlement: String, continueUrl: String): Document = Jsoup.parse(
-      app.injector.instanceOf[available_summary_section].apply(entitlement, continueUrl).body
+    def view(entitlement: String, continueUrl: String, barsLockFlag: Boolean): Document = Jsoup.parse(
+      app.injector.instanceOf[available_summary_section].apply(entitlement, continueUrl, barsLockFlag).body
     )
   }
 }

@@ -34,14 +34,16 @@ package base
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
 import models.nps.*
-import models.nps.ClaimStatus.Paid
-import models.userAnswers.UserAnswers
+import models.nps.ClaimStatus.Paid as NpsPaid
+import models.userAnswers.LeppItemStatus.*
+import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -55,13 +57,16 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.*
+import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
 import scala.reflect.ClassTag
+import scala.util.Random
 
 trait SpecBase
   extends AnyFreeSpec
@@ -84,21 +89,41 @@ trait SpecBase
 
   val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
 
+  val nino: String = generateNino()
+
+  def generateNino(prefix: String = "AA"): String = {
+    val num = Random.nextInt(1000000)
+    val suffix = "C"
+    val str: String = Random.alphanumeric.filter(_.isLetter).take(2).map(_.toUpper).mkString
+
+    prefix + f"$str$num%06d$suffix".drop(prefix.length)
+  }
+  
   val userAnswersId: String = "id"
 
+  def getFormPageViewModel(onSubmit: Call, backLinkUrl: String): FormPageViewModel =
+    FormPageViewModel(onSubmit = onSubmit, backLinkUrl = Some(backLinkUrl))
+    
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  def messageApi(app: Application) = app.injector.instanceOf[MessagesApi]
+  def messages(app: Application): Messages = messageApi(app).preferred(FakeRequest())
 
-  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction()
+  val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(nino = nino)
 
+  val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(1)
+  
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
+                                   barsLockoutAction: BarsLockoutAction = mockBarsLockoutAction,
                                    servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
       .overrides(
         bind[IdentifierAction].toInstance(identifierAction),
+        bind[BarsLockoutAction].toInstance(barsLockoutAction),
+        bind[BarsVerifyStatusConnector].toInstance(mockBarsConnector),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
 
@@ -113,7 +138,7 @@ trait SpecBase
     "microservice.services.lepp-backend.host" -> wireMockHost,
     "microservice.services.lepp-backend.port" -> wireMockPort
   )
-
+  
   implicit val testCorrelationId: CorrelationId = CorrelationId("some-id")
   implicit val dummyHeaderCarrier: HeaderCarrier = HeaderCarrier()
 
@@ -215,7 +240,7 @@ trait SpecBase
   private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
     claimSequenceNumber = 123,
     entitlementAmount = Some(10.56),
-    claimStatus = Paid,
+    claimStatus = NpsPaid,
     inSelfAssessment = true,
     calculationDate = Some("2023-06-27"),
     claimDate = Some("2023-06-27"),
@@ -234,13 +259,13 @@ trait SpecBase
     lowEarnersCalculations = Seq(calculation)
   )
 
-  val retrieveResponse: RetrieveClaimsResponse = RetrieveClaimsResponse(
+  val retrieveResponse: RetrieveLeppDetailsResponse = RetrieveLeppDetailsResponse(
     currentLowEarnersOptimisticLock = 123,
     identifier = "id",
     lowEarnersDetailsList = Seq(details)
   )
 
-  val leppResponse: ResponseWrapper[RetrieveClaimsResponse] = SuccessWrapper(
+  val leppResponse: ResponseWrapper[RetrieveLeppDetailsResponse] = SuccessWrapper(
     value = retrieveResponse,
     correlationId = testCorrelationId
   )
@@ -257,4 +282,51 @@ trait SpecBase
       Json.toJson(modelValue) mustBe JsString(jsonString)
     }
 
+  val summaryModel: LeppSummary = LeppSummary(
+    currentLock = 67,
+    availableItems = Some(Seq(
+      LeppItem(
+        id = "A-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Available,
+        claimDate = None
+      )
+    )),
+    paidItems = Some(Seq(
+      LeppItem(
+        id = "P-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Paid,
+        claimDate = None
+      )
+    )),
+    suspendedItems = Some(Seq(
+      LeppItem(
+        id = "S-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Suspended,
+        claimDate = None
+      )
+    )),
+    cancelledItems = Some(Seq(
+      LeppItem(
+        id = "C-25-1",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Cancelled,
+        claimDate = None
+      )
+    )
+    ))
 }

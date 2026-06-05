@@ -17,34 +17,36 @@
 package controllers
 
 import common.IntegrationSpecBase
+import models.CorrelationId
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import views.html.SubmitConfirmationView
 
 import scala.concurrent.Future
 
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
-  
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val correlationId: CorrelationId = CorrelationId("X-id")
+
   "GET /confirmation" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/low-earners-pensions-payment/confirmation"
     ).withSession(SessionKeys.authToken -> "auth token")
-    
-    testUserAnswersHandling(
-      request = request,
-      withBankDetailsHandlingTest = true,
-      submissionShouldExist = true
-    )
 
     "a valid request is made" should {
       "render view correctly" in {
         mockAuthSuccess()
-
+        
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
+        
         val application: Application = applicationWithUserAnswers(userAnswersWithExistingSubmission)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(

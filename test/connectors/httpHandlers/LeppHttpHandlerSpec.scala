@@ -69,7 +69,7 @@ class LeppHttpHandlerSpec extends SpecBase {
     
     "httpReads" - {
       "should return an error for a handled error status" in {
-        val result: DownstreamResponse[RetrieveClaimsResponse] = TestObject.httpReads.read(
+        val result: DownstreamResponse[RetrieveLeppDetailsResponse] = TestObject.httpReads.read(
           method = "aMethod",
           url = "aUrl",
           response = HttpResponse(BAD_REQUEST, "")
@@ -81,7 +81,7 @@ class LeppHttpHandlerSpec extends SpecBase {
       }
 
       "should return an error for an unhandled error status" in {
-        val result: DownstreamResponse[RetrieveClaimsResponse] = TestObject.httpReads.read(
+        val result: DownstreamResponse[RetrieveLeppDetailsResponse] = TestObject.httpReads.read(
           method = "aMethod",
           url = "aUrl",
           response = HttpResponse(IM_A_TEAPOT, "")
@@ -93,7 +93,7 @@ class LeppHttpHandlerSpec extends SpecBase {
       }
       
       "should return an error for an invalid response body" in {
-        val result: DownstreamResponse[RetrieveClaimsResponse] = TestObject.httpReads.read(
+        val result: DownstreamResponse[RetrieveLeppDetailsResponse] = TestObject.httpReads.read(
           method = "aMethod",
           url = "aUrl",
           response = HttpResponse(OK, "")
@@ -145,7 +145,7 @@ class LeppHttpHandlerSpec extends SpecBase {
             |}
     """.stripMargin
 
-        val result: DownstreamResponse[RetrieveClaimsResponse] = TestObject.httpReads.read(
+        val result: DownstreamResponse[RetrieveLeppDetailsResponse] = TestObject.httpReads.read(
           method = "aMethod",
           url = "aUrl",
           response = HttpResponse(OK, retrieveJson)
@@ -153,10 +153,10 @@ class LeppHttpHandlerSpec extends SpecBase {
 
         result mustBe a[Right[_, _]]
 
-        val expectedRetrieveClaimsResponse: RetrieveClaimsResponse = retrieveResponse
+        val expectedRetrieveLeppDetailsResponse: RetrieveLeppDetailsResponse = retrieveResponse
 
         result.getOrElse(leppResponse) mustBe
-          SuccessWrapper(expectedRetrieveClaimsResponse, CorrelationId("NO_CORRELATION_ID_IN_RESPONSE"))
+          SuccessWrapper(expectedRetrieveLeppDetailsResponse, CorrelationId("NO_CORRELATION_ID_IN_RESPONSE"))
       }
     }
   }

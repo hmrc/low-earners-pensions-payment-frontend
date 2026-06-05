@@ -14,12 +14,18 @@
  * limitations under the License.
  *@
 
-@this(layout: templates.Layout)
+@this(
+layout: templates.Layout
+)
 
-@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String = "", heading: String, message: String = "")(implicit rh: RequestHeader, messages: Messages)
 
-@layout(pageTitle = pageTitle) {
-    <h1 class="govuk-heading-xl">@{Text(heading).asHtml}</h1>
-    <p class="govuk-body">@{Text(message).asHtml}</p>
+@layout(
+pageTitle = titleNoForm("journeyRecovery.startAgain.title"),
+withReportTechnicalIssueLink = false
+) {
+<h1 class="govuk-heading-l">@messages(heading)</h1>
+
+<p class="govuk-body">@messages("journeyRecovery.try.again") <a class="govuk-link" href="https://www.gov.uk/find-hmrc-contacts/pension-schemes-general-enquiries">@messages("journeyRecovery.contact")</a></p>
 }
 

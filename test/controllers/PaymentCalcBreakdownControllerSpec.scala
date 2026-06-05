@@ -17,41 +17,27 @@
 package controllers
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
-import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
+import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
+import models.userAnswers.{LeppSummary, UserAnswers}
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-class PaymentCalcBreakdownControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
-  val summaryModel: LeppSummary = LeppSummary(
-    currentLock = 67,
-    availableItems = Some(Seq(
-      LeppItem(
-        id = "id1",
-        taxYear = 2025,
-        contributions = 1000,
-        taxRate = 20,
-        entitlement = 200,
-        status = Available,
-        claimDate = None
-      ),
-      LeppItem(
-        id = "id2",
-        taxYear = 2026,
-        contributions = 750,
-        taxRate = 20,
-        entitlement = 150,
-        status = Available,
-        claimDate = None
-      )
-    ))
-  )
+class PaymentCalcBreakdownControllerSpec extends SpecBase {
   
   "Payment calculation breakdown controller" - {
     "must return OK and the breakdown view for a GET having data in the cache" in {
+      when(mockBarsConnector.status()(
+        ArgumentMatchers.any(),
+        ArgumentMatchers.any(),
+        ArgumentMatchers.any()
+      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
+      
       val userAnswers = emptyUserAnswers.copy(
         data = Json.obj(
           "leppSummary" -> Json.toJson(summaryModel)
@@ -70,7 +56,12 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
 
     "must redirect to dashboard page when no summary data in the cache" in {
       val application = applicationBuilder().build()
-
+      when(mockBarsConnector.status()(
+        ArgumentMatchers.any(),
+        ArgumentMatchers.any(),
+        ArgumentMatchers.any()
+      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
+      
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =
           FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad().url)

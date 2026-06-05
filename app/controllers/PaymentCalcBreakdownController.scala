@@ -16,30 +16,39 @@
 
 package controllers
 
+import connectors.BarsVerifyStatusConnector
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.CorrelationId
 import models.userAnswers.LeppSummary
 import navigation.Navigator
 import pages.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                getData: DataRetrievalAction,
+                                               barsVerifyStatusConnector: BarsVerifyStatusConnector,
+                                               correlationIdHandler: CorrelationIdHandler,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>
-
-    request.userAnswers.get(DashboardPage) match {
-      case Some(value) => Future.successful(Ok(paymentCalcBreakdownView(value, navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url)))
-      case None => DashboardPage.asRedirect
+    implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
+    barsVerifyStatusConnector.status() map { status =>
+      request.userAnswers.get(DashboardPage) match {
+        case Some(value) => Ok(paymentCalcBreakdownView(value,
+          navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
+          status.lockoutExpiryDateTime.nonEmpty))
+        case None => DashboardPage.asRedirect
+      }
     }
   }
 }
