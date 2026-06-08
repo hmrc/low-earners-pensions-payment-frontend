@@ -23,7 +23,8 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.language.LanguageUtils
 
-import java.time.{Instant, ZoneId}
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDate, ZoneId, ZonedDateTime}
 
 class FormattersSpec extends SpecBase {
 
@@ -34,17 +35,22 @@ class FormattersSpec extends SpecBase {
   val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
   val instant: Instant = Instant.now()
 
-  val day: String = msgs(instant.atZone(ZoneId.of("Europe/London")).getDayOfWeek.toString)
-  val month: String = msgs(instant.atZone(ZoneId.of("Europe/London")).getMonth.toString)
-  val hour: Int = instant.atZone(ZoneId.of("Europe/London")).getHour
-  val min: Int = instant.atZone(ZoneId.of("Europe/London")).getMinute
-  val year: Int = instant.atZone(ZoneId.of("Europe/London")).getYear
-  val dayOfMonth: String = instant.atZone(ZoneId.of("Europe/London")).getDayOfMonth.toString
+  val zonedDateTime: ZonedDateTime = instant.atZone(ZoneId.of("Europe/London"))
+  val date: LocalDate = zonedDateTime.toLocalDate
+  val day: String = msgs(date.getDayOfWeek.toString)
+  val month: String = msgs(date.getMonth.toString)
+
+  val time: String = DateTimeFormatter
+    .ofPattern("HH:mm")
+    .format(zonedDateTime.toLocalTime)
+  
+  val year: String = date.getYear.toString
+  val dayOfMonth: String = date.getDayOfMonth.toString
   
   "Formatters" - {
     "fullDateTime" - {
       "should return a date formatted string" in {
-        val str = s"$hour:$min on $day $dayOfMonth $month $year"
+        val str = s"$time on $day $dayOfMonth $month $year"
 
         val  result = Formatters.fullDateTime(Some(instant), msgs, languageUtils)
         result mustBe str
