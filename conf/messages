@@ -68,6 +68,8 @@ dashboard.table.status.paid = Paid
 dashboard.table.status.suspended = Suspended
 dashboard.table.status.cancelled = Cancelled
 dashboard.table.availableUntil = 5 April {0}
+dashboard.lockout.title = Important
+dashboard.lockout.message = You''ve tried to enter your bank account details too many times. You can try again after {0}.
 
 # Calculation Breakdown page
 breakdown.title = Payment calculation breakdown page
@@ -204,6 +206,8 @@ THURSDAY = Thursday
 FRIDAY   = Friday
 SATURDAY = Saturday
 SUNDAY   = Sunday
+
+between.time.and.date = on
 
 journeyRecovery.startAgain.title = Sorry, there is a problem with the service
 journeyRecovery.startAgain.heading = Sorry, there is a problem with the service

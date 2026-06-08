@@ -29,6 +29,7 @@ import pages.DashboardPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{LeppRetrievalService, SessionCacheService}
+import uk.gov.hmrc.play.language.LanguageUtils
 import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.DashboardView
@@ -45,14 +46,14 @@ class DashboardController @Inject()(identify: IdentifierAction,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
                                     navigator: Navigator)
-                                   (implicit val ec: ExecutionContext)
+                                   (implicit val ec: ExecutionContext, languageUtils: LanguageUtils)
   extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
 
   def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
     implicit val cid: CorrelationId = correlationIdHandler.getCorrelationId(request)
 
     val result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
-      leppSummary <- leppRetrievalService.retrieveLeppDetails(request.user.nino)
+      leppSummary <- leppRetrievalService.retrieveLeppDetails()
       updatedAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
       _ <- EitherT.right(sessionService.save(updatedAnswers))
       barsStatus <- EitherT.right(barsVerifyStatusConnector.status())
@@ -61,7 +62,8 @@ class DashboardController @Inject()(identify: IdentifierAction,
         leppSummary = leppSummary.value,
         backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
         continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
-        barsLockFlag = barsStatus.lockoutExpiryDateTime.nonEmpty
+        barsLockFlag = barsStatus.lockoutExpiryDateTime.nonEmpty,
+        lockoutExpires = barsStatus.lockoutExpiryDateTime
       ))
     }
 
