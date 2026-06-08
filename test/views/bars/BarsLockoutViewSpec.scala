@@ -55,7 +55,7 @@ class BarsLockoutViewSpec extends SpecBase {
     implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
     
     val instant: Instant = Instant.now()
-    val time: String = Formatters.fullDateTime(instant, msg, languageUtils)
+    val time: String = Formatters.fullDateTime(Some(instant), msg, languageUtils)
     
     val view: Document = Jsoup.parse(
       app.injector.instanceOf[BarsLockoutView].apply(instant, "some-url").body

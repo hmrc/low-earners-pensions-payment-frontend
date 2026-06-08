@@ -22,7 +22,6 @@ import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
 import models.CorrelationId
 import models.nps.RetrieveLeppDetailsResponse
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
@@ -32,7 +31,7 @@ import scala.concurrent.ExecutionContext
 
 class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClientV2) extends LeppHttpHandler with Logging {
 
-  def retrieveLeppDetails(nino: Nino)(implicit hc: HeaderCarrier,
+  def retrieveLeppDetails()(implicit hc: HeaderCarrier,
                                       ec: ExecutionContext,
                                       correlationId: CorrelationId): ConnectorResponse[RetrieveLeppDetailsResponse] = {
     val getPaymentDetailsUrl = url"${config.getPaymentsUrl}"

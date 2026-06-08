@@ -26,25 +26,20 @@ import java.time.{Instant, ZoneId}
 
 object Formatters {
 
-  def fullDateTime(dt: Instant, messages: Messages, languageUtils: LanguageUtils)(implicit
+  def fullDateTime(dt: Option[Instant], messages: Messages, languageUtils: LanguageUtils)(implicit
     requestHeader: RequestHeader
   ): String = {
-    val zonedDateTime = dt.atZone(ZoneId.of("Europe/London"))
+    val zonedDateTime = dt.getOrElse(Instant.now()).atZone(ZoneId.of("Europe/London"))
     val date          = zonedDateTime.toLocalDate
     val time          = zonedDateTime.toLocalTime
-    val lang          = languageUtils.getCurrentLang(requestHeader).code
     val day           = messages(date.getDayOfWeek.toString)
      
     val dateString = s"$day ${date.getDayOfMonth.toString} ${messages(date.getMonth.toString)} ${date.getYear.toString}"
     val timeString = DateTimeFormatter
-      .ofPattern("h:mma")
+      .ofPattern("HH:mm")
       .format(time)
-      .replaceAll("AM$", "am")
-      .replaceAll("PM$", "pm")
-
-    if (lang === "en") {
-      s"<strong>$timeString on $dateString</strong>"
-    } else s"<strong>$timeString $dateString</strong>"
+    
+    s"$timeString ${messages("between.time.and.date")} $dateString"
   }
 
 }

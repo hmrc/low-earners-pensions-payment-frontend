@@ -26,7 +26,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{GatewayTimeoutException, HeaderCarrier}
 import utils.ErrorCodes.BAD_REQUEST_ERROR
@@ -85,7 +84,7 @@ class LeppRetrievalConnectorSpec extends SpecBase {
     }
 
     implicit val correlationId: String = testCorrelationId.value
-    lazy val requestOutcome: ConnectorResponse[RetrieveLeppDetailsResponse] = testConnector.retrieveLeppDetails(nino = Nino("AA000001A"))
+    lazy val requestOutcome: ConnectorResponse[RetrieveLeppDetailsResponse] = testConnector.retrieveLeppDetails()
   }
   
   "LeppRetrievalConnector" - {

@@ -29,7 +29,7 @@ import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                getData: DataRetrievalAction,
@@ -37,7 +37,7 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                correlationIdHandler: CorrelationIdHandler,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
-                                               navigator: Navigator)
+                                               navigator: Navigator)(implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>

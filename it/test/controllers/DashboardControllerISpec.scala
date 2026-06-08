@@ -20,15 +20,16 @@ import common.IntegrationSpecBase
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
 import play.api.Application
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.{DefaultLangs, Messages, MessagesApi}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.play.language.LanguageUtils
 import views.html.DashboardView
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class DashboardControllerISpec extends ControllerIntegrationSpecBase {
@@ -163,7 +164,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
         )
       }
 
-      "serve correct view for a valid response" in {
+      "serve correct view for a valid response" when {
         val json: JsValue = Json.parse(
           """
             |{
@@ -201,25 +202,13 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
             |   }
             | ]
             |}
-          """.stripMargin
+      """.stripMargin
         )
-
         lazy val application: Application = fakeApplication()
+        implicit val msgApi: MessagesApi = application.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = msgApi.preferred(request)
 
-        when(
-          method = GET,
-          uri = "/low-earners-pensions-payment/get-payment-details"
-        ).thenReturn(
-          status = OK,
-          body = json.toString
-        )
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        val view: DashboardView = application.injector.instanceOf[DashboardView]
-        implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+        implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
 
         val backLink: String = routes.WhatYouWillNeedController.onPageLoad().url
         val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad().url
@@ -238,14 +227,52 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
             )
           ))
         )
+        
+        "user not locked" in {
+          mockAuthSuccess()
+          mockBarsVerifyStatus(status = OK,
+            response = Json.obj("attempts" -> 1))
+          when(
+            method = GET,
+            uri = "/low-earners-pensions-payment/get-payment-details"
+          ).thenReturn(
+            status = OK,
+            body = json.toString
+          )
+          
+          lazy val result: Future[Result] = route(application, request).getOrElse(
+            Future.failed(new RuntimeException("TEST_ERROR"))
+          )
 
-        mockAuthSuccess()
-        mockBarsVerifyStatus(status = OK,
-          response = Json.obj("attempts" -> 1))
-        status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, false).toString
+          val view: DashboardView = application.injector.instanceOf[DashboardView]
+          
+          status(result) shouldBe OK
+          contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, false).toString
+        }
+
+        "user locked out" in {
+          mockAuthSuccess()
+          mockBarsVerifyStatus(status = OK,
+            response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z"))
+          when(
+            method = GET,
+            uri = "/low-earners-pensions-payment/get-payment-details"
+          ).thenReturn(
+            status = OK,
+            body = json.toString
+          )
+
+          lazy val result: Future[Result] = route(application, request).getOrElse(
+            Future.failed(new RuntimeException("TEST_ERROR"))
+          )
+          val lockoutExpiryDateTime = Instant.parse("2020-12-26T00:00:00Z")
+          
+          val view: DashboardView = application.injector.instanceOf[DashboardView]
+
+          status(result) shouldBe OK
+          contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, true, Some(lockoutExpiryDateTime)).toString
+        }
       }
     }
   }
-
 }

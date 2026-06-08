@@ -25,19 +25,18 @@ import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
 import models.userAnswers.LeppSummary
 import models.{CorrelationId, ResponseWrapper}
 import play.api.http.Status.*
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LeppRetrievalService @Inject()(connector: LeppRetrievalConnector) {
-  def retrieveLeppDetails(nino: Nino)
+  def retrieveLeppDetails()
                          (implicit hc: HeaderCarrier,
                           ec: ExecutionContext,
                           cid: CorrelationId): ConnectorResponse[LeppSummary] = {
     val summaryResult: ConnectorResponse[LeppSummary] = for {
-      wrappedResponse <- connector.retrieveLeppDetails(nino)
+      wrappedResponse <- connector.retrieveLeppDetails()
       leppSummary = wrappedResponse.map(LeppSummary(_))
     } yield leppSummary
     

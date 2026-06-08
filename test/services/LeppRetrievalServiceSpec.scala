@@ -29,7 +29,6 @@ import models.userAnswers.{LeppItem, LeppSummary}
 import org.mockito.Mockito.when
 import org.mockito.{ArgumentMatchers, stubbing}
 import org.mockito.stubbing.OngoingStubbing
-import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,9 +42,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
     private type ConnectorMock =  OngoingStubbing[ConnectorResponse[RetrieveLeppDetailsResponse]]
 
     def mockConnectorSuccess(resp: RetrieveLeppDetailsResponse): ConnectorMock = when(
-      mockConnector.retrieveLeppDetails(
-        nino = ArgumentMatchers.any()
-      )(
+      mockConnector.retrieveLeppDetails()(
         hc = ArgumentMatchers.any(),
         ec = ArgumentMatchers.any(),
         correlationId = ArgumentMatchers.any()
@@ -57,9 +54,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
     )
 
     def mockConnectorFailure(err: ServiceErrorResult): ConnectorMock = when(
-      mockConnector.retrieveLeppDetails(
-        nino = ArgumentMatchers.any()
-      )(
+      mockConnector.retrieveLeppDetails()(
         hc = ArgumentMatchers.any(),
         ec = ArgumentMatchers.any(),
         correlationId = ArgumentMatchers.any()
@@ -77,7 +72,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
       "should map to notEligibleError if status code is NOT_FOUND" in new Test {
         val error: ServiceErrorResult = ServiceErrorResult(NOT_FOUND, "No data found")
         mockConnectorFailure(error)
-        val result: ServiceResult = await(testService.retrieveLeppDetails(Nino(generateNino())).value)
+        val result: ServiceResult = await(testService.retrieveLeppDetails().value)
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper) mustBe ErrorWrapper(notEligibleError, testCorrelationId)
       }
@@ -85,7 +80,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
       "should return any other error" in new Test {
         val error: ServiceErrorResult = ServiceErrorResult(IM_A_TEAPOT, "TEAPOT TIME!")
         mockConnectorFailure(error)
-        val result: ServiceResult = await(testService.retrieveLeppDetails(Nino(generateNino())).value)
+        val result: ServiceResult = await(testService.retrieveLeppDetails().value)
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper) mustBe ErrorWrapper(error, testCorrelationId)
       }
@@ -108,7 +103,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
           lowEarnersDetailsList = Nil
         )
         mockConnectorSuccess(response)
-        val result: ServiceResult = await(testService.retrieveLeppDetails(Nino(generateNino())).value)
+        val result: ServiceResult = await(testService.retrieveLeppDetails().value)
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper) mustBe ErrorWrapper(notEligibleError, testCorrelationId)
       }
@@ -116,7 +111,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
       "should return success response if LeppSummary is not empty" in new Test {
         val response: RetrieveLeppDetailsResponse = retrieveResponse
         mockConnectorSuccess(response)
-        val result: ServiceResult = await(testService.retrieveLeppDetails(Nino(generateNino())).value)
+        val result: ServiceResult = await(testService.retrieveLeppDetails().value)
         result mustBe a[Right[_, _]]
         result.getOrElse(dummyResponse).value mustBe LeppSummary(
           currentLock = 123,
