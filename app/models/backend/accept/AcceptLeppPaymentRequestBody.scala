@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package models.backend
+package models.backend.accept
 
 import models.userAnswers.BankAccountDetails
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
-case class SubmitLeppRequest(currentLowEarnersOptimisticLock: BigInt,
-                             taxYear: Int,
-                             accountDetails: BankAccountDetails)
+case class AcceptLeppPaymentRequestBody(currentLowEarnersOptimisticLock: BigInt,
+                                        lowEarnersAccountDetails: BankAccountDetails)
 
-object SubmitLeppRequest {
-  implicit val writes: OWrites[SubmitLeppRequest] = Json.writes[SubmitLeppRequest]
+object AcceptLeppPaymentRequestBody {
+  implicit val writes: OWrites[AcceptLeppPaymentRequestBody] = Json.writes[AcceptLeppPaymentRequestBody]
 }

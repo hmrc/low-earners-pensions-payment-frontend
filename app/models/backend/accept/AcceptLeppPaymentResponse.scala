@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package models.backend
+package models.backend.accept
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OFormat}
 
-case class SubmitLeppResponse(updatedLowEarnersOptimisticLock: BigInt)
+case class AcceptLeppPaymentResponse(updatedLowEarnersOptimisticLock: BigInt)
 
-object SubmitLeppResponse {
-  implicit val reads: Reads[SubmitLeppResponse] = Json.reads[SubmitLeppResponse]
+object AcceptLeppPaymentResponse {
+  implicit val format: OFormat[AcceptLeppPaymentResponse] = Json.format[AcceptLeppPaymentResponse]
 }
