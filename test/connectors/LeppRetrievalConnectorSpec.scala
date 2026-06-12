@@ -21,7 +21,7 @@ import config.AppConfig
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.errors.ErrorResult.ServiceErrorResult
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing

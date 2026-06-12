@@ -23,7 +23,7 @@ import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.errors.ErrorResult
 import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
 import org.mockito.Mockito.when

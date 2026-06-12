@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.nps
+package models.backend.retrieve
 
 import play.api.libs.json.{Json, OFormat}
 

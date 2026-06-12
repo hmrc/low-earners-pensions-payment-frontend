@@ -19,7 +19,7 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import connectors.{BarsVerifyStatusConnector, PlaceholderBackendConnector}
+import connectors.{BarsVerifyStatusConnector, AcceptLeppPaymentConnector}
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.userAnswers.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -57,7 +57,7 @@ class IntegrationSpecBase extends AnyWordSpec
   }
   
   // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
-  val fakeConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
+  val fakeConnector: AcceptLeppPaymentConnector = mock[AcceptLeppPaymentConnector]
   val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
 
   override def fakeApplication(): Application = {
@@ -88,7 +88,7 @@ class IntegrationSpecBase extends AnyWordSpec
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
-        bind[PlaceholderBackendConnector].toInstance(fakeConnector)
+        bind[AcceptLeppPaymentConnector].toInstance(fakeConnector)
       )
       .build()
   }

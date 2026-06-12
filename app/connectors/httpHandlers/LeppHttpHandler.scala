@@ -19,7 +19,7 @@ package connectors.httpHandlers
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper}
 import models.errors.ErrorResult
 import models.errors.ErrorResult.ServiceErrorResult
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import play.api.http.Status.*
 import utils.ErrorCodes
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}

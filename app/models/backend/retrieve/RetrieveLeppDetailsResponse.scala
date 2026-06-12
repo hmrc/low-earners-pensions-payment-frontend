@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package models.nps
+package models.backend.retrieve
 
 import play.api.libs.json.{Json, Reads}
 
-case class LowEarnersDetails(taxYear: Int, lowEarnersCalculations: Seq[LowEarnersCalculation])
+case class RetrieveLeppDetailsResponse(currentLowEarnersOptimisticLock: BigInt,
+                                  identifier: String,
+                                  lowEarnersDetailsList: Seq[LowEarnersDetails])
 
-object LowEarnersDetails {
-  implicit val format: Reads[LowEarnersDetails] = Json.reads[LowEarnersDetails]
+object RetrieveLeppDetailsResponse {
+  implicit val format: Reads[RetrieveLeppDetailsResponse] = Json.reads[RetrieveLeppDetailsResponse]
 }

@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
 import models.CorrelationId
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey

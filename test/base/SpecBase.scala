@@ -40,8 +40,9 @@ import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
-import models.nps.*
-import models.nps.ClaimStatus.Paid as NpsPaid
+import models.backend.*
+import models.backend.retrieve.ClaimStatus.Paid as NpsPaid
+import models.backend.retrieve.{LowEarnersCalculation, LowEarnersClaimDetails, LowEarnersDataDetails, LowEarnersDetails, RetrieveLeppDetailsResponse}
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}
