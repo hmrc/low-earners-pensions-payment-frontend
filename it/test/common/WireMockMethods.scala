@@ -69,6 +69,10 @@ trait WireMockMethods {
       thenReturnInternal(status, Map.empty, Some(body))
     }
 
+    def thenReturn(status: Int, body: String, headers: Map[String, String]): StubMapping = {
+      thenReturnInternal(status, headers, Some(body))
+    }
+
     def thenReturn(status: Int, headers: Map[String, String] = Map.empty): StubMapping = {
       thenReturnInternal(status, headers, None)
     }

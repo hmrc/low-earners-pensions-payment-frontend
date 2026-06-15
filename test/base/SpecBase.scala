@@ -37,13 +37,13 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.backend.*
+import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
+import models.backend.retrieve.*
+import models.backend.retrieve.ClaimStatus.Paid as NpsPaid
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
-import models.backend.*
-import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
-import models.backend.retrieve.ClaimStatus.Paid as NpsPaid
-import models.backend.retrieve.{LowEarnersCalculation, LowEarnersClaimDetails, LowEarnersDataDetails, LowEarnersDetails, RetrieveLeppDetailsResponse}
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}

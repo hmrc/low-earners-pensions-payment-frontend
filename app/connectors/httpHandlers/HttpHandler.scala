@@ -25,6 +25,7 @@ import models.errors.ErrorResult.failedToParseError
 import models.{CorrelationId, ResponseWrapper}
 import play.api.libs.json.*
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import utils.Constants
 
 trait HttpHandler[Resp: Reads] {
   type HttpResult = Either[ErrorWrapper, HttpResponseWrapper]
@@ -33,8 +34,10 @@ trait HttpHandler[Resp: Reads] {
 
   private val noCorrelationIdString: String = "NO_CORRELATION_ID_IN_RESPONSE"
 
-  def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult =
-    Right(HttpResponseWrapper(httpResponse, CorrelationId(noCorrelationIdString)))
+  def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult = {
+    val correlationId: Option[String] = httpResponse.header(Constants.correlationIdKey)
+    Right(HttpResponseWrapper(httpResponse, CorrelationId(correlationId.getOrElse(noCorrelationIdString))))
+  }
 
   val errorMap: ErrorResult => ErrorResult = err => err
 

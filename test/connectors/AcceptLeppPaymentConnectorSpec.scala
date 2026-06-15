@@ -20,9 +20,8 @@ import base.SpecBase
 import config.AppConfig
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.errors.ErrorResult.ServiceErrorResult
 import models.backend.accept.AcceptLeppPaymentResponse
-import models.backend.retrieve.RetrieveLeppDetailsResponse
+import models.errors.ErrorResult.ServiceErrorResult
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing

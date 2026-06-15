@@ -22,15 +22,14 @@ import config.AppConfig
 import connectors.httpHandlers.LeppHttpHandler
 import models.CorrelationId
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentResponse}
-import play.api.http.Status.CREATED
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
+import utils.ErrorCodes.{BAD_REQUEST_ERROR, CONFLICT_ERROR, INTERNAL_ERROR}
 import utils.Logging
-import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, CONFLICT_ERROR}
-import play.api.http.Status.*
 
 import java.net.URL
 import scala.concurrent.ExecutionContext
@@ -46,7 +45,7 @@ class AcceptLeppPaymentConnector @Inject()(config: AppConfig, httpClient: HttpCl
                     ec: ExecutionContext,
                     cid: CorrelationId): ConnectorResponse[AcceptLeppPaymentResponse] = {
     val acceptPaymentUrl: URL = url"${config.acceptPaymentUrl}/${request.taxYear}"
-
+    
     EitherT(
       httpClient
         .post(acceptPaymentUrl)

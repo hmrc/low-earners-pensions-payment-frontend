@@ -22,12 +22,12 @@ import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
 import models.CorrelationId
 import models.backend.retrieve.RetrieveLeppDetailsResponse
+import play.api.http.Status.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
-import utils.Logging
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
-import play.api.http.Status.*
+import utils.Logging
 
 import scala.concurrent.ExecutionContext
 

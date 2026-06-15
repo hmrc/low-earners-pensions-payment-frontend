@@ -24,8 +24,8 @@ import pages.{CheckYourAnswersPage, DashboardPage, WhatAreYourBankDetailsPage}
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.{CheckMode, NormalMode}
 import viewmodels.formPages.FormPageViewModel
+import viewmodels.{CheckMode, NormalMode}
 import views.html.WhatAreYourBankDetailsView
 
 class WhatAreYourBankDetailsControllerSpec extends SpecBase {

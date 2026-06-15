@@ -17,7 +17,7 @@
 package models.backend.accept
 
 import models.userAnswers.BankAccountDetails
-import play.api.libs.json.{Json, OFormat, OWrites}
+import play.api.libs.json.{Json, OWrites}
 
 case class AcceptLeppPaymentRequestBody(currentLowEarnersOptimisticLock: BigInt,
                                         lowEarnersAccountDetails: BankAccountDetails)

@@ -35,7 +35,7 @@ trait LeppHttpHandler[Resp: Reads] extends HttpHandler[Resp]{
       value = BackendErrorResult(status, code),
       correlationId = response.correlationId
     ))
-    
+
     response.value.status match {
       case `successStatus` => Right(response)
       case errorStatus => errorStatusMap.get(errorStatus) match {

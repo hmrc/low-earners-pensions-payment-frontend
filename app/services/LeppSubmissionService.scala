@@ -19,11 +19,10 @@ package services
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.{AcceptLeppPaymentConnector, ConnectorResponse}
-import models.{CorrelationId, ResponseWrapper}
-import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.backend.accept.AcceptLeppPaymentResponse
+import models.ResponseWrapper.SuccessWrapper
 import models.backend.accept.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
+import models.{CorrelationId, ResponseWrapper}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,7 +34,12 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
                                       (implicit hc: HeaderCarrier,
                                        ec: ExecutionContext,
                                        cid: CorrelationId): ConnectorResponse[AcceptLeppPaymentResponse] = {
-    connector.acceptPayment(acceptLeppPaymentRequest)
+    connector.acceptPayment(acceptLeppPaymentRequest).map(success =>
+        if (success.correlationId.value == "NO_CORRELATION_ID_IN_RESPONSE")
+          success.copy(correlationId = cid)
+        else
+          success
+    )
   }
 
   def submitMultiple(nino: Nino, bankAccountDetails: BankAccountDetails, leppSummary: LeppSummary)
@@ -64,7 +68,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
           )
           
           submitSingle(acceptLeppPaymentRequest).flatMap(success =>
-            implicit val cid: CorrelationId = success.correlationId
+            implicit val newCid: CorrelationId = success.correlationId
             doSubmit(
               nino = nino,
               bankAccountDetails = bankAccountDetails,

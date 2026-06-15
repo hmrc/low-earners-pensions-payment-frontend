@@ -19,9 +19,9 @@ package connectors.httpHandlers
 import base.SpecBase
 import connectors.DownstreamResponse
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper, SuccessWrapper}
-import models.errors.ErrorResult.{BackendErrorResult, ServiceErrorResult}
 import models.backend.*
 import models.backend.retrieve.RetrieveLeppDetailsResponse
+import models.errors.ErrorResult.BackendErrorResult
 import models.{CorrelationId, ResponseWrapper}
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HttpResponse

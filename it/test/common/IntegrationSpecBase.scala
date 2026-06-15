@@ -19,7 +19,7 @@ package common
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import connectors.{AcceptLeppPaymentConnector, BarsVerifyStatusConnector}
+import connectors.BarsVerifyStatusConnector
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
 import models.CorrelationId
 import models.ResponseWrapper.ErrorWrapper
@@ -67,8 +67,6 @@ class IntegrationSpecBase extends AnyWordSpec
     override def now(zoneId: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(10000L), zoneId)
   }
   
-  // TODO - This should be replaced by stubbing out the actual HTTP call to the backend once the connection is implemented
-  val fakeConnector: AcceptLeppPaymentConnector = mock[AcceptLeppPaymentConnector]
   val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
 
   def generateNino(prefix: String = "AA"): String = {
@@ -107,7 +105,6 @@ class IntegrationSpecBase extends AnyWordSpec
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(answers)),
-        bind[AcceptLeppPaymentConnector].toInstance(fakeConnector)
       )
       .build()
   }
