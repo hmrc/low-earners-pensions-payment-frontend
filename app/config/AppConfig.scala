@@ -76,6 +76,7 @@ class AppConfig @Inject()(config: Configuration):
   //BARS config
   private val backendUrl: String = servicesConfig.baseUrl("lepp-backend")
   val getPaymentsUrl = s"$backendUrl/${loadConfig("urls.getPaymentsUrl")}"
+  val acceptPaymentUrl = s"$backendUrl/${loadConfig("urls.acceptPaymentUrl")}"
   val verifyStatus = s"$backendUrl/${loadConfig("urls.verifyStatus")}"
   val updateStatus = s"$backendUrl/${loadConfig("urls.verifyUpdate")}"
 
