@@ -29,7 +29,13 @@ import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 
 class LeppHttpHandlerSpec extends SpecBase {
 
-  private object TestObject extends LeppHttpHandler
+  private object TestObject extends LeppHttpHandler[RetrieveLeppDetailsResponse] {
+    override val errorStatusMap: Map[Int, String] = Map(
+      BAD_REQUEST -> BAD_REQUEST_ERROR,
+      NOT_FOUND -> NOT_FOUND_ERROR,
+      INTERNAL_SERVER_ERROR -> INTERNAL_ERROR
+    )
+  }
 
   "LeppHttpHandler" - {
     "statusHandler" - {
