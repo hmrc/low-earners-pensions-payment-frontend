@@ -21,6 +21,7 @@ import config.AppConfig
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.errors.ErrorResult.ServiceErrorResult
+import models.backend.accept.AcceptLeppPaymentResponse
 import models.backend.retrieve.RetrieveLeppDetailsResponse
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
@@ -34,32 +35,41 @@ import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class LeppRetrievalConnectorSpec extends SpecBase {
-
+class AcceptLeppPaymentConnectorSpec extends SpecBase {
   trait Test {
-    type ServiceResult = DownstreamResponse[RetrieveLeppDetailsResponse]
-    
+    type ServiceResult = DownstreamResponse[AcceptLeppPaymentResponse]
+
     val mockConfig: AppConfig = mock[AppConfig]
-    when(mockConfig.getPaymentsUrl).thenReturn("http://dummyUrl/nps")
-    
+    when(mockConfig.acceptPaymentUrl).thenReturn("http://dummyUrl/nps")
+
     val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
     val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-    
-    lazy val testConnector: LeppRetrievalConnector = new LeppRetrievalConnector(
+
+    lazy val testConnector: AcceptLeppPaymentConnector = new AcceptLeppPaymentConnector(
       config = mockConfig,
       httpClient = mockHttpClient
     )
 
     lazy val connectorResponse: Future[ServiceResult] = Future.successful(
-      Right(SuccessWrapper(retrieveResponse, testCorrelationId))
+      Right(SuccessWrapper(acceptResponse, testCorrelationId))
     )
-    
+
     def setupStubs(): OngoingStubbing[Future[ServiceResult]] = {
       when(
-        mockHttpClient.get(
+        mockHttpClient.post(
           ArgumentMatchers.any[URL]()
         )(
           ArgumentMatchers.any[HeaderCarrier]()
+        )
+      ).thenReturn(mockRequestBuilder)
+
+      when(
+        mockRequestBuilder.withBody(
+          ArgumentMatchers.any[JsValue]()
+        )(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
         )
       ).thenReturn(mockRequestBuilder)
 
@@ -74,17 +84,18 @@ class LeppRetrievalConnectorSpec extends SpecBase {
     }
 
     implicit val correlationId: String = testCorrelationId.value
-    lazy val requestOutcome: ConnectorResponse[RetrieveLeppDetailsResponse] = testConnector.retrieveLeppDetails()
+    lazy val requestOutcome: ConnectorResponse[AcceptLeppPaymentResponse] = testConnector.acceptPayment(acceptRequest)
   }
   
-  "LeppRetrievalConnector" - {
-    "retrieveLeppDetails" - {
+  "AcceptLeppPaymentConnector" - {
+    "acceptPayment" - {
       "should handle a success outcome" in new Test {
         setupStubs()
-        val result: Either[ErrorWrapper, SuccessWrapper[RetrieveLeppDetailsResponse]] = await(requestOutcome.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(requestOutcome.value)
         result mustBe a[Right[_, _]]
-        val expectedResponse: ResponseWrapper[RetrieveLeppDetailsResponse] = SuccessWrapper(retrieveResponse, testCorrelationId)
-        result.getOrElse(leppResponse) mustBe expectedResponse
+        val expectedResponse: ResponseWrapper[AcceptLeppPaymentResponse] = SuccessWrapper(acceptResponse, testCorrelationId)
+        val dummyResponse = SuccessWrapper(AcceptLeppPaymentResponse(9999), testCorrelationId)
+        result.getOrElse(dummyResponse) mustBe expectedResponse
       }
 
       "should handle any error response" in new Test {
@@ -93,7 +104,7 @@ class LeppRetrievalConnectorSpec extends SpecBase {
         )
         setupStubs()
 
-        val result: Either[ErrorWrapper, SuccessWrapper[RetrieveLeppDetailsResponse]] = await(requestOutcome.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(requestOutcome.value)
         result mustBe a[Left[_, _]]
 
         val expectedError: ErrorWrapper = ErrorWrapper(
@@ -106,9 +117,10 @@ class LeppRetrievalConnectorSpec extends SpecBase {
       "should handle a failed response" in new Test {
         override lazy val connectorResponse: Future[ServiceResult] = Future.failed(new GatewayTimeoutException(""))
         setupStubs()
-        lazy val result: Either[ErrorWrapper, SuccessWrapper[RetrieveLeppDetailsResponse]] = await(requestOutcome.value)
+        lazy val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(requestOutcome.value)
         assertThrows[GatewayTimeoutException](result)
       }
-    } 
+    }
   }
+
 }

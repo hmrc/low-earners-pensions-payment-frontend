@@ -28,8 +28,9 @@ trait WireMockMethods {
   def when(method: HTTPMethod,
            uri: String,
            queryParams: Map[String, String] = Map.empty,
-           headers: Map[String, String] = Map.empty): Mapping = {
-    new Mapping(method, uri, queryParams, headers, None)
+           headers: Map[String, String] = Map.empty,
+           bodyOpt: Option[String] = None): Mapping = {
+    new Mapping(method, uri, queryParams, headers, bodyOpt)
   }
 
   class Mapping(method: HTTPMethod,

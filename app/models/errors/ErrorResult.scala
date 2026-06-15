@@ -33,6 +33,8 @@ enum ErrorResult(val source: String) {
                           code: String,
                           override val pathsOpt: Option[Set[String]] = None,
                           override val errorsOpt: Option[Seq[ServiceErrorResult]] = None) extends ErrorResult("SERVICE")
+  
+  case BackendErrorResult(status: Int, code: String) extends ErrorResult("BACKEND")
 
   case BarsErrorResult(status: Int,
                        code: String,

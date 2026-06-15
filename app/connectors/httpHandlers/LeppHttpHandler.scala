@@ -18,24 +18,24 @@ package connectors.httpHandlers
 
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper}
 import models.errors.ErrorResult
-import models.errors.ErrorResult.ServiceErrorResult
+import models.errors.ErrorResult.BackendErrorResult
 import play.api.http.Status.*
 import play.api.libs.json.Reads
 import utils.ErrorCodes
-import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR, UNEXPECTED_STATUS}
+import utils.ErrorCodes.UNEXPECTED_STATUS
 
 trait LeppHttpHandler[Resp: Reads] extends HttpHandler[Resp]{
   val successStatus: Int = OK
-  override val errorMap: ErrorResult => ErrorResult = err => ServiceErrorResult(err.status, err.code)
+  override val errorMap: ErrorResult => ErrorResult = err => BackendErrorResult(err.status, err.code)
 
   val errorStatusMap: Map[Int, String]
   
   override def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult = {
     def errorResponse(status: Int, code: String): HttpResult = Left(ErrorWrapper(
-      value = ServiceErrorResult(status, code),
+      value = BackendErrorResult(status, code),
       correlationId = response.correlationId
     ))
-
+    
     response.value.status match {
       case `successStatus` => Right(response)
       case errorStatus => errorStatusMap.get(errorStatus) match {
