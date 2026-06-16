@@ -34,7 +34,7 @@ import views.html.WhatAreYourBankDetailsView
 import scala.concurrent.Future
 
 class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBase {
-  private val backUrl: String = routes.PaymentCalcBreakdownController.onPageLoad().url
+  private val backUrl: String = routes.PaymentCalcBreakdownController.onPageLoad(None).url
   private val onSubmitUrl: Call = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode)
 
   private val formViewModel: FormPageViewModel = FormPageViewModel(

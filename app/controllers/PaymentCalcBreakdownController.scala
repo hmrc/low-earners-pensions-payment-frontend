@@ -40,13 +40,13 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                navigator: Navigator)(implicit val ec: ExecutionContext)
   extends LeppBaseController(identify, getData) with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+  def onPageLoad(id: Option[String] = None): Action[AnyContent] = handle { implicit request =>
     implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
     barsVerifyStatusConnector.status() map { status =>
       request.userAnswers.get(DashboardPage) match {
         case Some(value) => Ok(paymentCalcBreakdownView(value,
           navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
-          status.lockoutExpiryDateTime.nonEmpty))
+          status.lockoutExpiryDateTime.nonEmpty, id))
         case None => DashboardPage.asRedirect
       }
     }

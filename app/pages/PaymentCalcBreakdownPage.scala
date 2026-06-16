@@ -21,5 +21,5 @@ import play.api.mvc.Call
 import viewmodels.Mode
 
 case object PaymentCalcBreakdownPage extends Page {
-  override def route(mode: Mode): Call = routes.PaymentCalcBreakdownController.onPageLoad()
+  override def route(mode: Mode): Call = routes.PaymentCalcBreakdownController.onPageLoad(None)
 }

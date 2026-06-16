@@ -211,7 +211,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
         implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
 
         val backLink: String = routes.WhatYouWillNeedController.onPageLoad().url
-        val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad().url
+        val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad(None).url
 
         val leppSummaryModel: LeppSummary = LeppSummary(
           currentLock = 123,

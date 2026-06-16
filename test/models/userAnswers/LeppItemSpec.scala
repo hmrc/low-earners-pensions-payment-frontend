@@ -31,7 +31,8 @@ class LeppItemSpec extends SpecBase {
       taxRate = 20,
       entitlement = 200,
       status = Paid,
-      claimDate = Some(LocalDate.of(2025, 11, 30))
+      claimDate = Some(LocalDate.of(2025, 11, 30)),
+      None
     )
 
     val json: JsValue = Json.parse(
@@ -77,7 +78,7 @@ class LeppItemSpec extends SpecBase {
 
     "formattedContributions" - {
       "should return the expected value for a whole pounds number" in {
-        model.formattedContributions mustBe "£1,000"
+        model.formattedContributions mustBe "£1000"
       }
 
       "should return the expected value for a number with decimals" in {
@@ -94,7 +95,8 @@ class LeppItemSpec extends SpecBase {
           taxRate = 10.56,
           entitlement = 10.56,
           status = Paid,
-          claimDate = Some(LocalDate.of(2023, 6, 27))
+          claimDate = Some(LocalDate.of(2023, 6, 27)),
+          Some(10.56)
         )
       }
     }

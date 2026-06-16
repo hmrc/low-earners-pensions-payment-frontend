@@ -32,7 +32,7 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
 
   private lazy val onPageLoad = routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url
   private lazy val onSubmit = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode)
-  private lazy val backLinkUrl = routes.PaymentCalcBreakdownController.onPageLoad().url
+  private lazy val backLinkUrl = routes.PaymentCalcBreakdownController.onPageLoad(None).url
   private val formProvider = new WhatAreYourBankDetailsFormProvider()
   private val form: Form[BankAccountDetails] = formProvider()
 
