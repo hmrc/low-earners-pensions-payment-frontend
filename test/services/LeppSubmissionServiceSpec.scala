@@ -18,10 +18,11 @@ package services
 
 import base.SpecBase
 import cats.data.EitherT
-import connectors.{ConnectorResponse, PlaceholderBackendConnector}
+import connectors.{AcceptLeppPaymentConnector, ConnectorResponse}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
-import models.errors.ErrorResult.ServiceErrorResult
+import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
+import models.errors.ErrorResult
+import models.errors.ErrorResult.{BackendErrorResult, ServiceErrorResult}
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
 import models.{CorrelationId, ResponseWrapper}
@@ -29,14 +30,15 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
+import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class LeppSubmissionServiceSpec extends SpecBase {
   private trait Test {
-    val mockConnector: PlaceholderBackendConnector = mock[PlaceholderBackendConnector]
-    val testService = new LeppSubmissionService(placeholderBackendConnector = mockConnector)
+    val mockConnector: AcceptLeppPaymentConnector = mock[AcceptLeppPaymentConnector]
+    val testService: LeppSubmissionService = new LeppSubmissionService(connector = mockConnector)
 
     val bankDetails: BankAccountDetails = BankAccountDetails(
       accountName = "name",
@@ -44,67 +46,79 @@ class LeppSubmissionServiceSpec extends SpecBase {
       sortCode = "sortcode",
       rollNumber = Some("rollNumber")
     )
-
-    def submitClaimResult: ConnectorResponse[SubmitLeppResponse] = testService.submitSingle(
-      currentLeppLock = 1, taxYear = 2, bankDetails = bankDetails
+    
+    val nino: Nino = Nino(generateNino())
+    
+    val requestBody: AcceptLeppPaymentRequestBody = AcceptLeppPaymentRequestBody(
+      currentLowEarnersOptimisticLock = 67,
+      lowEarnersAccountDetails = bankDetails
+    )
+    
+    val acceptRequest: AcceptLeppPaymentRequest = AcceptLeppPaymentRequest(
+      identifier = nino,
+      taxYear = 2024,
+      body = requestBody
+    )
+    
+    val dummyResult: ResponseWrapper[AcceptLeppPaymentResponse] = SuccessWrapper(
+      value = AcceptLeppPaymentResponse(99),
+      correlationId = CorrelationId("N/A")
+    )
+    
+    val dummyErrorResult: ResponseWrapper[ErrorResult] = ErrorWrapper(
+      value = BackendErrorResult(status = 1, code = "N/A"),
+      correlationId = CorrelationId("N/A")
+    )
+    
+    def submitClaimResult: ConnectorResponse[AcceptLeppPaymentResponse] = testService.submitSingle(
+      acceptLeppPaymentRequest = acceptRequest
     )
 
-    def mockSingleClaim(result: ConnectorResponse[SubmitLeppResponse]): OngoingStubbing[ConnectorResponse[SubmitLeppResponse]] =
+    def mockSingleClaim(
+                         result: ConnectorResponse[AcceptLeppPaymentResponse]
+                       ): OngoingStubbing[ConnectorResponse[AcceptLeppPaymentResponse]] =
       when(
-        mockConnector.submitLepp(
-          request = any()
-        )(
+        mockConnector.acceptPayment(request = any())(
           hc = any(),
           ec = any(),
           cid = any()
         )
       ).thenReturn(result)
-
   }
 
   "LeppSubmissionService" - {
     "submitSingle" - {
       "should handle for a success response" in new Test {
         mockSingleClaim(
-          EitherT(Future.successful(Right(
-            SuccessWrapper(
-              value = SubmitLeppResponse(2),
-              correlationId = testCorrelationId
-            )
+          result = EitherT(Future.successful(Right(
+            SuccessWrapper(value = AcceptLeppPaymentResponse(2), correlationId = testCorrelationId)
           )))
         )
 
-        val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(submitClaimResult.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(submitClaimResult.value)
 
         result mustBe a[Right[_, _]]
-        result.getOrElse(
-          SuccessWrapper(value = SubmitLeppResponse(99), correlationId = CorrelationId("N/A"))
-        ) mustBe SuccessWrapper(
-          value = SubmitLeppResponse(2),
+        result.getOrElse(dummyResult) mustBe SuccessWrapper(
+          value = AcceptLeppPaymentResponse(2),
           correlationId = testCorrelationId
         )
       }
 
       "should handle for an error response" in new Test {
         mockSingleClaim(
-          EitherT(Future.successful(Left(
+          result = EitherT(Future.successful(Left(
             ErrorWrapper(
-              value = ServiceErrorResult(status = IM_A_TEAPOT, code = "TEAPOT_TIME"),
+              value = BackendErrorResult(status = IM_A_TEAPOT, code = "TEAPOT_TIME"),
               correlationId = testCorrelationId
             )
           )))
         )
 
-        val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(submitClaimResult.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(submitClaimResult.value)
 
         result mustBe a[Left[_, _]]
-        result.swap.getOrElse(
-          ErrorWrapper(
-            value = ServiceErrorResult(status = 1, code = "N/A"),
-            correlationId = CorrelationId("N/A")
-          )
-        ) mustBe ErrorWrapper(
-          value = ServiceErrorResult(status = IM_A_TEAPOT, code = "TEAPOT_TIME"),
+        result.swap.getOrElse(dummyErrorResult) mustBe ErrorWrapper(
+          value = BackendErrorResult(status = IM_A_TEAPOT, code = "TEAPOT_TIME"),
           correlationId = testCorrelationId
         )
       }
@@ -119,7 +133,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         )
       }
     }
-
+    
     "submitMultiple" - {
       val leppSummary: LeppSummary = LeppSummary(
         currentLock = 67,
@@ -179,10 +193,10 @@ class LeppSubmissionServiceSpec extends SpecBase {
       )
 
       "handle as expected when all submissions complete successfully" in new Test {
-        val req1 = SubmitLeppRequest(currentLowEarnersOptimisticLock = 67, taxYear = 2024, accountDetails = bankDetails)
+        val req1: AcceptLeppPaymentRequest = acceptRequest
 
         when(
-          mockConnector.submitLepp(
+          mockConnector.acceptPayment(
             request = ArgumentMatchers.eq(req1)
           )(
             hc = any(),
@@ -192,16 +206,19 @@ class LeppSubmissionServiceSpec extends SpecBase {
         ).thenReturn(
           EitherT(Future.successful(Right(
             SuccessWrapper(
-              value = SubmitLeppResponse(BigInt(68)),
+              value = AcceptLeppPaymentResponse(BigInt(68)),
               correlationId = testCorrelationId
             )
           )))
         )
 
-        val req2: SubmitLeppRequest = req1.copy(currentLowEarnersOptimisticLock = 68, taxYear = 2025)
+        val req2: AcceptLeppPaymentRequest = req1.copy(
+          taxYear = 2025,
+          body = requestBody.copy(currentLowEarnersOptimisticLock = 68)
+        )
 
         when(
-          mockConnector.submitLepp(request = ArgumentMatchers.eq(req2)
+          mockConnector.acceptPayment(request = ArgumentMatchers.eq(req2)
           )(
             hc = any(),
             ec = any(),
@@ -210,25 +227,26 @@ class LeppSubmissionServiceSpec extends SpecBase {
         ).thenReturn(
           EitherT(Future.successful(Right(
             SuccessWrapper(
-              value = SubmitLeppResponse(69),
+              value = AcceptLeppPaymentResponse(69),
               correlationId = testCorrelationId
             )
           )))
         )
 
-        lazy val futureResult: ConnectorResponse[SubmitLeppResponse] = testService.submitMultiple(
-          leppSummary = leppSummary,
-          accountDetails = bankDetails
+        lazy val futureResult: ConnectorResponse[AcceptLeppPaymentResponse] = testService.submitMultiple(
+          nino = nino,
+          bankAccountDetails = bankDetails,
+          leppSummary = leppSummary
         )
 
-        val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(futureResult.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(futureResult.value)
         result mustBe a[Right[_, _]]
-        result.getOrElse(dummySuccessResponse).value mustBe SubmitLeppResponse(69)
+        result.getOrElse(dummySuccessResponse).value mustBe AcceptLeppPaymentResponse(69)
       }
 
       "handle as expected when a submission fails" in new Test {
         when(
-          mockConnector.submitLepp(
+          mockConnector.acceptPayment(
             request = ArgumentMatchers.any()
           )(
             hc = any(),
@@ -238,16 +256,19 @@ class LeppSubmissionServiceSpec extends SpecBase {
         ).thenReturn(
           EitherT(Future.successful(Right(
             SuccessWrapper(
-              value = SubmitLeppResponse(2),
+              value = AcceptLeppPaymentResponse(68),
               correlationId = testCorrelationId
             )
           )))
         )
 
         when(
-          mockConnector.submitLepp(
+          mockConnector.acceptPayment(
             request = ArgumentMatchers.eq(
-              SubmitLeppRequest(currentLowEarnersOptimisticLock = 2, taxYear = 2025, accountDetails = bankDetails)
+              acceptRequest.copy(
+                taxYear = 2025,
+                body = requestBody.copy(currentLowEarnersOptimisticLock = 68)
+              )
             )
           )(
             hc = any(),
@@ -263,16 +284,16 @@ class LeppSubmissionServiceSpec extends SpecBase {
           )))
         )
 
-        lazy val futureResult: ConnectorResponse[SubmitLeppResponse] = testService.submitMultiple(
-          leppSummary = leppSummary,
-          accountDetails = bankDetails
+        lazy val futureResult: ConnectorResponse[AcceptLeppPaymentResponse] = testService.submitMultiple(
+          nino = nino,
+          bankAccountDetails = bankDetails,
+          leppSummary = leppSummary
         )
 
-        val result: Either[ErrorWrapper, SuccessWrapper[SubmitLeppResponse]] = await(futureResult.value)
+        val result: Either[ErrorWrapper, SuccessWrapper[AcceptLeppPaymentResponse]] = await(futureResult.value)
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper).value mustBe ServiceErrorResult(IM_A_TEAPOT, "Teapot time")
       }
     }
   }
-
 }

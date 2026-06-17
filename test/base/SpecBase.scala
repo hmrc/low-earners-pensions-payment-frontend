@@ -37,13 +37,15 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.backend.*
+import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
+import models.backend.retrieve.*
+import models.backend.retrieve.ClaimStatus.Paid as NpsPaid
 import models.bars.*
 import models.bars.statuses.*
 import models.errors.ErrorResult.{BarsErrorResult, ServiceErrorResult}
-import models.nps.*
-import models.nps.ClaimStatus.Paid as NpsPaid
 import models.userAnswers.LeppItemStatus.*
-import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
+import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -60,6 +62,7 @@ import play.api.libs.json.*
 import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import viewmodels.formPages.FormPageViewModel
@@ -264,7 +267,27 @@ trait SpecBase
     identifier = "id",
     lowEarnersDetailsList = Seq(details)
   )
+  
+  val acceptResponse: AcceptLeppPaymentResponse = AcceptLeppPaymentResponse(updatedLowEarnersOptimisticLock = 1234)
 
+  val accountDetails: BankAccountDetails = BankAccountDetails(
+    accountName = "Name",
+    accountNumber = "12345678",
+    sortCode = "123456",
+    rollNumber = Some("roll")
+  )
+  
+  val acceptRequestBody: AcceptLeppPaymentRequestBody = AcceptLeppPaymentRequestBody(
+    currentLowEarnersOptimisticLock = 1234,
+    lowEarnersAccountDetails = accountDetails
+  )
+  
+  val acceptRequest = AcceptLeppPaymentRequest(
+    identifier = Nino(generateNino()),
+    taxYear = 2025,
+    body = acceptRequestBody
+  )
+  
   val leppResponse: ResponseWrapper[RetrieveLeppDetailsResponse] = SuccessWrapper(
     value = retrieveResponse,
     correlationId = testCorrelationId

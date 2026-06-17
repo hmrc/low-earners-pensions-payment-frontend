@@ -16,7 +16,7 @@
 
 package models.userAnswers
 
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.{Json, OFormat}
 import utils.CurrencyFormats

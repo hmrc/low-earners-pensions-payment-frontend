@@ -21,15 +21,18 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.httpHandlers.{HttpHandler, LeppHttpHandler}
 import models.CorrelationId
-import models.nps.RetrieveLeppDetailsResponse
+import models.backend.retrieve.RetrieveLeppDetailsResponse
+import play.api.http.Status.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
+import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 import utils.Logging
 
 import scala.concurrent.ExecutionContext
 
-class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClientV2) extends LeppHttpHandler with Logging {
+class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClientV2)
+  extends LeppHttpHandler[RetrieveLeppDetailsResponse] with Logging {
 
   def retrieveLeppDetails()(implicit hc: HeaderCarrier,
                                       ec: ExecutionContext,
@@ -46,4 +49,10 @@ class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClient
         .execute[DownstreamResponse[RetrieveLeppDetailsResponse]]
     )
   }
+
+  override val errorStatusMap: Map[Int, String] = Map(
+    BAD_REQUEST -> BAD_REQUEST_ERROR,
+    NOT_FOUND -> NOT_FOUND_ERROR,
+    INTERNAL_SERVER_ERROR -> INTERNAL_ERROR,
+  )
 }

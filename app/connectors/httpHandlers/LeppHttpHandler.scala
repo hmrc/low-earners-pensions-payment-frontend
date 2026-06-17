@@ -18,27 +18,30 @@ package connectors.httpHandlers
 
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper}
 import models.errors.ErrorResult
-import models.errors.ErrorResult.ServiceErrorResult
-import models.nps.RetrieveLeppDetailsResponse
+import models.errors.ErrorResult.BackendErrorResult
 import play.api.http.Status.*
+import play.api.libs.json.Reads
 import utils.ErrorCodes
-import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
+import utils.ErrorCodes.UNEXPECTED_STATUS
 
-trait LeppHttpHandler extends HttpHandler[RetrieveLeppDetailsResponse]{
+trait LeppHttpHandler[Resp: Reads] extends HttpHandler[Resp]{
+  val successStatus: Int = OK
+  override val errorMap: ErrorResult => ErrorResult = err => BackendErrorResult(err.status, err.code)
 
-  override val errorMap: ErrorResult => ErrorResult = err => ServiceErrorResult(err.status, err.code)
-
+  val errorStatusMap: Map[Int, String]
+  
   override def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult = {
     def errorResponse(status: Int, code: String): HttpResult = Left(ErrorWrapper(
-      value = ServiceErrorResult(status, code),
+      value = BackendErrorResult(status, code),
       correlationId = response.correlationId
     ))
 
     response.value.status match {
-      case OK => Right(response)
-      case BAD_REQUEST => errorResponse(BAD_REQUEST, BAD_REQUEST_ERROR)
-      case NOT_FOUND => errorResponse(NOT_FOUND, NOT_FOUND_ERROR)
-      case _ => errorResponse(INTERNAL_SERVER_ERROR, INTERNAL_ERROR)
+      case `successStatus` => Right(response)
+      case errorStatus => errorStatusMap.get(errorStatus) match {
+        case Some(errorCode) => errorResponse(errorStatus, errorCode)
+        case _ => errorResponse(INTERNAL_SERVER_ERROR, UNEXPECTED_STATUS)
+      }
     }
   }
 }

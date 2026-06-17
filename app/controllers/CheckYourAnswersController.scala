@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{CorrelationIdHandler, Logging}
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
-import views.html.{CheckYourAnswersView, ErrorTemplate}
+import views.html.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +45,6 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            barsService: BarsService,
                                            leppSubmissionService: LeppSubmissionService,
                                            navigator: Navigator,
-                                           errorView: ErrorTemplate,
                                            val sessionService: SessionCacheService,
                                            barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                            val controllerComponents: MessagesControllerComponents)
@@ -68,7 +67,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       
       handleWithBars(bankDetails)(() => {
         val result: EitherT[Future, ErrorWrapper, Result] = for {
-          _ <- leppSubmissionService.submitMultiple(leppData, bankDetails)
+          _ <- leppSubmissionService.submitMultiple(req.user.nino, bankDetails, leppData)
           updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
           _ <- EitherT.right(sessionService.save(updatedUserAnswers))
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
@@ -76,9 +75,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         result.leftSemiflatMap(_ =>
           for {
             _ <- sessionService.clear(req.userAnswers)
-          } yield InternalServerError(errorView("title", "heading", "message")),
-          //TODO - Need to write content for this page
-          //TODO - should probably implement ClearCacheController like in MPE
+          } yield Redirect(routes.ClearCacheController.onPageLoad())
         ).merge
       })
   }
