@@ -35,6 +35,6 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
   extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling:
 
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
-    
+
     Future.successful(Ok(confirmationView(DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))))
   }

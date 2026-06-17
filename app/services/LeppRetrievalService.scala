@@ -21,7 +21,7 @@ import com.google.inject.{Inject, Singleton}
 import connectors.{ConnectorResponse, LeppRetrievalConnector}
 import models.ResponseWrapper.ErrorWrapper
 import models.errors.ErrorResult
-import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
+import models.errors.ErrorResult.{BackendErrorResult, notEligibleError}
 import models.userAnswers.LeppSummary
 import models.{CorrelationId, ResponseWrapper}
 import play.api.http.Status.*
@@ -42,7 +42,7 @@ class LeppRetrievalService @Inject()(connector: LeppRetrievalConnector) {
     
     summaryResult.biflatMap(
       err => err.value match {
-        case ServiceErrorResult(status, _, _, _) if status == NOT_FOUND =>
+        case BackendErrorResult(status, _) if status == NOT_FOUND =>
           EitherT(Future.successful(Left(err.copy(value = notEligibleError))))
         case _ =>
           summaryResult

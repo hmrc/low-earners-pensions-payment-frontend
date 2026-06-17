@@ -33,7 +33,7 @@ import utils.Constants
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class BarsVerifyStatusConnectorSpec extends IntegrationSpecBase {
+class BarsVerifyStatusConnectorISpec extends IntegrationSpecBase {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val correlationId: CorrelationId = CorrelationId("X-123")

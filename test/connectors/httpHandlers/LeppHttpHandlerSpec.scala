@@ -19,8 +19,9 @@ package connectors.httpHandlers
 import base.SpecBase
 import connectors.DownstreamResponse
 import models.ResponseWrapper.{ErrorWrapper, HttpResponseWrapper, SuccessWrapper}
-import models.errors.ErrorResult.ServiceErrorResult
-import models.nps.*
+import models.backend.*
+import models.backend.retrieve.RetrieveLeppDetailsResponse
+import models.errors.ErrorResult.BackendErrorResult
 import models.{CorrelationId, ResponseWrapper}
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HttpResponse
@@ -28,7 +29,13 @@ import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 
 class LeppHttpHandlerSpec extends SpecBase {
 
-  private object TestObject extends LeppHttpHandler
+  private object TestObject extends LeppHttpHandler[RetrieveLeppDetailsResponse] {
+    override val errorStatusMap: Map[Int, String] = Map(
+      BAD_REQUEST -> BAD_REQUEST_ERROR,
+      NOT_FOUND -> NOT_FOUND_ERROR,
+      INTERNAL_SERVER_ERROR -> INTERNAL_ERROR
+    )
+  }
 
   "LeppHttpHandler" - {
     "statusHandler" - {
@@ -54,7 +61,7 @@ class LeppHttpHandlerSpec extends SpecBase {
           )
 
           result mustBe a[Left[_, _]]
-          val expectedResult = ErrorWrapper(ServiceErrorResult(status, code), testCorrelationId)
+          val expectedResult = ErrorWrapper(BackendErrorResult(status, code), testCorrelationId)
           result.swap.getOrElse(dummyErrorWrapper) mustBe expectedResult
         }
 
@@ -77,7 +84,7 @@ class LeppHttpHandlerSpec extends SpecBase {
         
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper).value mustBe
-          ServiceErrorResult(BAD_REQUEST, BAD_REQUEST_ERROR)
+          BackendErrorResult(BAD_REQUEST, BAD_REQUEST_ERROR)
       }
 
       "should return an error for an unhandled error status" in {
@@ -89,7 +96,7 @@ class LeppHttpHandlerSpec extends SpecBase {
 
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper).value mustBe
-          ServiceErrorResult(INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR")
+          BackendErrorResult(INTERNAL_SERVER_ERROR, "UNEXPECTED_STATUS")
       }
       
       "should return an error for an invalid response body" in {
@@ -101,7 +108,7 @@ class LeppHttpHandlerSpec extends SpecBase {
         
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorWrapper).value mustBe
-          ServiceErrorResult(INTERNAL_SERVER_ERROR, "FAILED_TO_PARSE_DOWNSTREAM_RESPONSE")
+          BackendErrorResult(INTERNAL_SERVER_ERROR, "FAILED_TO_PARSE_DOWNSTREAM_RESPONSE")
       }
 
 

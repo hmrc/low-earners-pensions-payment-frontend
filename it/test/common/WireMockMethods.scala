@@ -28,8 +28,9 @@ trait WireMockMethods {
   def when(method: HTTPMethod,
            uri: String,
            queryParams: Map[String, String] = Map.empty,
-           headers: Map[String, String] = Map.empty): Mapping = {
-    new Mapping(method, uri, queryParams, headers, None)
+           headers: Map[String, String] = Map.empty,
+           bodyOpt: Option[String] = None): Mapping = {
+    new Mapping(method, uri, queryParams, headers, bodyOpt)
   }
 
   class Mapping(method: HTTPMethod,
@@ -66,6 +67,10 @@ trait WireMockMethods {
 
     def thenReturn(status: Int, body: String): StubMapping = {
       thenReturnInternal(status, Map.empty, Some(body))
+    }
+
+    def thenReturn(status: Int, body: String, headers: Map[String, String]): StubMapping = {
+      thenReturnInternal(status, headers, Some(body))
     }
 
     def thenReturn(status: Int, headers: Map[String, String] = Map.empty): StubMapping = {

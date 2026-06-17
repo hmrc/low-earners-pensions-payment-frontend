@@ -17,8 +17,9 @@
 package models.userAnswers
 
 import base.SpecBase
-import models.nps.ClaimStatus.{DeceasedCapacitor, Available as NpsAvailable, Cancelled as NpsCancelled, Paid as NpsPaid, Suspended as NpsSuspended}
-import models.nps.*
+import models.backend.*
+import models.backend.retrieve.ClaimStatus.{DeceasedCapacitor, Available as NpsAvailable, Cancelled as NpsCancelled, Paid as NpsPaid, Suspended as NpsSuspended}
+import models.backend.retrieve.*
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.*
 

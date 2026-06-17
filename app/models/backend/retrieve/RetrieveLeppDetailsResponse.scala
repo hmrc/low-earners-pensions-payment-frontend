@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package models.backend
+package models.backend.retrieve
 
 import play.api.libs.json.{Json, Reads}
 
-case class SubmitLeppResponse(updatedLowEarnersOptimisticLock: BigInt)
+case class RetrieveLeppDetailsResponse(currentLowEarnersOptimisticLock: BigInt,
+                                  identifier: String,
+                                  lowEarnersDetailsList: Seq[LowEarnersDetails])
 
-object SubmitLeppResponse {
-  implicit val reads: Reads[SubmitLeppResponse] = Json.reads[SubmitLeppResponse]
+object RetrieveLeppDetailsResponse {
+  implicit val format: Reads[RetrieveLeppDetailsResponse] = Json.reads[RetrieveLeppDetailsResponse]
 }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package models.nps
+package models.backend.accept
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OFormat}
 
-case class LowEarnersDetails(taxYear: Int, lowEarnersCalculations: Seq[LowEarnersCalculation])
+case class AcceptLeppPaymentResponse(updatedLowEarnersOptimisticLock: BigInt)
 
-object LowEarnersDetails {
-  implicit val format: Reads[LowEarnersDetails] = Json.reads[LowEarnersDetails]
+object AcceptLeppPaymentResponse {
+  implicit val format: OFormat[AcceptLeppPaymentResponse] = Json.format[AcceptLeppPaymentResponse]
 }

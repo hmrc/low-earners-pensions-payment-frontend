@@ -59,7 +59,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         barsService = mockBarsService,
         leppSubmissionService = mock[LeppSubmissionService],
         navigator = mock[Navigator],
-        errorView = mock[ErrorTemplate],
         sessionService = mock[SessionCacheService],
         barsVerifyStatusConnector = mockBarsConnector,
         controllerComponents = stubMessagesControllerComponents()

@@ -16,16 +16,11 @@
 
 package controllers
 
-import cats.data.EitherT
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.CorrelationId
-import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
-import models.backend.{SubmitLeppRequest, SubmitLeppResponse}
-import models.errors.ErrorResult.ServiceErrorResult
+import models.backend.accept.AcceptLeppPaymentRequestBody
 import models.userAnswers.LeppItemStatus.{Available, Paid}
 import models.userAnswers.{LeppItem, LeppSummary, UserAnswers}
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when as mockitoWhen
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.libs.json.{JsValue, Json}
@@ -37,7 +32,7 @@ import uk.gov.hmrc.http.SessionKeys
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import viewmodels.formPages.FormPageViewModel
-import views.html.{CheckYourAnswersView, ErrorTemplate}
+import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -80,8 +75,10 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     "user locked out for too many BARS attempts" should {
       "return bank details view" in {
         mockAuthSuccess()
-        mockBarsVerifyStatus(status = OK,
-          response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z"))
+        mockBarsVerifyStatus(
+          status = OK,
+          response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z")
+        )
 
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
@@ -101,6 +98,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       path = "/low-earners-pensions-payment/check-your-answers"
     )
       .withSession(SessionKeys.authToken -> "auth token")
+      .withHeaders("correlationId" -> testCorrelationId.value)
 
     val barsRequest: JsValue = Json.parse(
       """
@@ -253,38 +251,46 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       }
     }
 
+    val requestBody: AcceptLeppPaymentRequestBody = AcceptLeppPaymentRequestBody(
+      currentLowEarnersOptimisticLock = 67,
+      lowEarnersAccountDetails = bankAccountDetails
+    )
+    
+    def mockBackendResponse(taxYear: Int,
+                            requestBody: Option[String],
+                            responseStatus: Int = CREATED,
+                            responseBody: String): StubMapping = when(
+      method = POST,
+      uri = s"/low-earners-pensions-payment/accept-payment/$taxYear",
+      headers = Map("correlationId" -> testCorrelationId),
+      bodyOpt = requestBody
+    ).thenReturn(
+      status = responseStatus,
+      body = responseBody,
+      headers = Map("correlationId" -> testCorrelationId)
+    )
+
     "backend returns an error for any LEPP submissions" should {
-      "redirect to error page" in {
+      "redirect to ClearCacheController" in {
         mockAuthSuccess()
         mockBarsSuccess()
-        mockBarsVerifyStatus(status = OK,
-          response = Json.obj("attempts" -> 1))
+        mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
 
+        mockBackendResponse(
+          taxYear = 2025,
+          requestBody = Some(Json.toJson(requestBody).toString),
+          responseStatus = IM_A_TEAPOT,
+          responseBody = ""
+        )
+        
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
-
-        mockitoWhen(
-          fakeConnector.submitLepp(
-            request = ArgumentMatchers.any()
-          )(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any(),
-            cid = ArgumentMatchers.any()
-          )
-        ).thenReturn(EitherT(Future.successful(
-          Left(ErrorWrapper(
-            value = ServiceErrorResult(IM_A_TEAPOT, "Teapot time!"),
-            correlationId = CorrelationId("cid")))
-        )))
-
-        val view = application.injector.instanceOf[ErrorTemplate]
-        implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
-
-        status(result) shouldBe INTERNAL_SERVER_ERROR
-        contentAsString(result) shouldBe view("title", "heading", "message")(request, messages).toString
+        
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(routes.ClearCacheController.onPageLoad().url)
       }
     }
 
@@ -292,28 +298,37 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       "redirect to confirmation page" in {
         mockAuthSuccess()
         mockBarsSuccess()
-        mockBarsVerifyStatus(status = OK,
-          response = Json.obj("attempts" -> 1))
+        mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
+
+        mockBackendResponse(
+          taxYear = 2025,
+          requestBody = Some(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock":67,
+              | "lowEarnersAccountDetails":{
+              |   "accountName":"Taxwell Payer",
+              |   "accountNumber":"12345678",
+              |   "sortCode":"112233",
+              |   "rollNumber":"1234678"
+              |   }
+              |}
+            """.stripMargin
+          ),
+          responseStatus = CREATED,
+          responseBody =
+            """
+              |{
+              | "updatedLowEarnersOptimisticLock": 1234
+              |}
+            """.stripMargin
+        )
 
         val application: Application = applicationWithUserAnswers(userAnswersWithBankDetails)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
-
-        mockitoWhen(
-          fakeConnector.submitLepp(
-            request = ArgumentMatchers.any()
-          )(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any(),
-            cid = ArgumentMatchers.any()
-          )
-        ).thenReturn(EitherT(Future.successful(
-          Right(SuccessWrapper(
-            value = SubmitLeppResponse(updatedLowEarnersOptimisticLock = 2),
-            correlationId = CorrelationId("cid")))
-        )))
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some(routes.SubmitConfirmationController.onPageLoad().url)
@@ -324,8 +339,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       "redirect to confirmation page" in {
         mockAuthSuccess()
         mockBarsSuccess()
-        mockBarsVerifyStatus(status = OK,
-          response = Json.obj("attempts" -> 1))
+        mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
 
         val summaryModel: LeppSummary = LeppSummary(
           currentLock = 67,
@@ -376,45 +390,53 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
 
-        mockitoWhen(
-          fakeConnector.submitLepp(
-            request = ArgumentMatchers.eq(
-              SubmitLeppRequest(
-                currentLowEarnersOptimisticLock = 67,
-                taxYear = 2025,
-                accountDetails = bankAccountDetails
-              )
-            )
-          )(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any(),
-            cid = ArgumentMatchers.any()
-          )
-        ).thenReturn(EitherT(Future.successful(
-          Right(SuccessWrapper(
-            value = SubmitLeppResponse(updatedLowEarnersOptimisticLock = 68),
-            correlationId = CorrelationId("cid")))
-        )))
+        mockBackendResponse(
+          taxYear = 2025,
+          requestBody = Some(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock":67,
+              | "lowEarnersAccountDetails":{
+              |   "accountName":"Taxwell Payer",
+              |   "accountNumber":"12345678",
+              |   "sortCode":"112233",
+              |   "rollNumber":"1234678"
+              |   }
+              |}
+            """.stripMargin
+          ),
+          responseStatus = CREATED,
+          responseBody =
+          """
+             |{
+             | "updatedLowEarnersOptimisticLock": 68
+             |}
+            """.stripMargin
+        )
 
-        mockitoWhen(
-          fakeConnector.submitLepp(
-            request = ArgumentMatchers.eq(
-              SubmitLeppRequest(
-                currentLowEarnersOptimisticLock = 68,
-                taxYear = 2026,
-                accountDetails = bankAccountDetails
-              )
-            )
-          )(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any(),
-            cid = ArgumentMatchers.any()
-          )
-        ).thenReturn(EitherT(Future.successful(
-          Right(SuccessWrapper(
-            value = SubmitLeppResponse(updatedLowEarnersOptimisticLock = 69),
-            correlationId = CorrelationId("cid")))
-        )))
+        mockBackendResponse(
+          taxYear = 2026,
+          requestBody = Some(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock": 68,
+              | "lowEarnersAccountDetails":{
+              |   "accountName":"Taxwell Payer",
+              |   "accountNumber":"12345678",
+              |   "sortCode":"112233",
+              |   "rollNumber":"1234678"
+              | }
+              |}
+            """.stripMargin
+          ),
+          responseStatus = CREATED,
+          responseBody =
+            """
+              |{
+              | "updatedLowEarnersOptimisticLock": 69
+              |}
+            """.stripMargin
+        )
 
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some(routes.SubmitConfirmationController.onPageLoad().url)

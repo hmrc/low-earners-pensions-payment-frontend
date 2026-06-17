@@ -21,14 +21,14 @@ import cats.data.EitherT
 import connectors.{ConnectorResponse, LeppRetrievalConnector}
 import models.ResponseWrapper
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.backend.retrieve.RetrieveLeppDetailsResponse
 import models.errors.ErrorResult
-import models.errors.ErrorResult.{ServiceErrorResult, notEligibleError}
-import models.nps.RetrieveLeppDetailsResponse
+import models.errors.ErrorResult.{BackendErrorResult, ServiceErrorResult, notEligibleError}
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
 import org.mockito.Mockito.when
-import org.mockito.{ArgumentMatchers, stubbing}
 import org.mockito.stubbing.OngoingStubbing
+import org.mockito.{ArgumentMatchers, stubbing}
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,7 +53,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
       )
     )
 
-    def mockConnectorFailure(err: ServiceErrorResult): ConnectorMock = when(
+    def mockConnectorFailure(err: ErrorResult): ConnectorMock = when(
       mockConnector.retrieveLeppDetails()(
         hc = ArgumentMatchers.any(),
         ec = ArgumentMatchers.any(),
@@ -70,7 +70,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
     type ServiceResult = Either[ErrorWrapper, SuccessWrapper[LeppSummary]]
     "when LeppRetrievalConnector returns an error response" - {
       "should map to notEligibleError if status code is NOT_FOUND" in new Test {
-        val error: ServiceErrorResult = ServiceErrorResult(NOT_FOUND, "No data found")
+        val error: BackendErrorResult = BackendErrorResult(NOT_FOUND, "No data found")
         mockConnectorFailure(error)
         val result: ServiceResult = await(testService.retrieveLeppDetails().value)
         result mustBe a[Left[_, _]]
