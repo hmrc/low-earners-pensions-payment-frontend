@@ -27,10 +27,10 @@ import scala.concurrent.Future
 
 class IneligibleControllerISpec extends ControllerIntegrationSpecBase {
 
-  "GET /ineligible" when {
+  "GET /not-eligible" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/ineligible"
+      path = "/low-earners-pensions-payment/not-eligible"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {

@@ -34,10 +34,10 @@ import scala.concurrent.Future
 
 class DashboardControllerISpec extends ControllerIntegrationSpecBase {
 
-  "GET /dashboard" when {
+  "GET /payments" when {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/dashboard"
+      path = "/low-earners-pensions-payment/payments"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     val ineligibleRoute: String = controllers.auth.routes.IneligibleController.onPageLoad().url
