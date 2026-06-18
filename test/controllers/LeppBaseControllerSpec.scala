@@ -62,7 +62,7 @@ class LeppBaseControllerSpec extends SpecBase {
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/payments")
       ).foreach(testSubmitUrl)
     }
     
@@ -74,11 +74,11 @@ class LeppBaseControllerSpec extends SpecBase {
 
       Seq(
         (NormalMode, DashboardPage, "/low-earners-pensions-payment/start"),
-        (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/dashboard"),
-        (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/breakdown"),
+        (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/payments"),
+        (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/payment-breakdown"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/check-your-answers"),
         (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/payments")
       ).foreach(testBackLink)
     }
     

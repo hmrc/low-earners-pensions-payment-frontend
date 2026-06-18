@@ -34,10 +34,10 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val correlationId: CorrelationId = CorrelationId("X-id")
 
-  "GET /confirmation" when {
+  "GET /bank-details-received" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/confirmation"
+      path = "/low-earners-pensions-payment/bank-details-received"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {

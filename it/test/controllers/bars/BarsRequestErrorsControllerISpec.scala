@@ -28,10 +28,10 @@ import uk.gov.hmrc.http.SessionKeys
 import scala.concurrent.Future
 
   class BarsRequestErrorsControllerISpec extends ControllerIntegrationSpecBase {
-    "GET /bank-details-check-errors" when {
+    "GET /bank-details-not-verified-service" when {
       val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
         method = "GET",
-        path = "/low-earners-pensions-payment/bank-details-check-errors"
+        path = "/low-earners-pensions-payment/bank-details-not-verified-service"
       ).withSession(SessionKeys.authToken -> "auth token")
       
       "a valid request is made" should {

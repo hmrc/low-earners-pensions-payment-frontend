@@ -94,13 +94,13 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
   "Auth request for GET endpoints" should {
     Seq(
       "/low-earners-pensions-payment/start",
-      "/low-earners-pensions-payment/dashboard",
-      "/low-earners-pensions-payment/breakdown",
+      "/low-earners-pensions-payment/payments",
+      "/low-earners-pensions-payment/payment-breakdown",
       "/low-earners-pensions-payment/bank-details",
-      "/low-earners-pensions-payment/bank-details-check-failed",
-      "/low-earners-pensions-payment/bank-details-check-errors",
+      "/low-earners-pensions-payment/bank-details-not-verified-user",
+      "/low-earners-pensions-payment/bank-details-not-verified-service",
       "/low-earners-pensions-payment/check-your-answers",
-      "/low-earners-pensions-payment/confirmation",
+      "/low-earners-pensions-payment/bank-details-received",
     ).foreach(url =>
       s"for GET of url: $url" when {
         Seq(
