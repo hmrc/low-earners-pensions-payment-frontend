@@ -23,7 +23,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("somethingWentWrong.heading"))) {
+@layout(pageTitle = titleNoForm(messages("somethingWentWrong.title"))) {
     @heading(messages("somethingWentWrong.heading"))
     <p class="govuk-body">@messages("somethingWentWrong.p1")</p>
 }
