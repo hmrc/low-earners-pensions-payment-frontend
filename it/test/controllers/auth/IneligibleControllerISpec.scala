@@ -43,7 +43,7 @@ class IneligibleControllerISpec extends ControllerIntegrationSpecBase {
         )
 
         status(result) shouldBe FORBIDDEN
-        contentAsString(result) should include("You are not eligible to access this service")
+        contentAsString(result) should include("You cannot use this service")
       }
     }
   }

@@ -1,31 +1,6 @@
 service.name = Accept your low earner''s pension payment
 service.text = This is your new service
 
-# Unauthorised page
-unauthorised.title = You can''t access this service with this account
-unauthorised.heading = You can''t access this service with this account
-unauthorised.guidance.preform = If you think you need access to this service, you can
-unauthorised.guidance.formLink = request it through the feedback form
-unauthorised.guidance.postform = . We will respond to you within 5 working days.
-
-# Ineligible page
-ineligible.title = You are not eligible to access this service
-ineligible.heading = You are not eligible to access this service
-ineligible.guidance.preform = If you believe this is wrong you may
-ineligible.guidance.formLink = contact us (opens in a new link)
-ineligible.guidance.postform = . We will respond to you within 5 working days.
-
-# Something went wrong page
-somethingWentWrong.heading = Sorry, there is a problem with the service
-somethingWentWrong.p1 = You can try again later.
-
-# Uplift failure page
-ivUpliftFailure.title = There''s a problem
-ivUpliftFailure.p1 = You cannot access this service. This may be because:
-ivUpliftFailure.li1 = you took too long to enter information and the service has timed out
-ivUpliftFailure.li2 = you have failed to answer enough questions correctly
-ivUpliftFailure.li3 = we could not match your details to our system
-
 # What you will need page
 whatYouWillNeed.title = Accept your low earner''s pension payment
 whatYouWillNeed.heading = Accept your low earner''s pension payment
@@ -38,7 +13,7 @@ whatYouWillNeed.t1 = This payment is not classed as income. It will not affect a
 whatYouWillNeed.h2.p1 = Before you continue
 whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 
-# Dashboard page
+# Payments dashboard page
 dashboard.title = Your low earner''s pension payments
 dashboard.heading = Your low earner''s pension payments
 dashboard.moreInformation = For more information,
@@ -112,22 +87,6 @@ bankDetails.sortCode.formError.format = The sort code must only include numbers
 bankDetails.accountNumber.formError.format = The account number must only include numbers
 bankDetails.rollNumber.formError.format = The building society roll number must only include letters a to z, numbers, hyphens, spaces, forward slashes and full stops
 
-# Bars check failure page
-barsCheckFailed.title = We could not verify your bank account details
-barsCheckFailed.heading = We could not verify your bank account details
-barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
-barsCheckFailed.p2 = Please try again later
-
-# Bars request errors page
-barsRequestErrors.title = We could not verify your bank account details
-barsRequestErrors.heading = We could not verify your bank account details
-barsRequestErrors.p1 = An error occurred while attempting to verify your bank account details. This could be because:
-barsRequestErrors.u1.l1 = a bank account roll number was not supplied for a building society account
-barsRequestErrors.u1.l2 = the supplied account does not support direct credit
-barsRequestErrors.u1.l3 = no account with the supplied details could be found
-barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
-barsRequestErrors.p2 = If this issue persists you may have to contact HMRC
-
 # Check your answers page
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
@@ -148,15 +107,69 @@ confirmation.what-next.heading = What you can do next
 confirmation.what-next.opt1 = View your payments
 confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 
-# Timeout dialogue
-timeout.title = You''re about to be signed out
-timeout.message = For your security, we will sign you out in
-timeout.keepAlive = Stay signed in
+# Bars request errors page
+barsRequestErrors.title = We could not verify your bank account details
+barsRequestErrors.heading = We could not verify your bank account details
+barsRequestErrors.p1 = An error occurred while attempting to verify your bank account details. This could be because:
+barsRequestErrors.u1.l1 = a bank account roll number was not supplied for a building society account
+barsRequestErrors.u1.l2 = the supplied account does not support direct credit
+barsRequestErrors.u1.l3 = no account with the supplied details could be found
+barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
+barsRequestErrors.p2 = If this issue persists you may have to contact HMRC
+
+# Bars check failure page
+barsCheckFailed.title = We could not verify your bank account details
+barsCheckFailed.heading = We could not verify your bank account details
+barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
+barsCheckFailed.p2 = Please try again later
+
+# BARS lockout page
+bars.lockout.title = You've tried to enter your bank account details too many times
+bars.lockout.heading = You've tried to enter your bank account details too many times
+bars.lockout.p2 = You can try again after {0} to confirm your bank details.
+bars.lockout.go-to-dashboard = Return to the payments
+
+# Not eligible page
+ineligible.title = You cannot use this service
+ineligible.heading = You cannot use this service
+ineligible.guidance.preform = If you believe this is wrong you may
+ineligible.guidance.formLink = contact us (opens in a new link)
+ineligible.guidance.postform = . We will respond to you within 5 working days.
+
+# Something went wrong page
+somethingWentWrong.title = Sorry, there is a problem with the service
+somethingWentWrong.heading = Sorry, there is a problem with the service
+somethingWentWrong.p1 = You can try again later.
+
+# Journey recovery page
+journeyRecovery.startAgain.title = Sorry, there is a problem with the service
+journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
+journeyRecovery.try.again = You can try again later or
+journeyRecovery.contact = contact us for help with pension scheme queries
 
 # Session timeout page
 sessionTimeout.title = For your security, we signed you out
 sessionTimeout.heading = For your security, we signed you out
 sessionTimeout.signIn = Sign in
+
+# Unauthorised page
+unauthorised.title = You can''t access this service with this account
+unauthorised.heading = You can''t access this service with this account
+unauthorised.guidance.preform = If you think you need access to this service, you can
+unauthorised.guidance.formLink = request it through the feedback form
+unauthorised.guidance.postform = . We will respond to you within 5 working days.
+
+# Uplift failure page
+ivUpliftFailure.title = There''s a problem
+ivUpliftFailure.p1 = You cannot access this service. This may be because:
+ivUpliftFailure.li1 = you took too long to enter information and the service has timed out
+ivUpliftFailure.li2 = you have failed to answer enough questions correctly
+ivUpliftFailure.li3 = we could not match your details to our system
+
+# Timeout dialogue
+timeout.title = You''re about to be signed out
+timeout.message = For your security, we will sign you out in
+timeout.keepAlive = Stay signed in
 
 # Months
 month.1 = January
@@ -183,11 +196,6 @@ site.print = Print this page
 site.acceptAndSubmit = Submit
 error.title.prefix = Error:
 submitted.on = Submitted on
-
-# BARS lockout page
-bars.lockout.title = You’ve tried to confirm your bank details too many times
-bars.lockout.p2 = You can try again after {0} to confirm your bank details.
-bars.lockout.go-to-dashboard = Return to the payments
 
 # Months
 JANUARY = January

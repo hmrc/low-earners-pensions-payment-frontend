@@ -29,10 +29,10 @@
 @expiryTimeString = @{ Formatters.fullDateTime(Some(lockoutExpires), messages, languageUtils)(requestHeader) }
 
 @layout(
-    pageTitle = titleNoForm(messages("barsRequestErrors.title")),
+    pageTitle = titleNoForm(messages("bars.lockout.title")),
     showBackLink = false
 ) {
-    @heading("bars.lockout.title", headerSize = "l")
+    @heading("bars.lockout.heading", headerSize = "l")
 
     <p id="lockout" class="govuk-body">@{Html(messages("bars.lockout.p2", expiryTimeString))}</p>
 
