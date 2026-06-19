@@ -18,19 +18,15 @@
 @import viewmodels.govuk._
 @import models.userAnswers._
 @import models.userAnswers.LeppSummary
+@import viewmodels.paymentBreakdown.BreakdownUtils._
 
 @this(
     layout: templates.Layout,
     heading: h1,
-    heading2: h2,
-    insetText: GovukInsetText
+    govukSummaryList: GovukSummaryList
 )
 
-@(paymentSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean = false)(implicit request: Request[_], messages: Messages)
-
-@taxYearString(item: LeppItem) = @{
-    messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")
-}
+@(paymentSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean = false, itemId: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("breakdown.title")),
@@ -39,17 +35,10 @@
     @heading(messages("breakdown.heading", paymentSummary.totalEntitlementString), headerSize = "l")
 
     <p class="govuk-body">@messages("breakdown.p1")</p>
-    @for(item <- paymentSummary.availableItems.getOrElse(Nil)) {
-        @insetText(
-            InsetText(content = HtmlContent(
-            List(
-                    s"""${heading2(s"${messages("breakdown.u1")} ${taxYearString(item)}", marginBottom = "0")}""",
-                    messages("breakdown.l1", item.formattedContributions),
-                    messages("breakdown.l2", item.taxRate),
-                    messages("breakdown.l3", item.formattedEntitlement)
-                    ).mkString("<br />")))
-            )
-        }
+
+    @for(summaryList <- paymentSummaryList(paymentSummary, itemId)){
+        @govukSummaryList(summaryList)
+    }
 
     <p class="govuk-body">@messages("breakdown.p2")
         <a class="govuk-link govuk-link--no-visited-state"
@@ -59,9 +48,9 @@
     </p>
     <p class="govuk-body">@messages("breakdown.p3")</p>
 
-    @if(barsLockFlag){
+    @if(itemId.isDefined || barsLockFlag){
         <p class="govuk-body"><a id="barsLockFlag" class="govuk-link"
-            href="@routes.DashboardController.onPageLoad()">@messages("bars.lockout.go-to-dashboard")</a></p>
+                                 href="@routes.DashboardController.onPageLoad()">@messages("bars.lockout.go-to-dashboard")</a></p>
     } else {
         <a href="@continueUrl"
            role="button"

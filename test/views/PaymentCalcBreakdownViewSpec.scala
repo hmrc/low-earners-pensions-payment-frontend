@@ -17,10 +17,11 @@
 package views
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.LeppItemStatus.{Available, Paid}
 import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
@@ -36,9 +37,10 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     taxRate = 20,
     entitlement = 200,
     status = Available,
-    claimDate = None
+    claimDate = None,
+    originalAmount = Some(100)
   )
-  val summary = LeppSummary(1, Some(Seq(leppItem)))
+  val summary = LeppSummary(1, Some(Seq(leppItem)), Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid))))
   
   "view" - {
 
@@ -64,19 +66,46 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     }
 
     "display back to dashboard link when locked out" in new Setup(true) {
-      
       view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
+    }
+
+    "display specific history item details" in new Setup(false, Some("P-id-1")) {
+      view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
+
+      val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
+      elements.forEach(
+        element =>
+          element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your net pay pension contributions"
+          element.getElementsByClass("govuk-summary-list__value").first().text() mustBe "£1000"
+
+          element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Your payment"
+          element.getElementsByClass("govuk-summary-list__value").last().text() mustBe "£200"
+      )
+    }
+
+    "display available items details" in new Setup(false) {
+      view.getElementById("id-1").getElementsByClass("govuk-summary-card__title").text() mustBe "For the tax year 6 April 2025 to 5 April 2026"
+      
+      val elements: Elements = view.getElementById("id-1").getElementsByClass("govuk-summary-card__content")
+      elements.forEach(
+        element =>
+         element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your net pay pension contributions"
+         element.getElementsByClass("govuk-summary-list__value").first().text() mustBe "£1000"
+
+         element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Additional amount due"
+         element.getElementsByClass("govuk-summary-list__value").last().text() mustBe "£200"
+      )
     }
   }
 
-  trait Setup(barsLock: Boolean = false) {
+  trait Setup(barsLock: Boolean = false, id: Option[String] = None) {
 
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", barsLock).body
+      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", barsLock, id).body
     )
   }
 }

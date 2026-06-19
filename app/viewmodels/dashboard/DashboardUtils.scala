@@ -59,7 +59,7 @@ object DashboardUtils {
     linkElementBuilderOpt.fold(baseRows)(linkElementBuilder => 
       val linkRow: TableRow = TableRowViewModel(
         linkElementBuilder(
-          href = s"${controllers.routes.PaymentCalcBreakdownController.onPageLoad()}?id=${item.id}",
+          href = s"${controllers.routes.PaymentCalcBreakdownController.onPageLoad(Some(item.id))}",
           msgKey = "dashboard.table.link.checkCalculation"
         )
       )

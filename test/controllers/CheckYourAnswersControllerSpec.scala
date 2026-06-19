@@ -38,7 +38,7 @@ import play.api.test.Helpers.{GET, route, running, stubMessagesControllerCompone
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import utils.CorrelationIdHandler
 import viewmodels.NormalMode
-import views.html.{CheckYourAnswersView, ErrorTemplate}
+import views.html.CheckYourAnswersView
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

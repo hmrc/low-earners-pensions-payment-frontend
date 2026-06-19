@@ -31,4 +31,5 @@ object CurrencyFormats {
       .format(value)
       .replace("GBP", "")
       .replace(".00", "")
+      .replace(",", "")
 }

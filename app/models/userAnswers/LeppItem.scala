@@ -28,9 +28,11 @@ case class LeppItem(id: String,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
                     status: LeppItemStatus,
-                    claimDate: Option[LocalDate]) {
+                    claimDate: Option[LocalDate],
+                    originalAmount: Option[BigDecimal] = None) {
   val formattedEntitlement: String = CurrencyFormats.format(entitlement)
   val formattedContributions: String = CurrencyFormats.format(contributions)
+  val taxRatePercent = s"${taxRate.toString()}%"
 }
 
 object LeppItem {
@@ -45,7 +47,8 @@ object LeppItem {
       taxRate = calculation.lowEarnersDataDetails.basicRatePercentage.getOrElse(0),
       entitlement = calculation.lowEarnersClaimDetails.entitlementAmount.getOrElse(0),
       status = calculation.lowEarnersClaimDetails.claimStatus.toLeppItemStatus,
-      claimDate = calculation.lowEarnersClaimDetails.claimDate.map(LocalDate.parse(_))
+      claimDate = calculation.lowEarnersClaimDetails.claimDate.map(LocalDate.parse(_)),
+      originalAmount = calculation.lowEarnersClaimDetails.originalAmount
     )
   }
   

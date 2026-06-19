@@ -25,7 +25,6 @@ import models.errors.ErrorResult.ServiceErrorResult
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{GatewayTimeoutException, HeaderCarrier}
 import utils.ErrorCodes.BAD_REQUEST_ERROR
