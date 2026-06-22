@@ -105,14 +105,13 @@ confirmation.title = We''ve received your bank details
 confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
 confirmation.what-next.opt1 = View your payments
-#confirmation.details = The payment of £200 for the tax year 6 April 2021 to 5 April 2022 will be in your bank account within 7 working days.
 confirmation.failure.items.p1 = To accept them again, return to your payments and select ''Accept''.
 confirmation.failure.sub.heading = Some of your payments could not be processed
 confirmation.table.availableUntil = 5 April {0}
 confirmation.table.header.taxYear = Tax year
 confirmation.table.header.amount = Amount
 confirmation.table.header.availableUntil = Available until
-confirmation.details = The following payments were processed successfully. We'll send them separately, to the bank account you provided, within 7 working days.
+confirmation.details = The following payments were processed successfully. We''ll send them separately, to the bank account you provided, within 7 working days.
 
 # Bars request errors page
 barsRequestErrors.title = We could not verify your bank account details
@@ -131,8 +130,8 @@ barsCheckFailed.p1 = An error occurred while attempting to verify your bank acco
 barsCheckFailed.p2 = Please try again later
 
 # BARS lockout page
-bars.lockout.title = You've tried to enter your bank account details too many times
-bars.lockout.heading = You've tried to enter your bank account details too many times
+bars.lockout.title = You''ve tried to enter your bank account details too many times
+bars.lockout.heading = You''ve tried to enter your bank account details too many times
 bars.lockout.p2 = You can try again after {0} to confirm your bank details.
 bars.lockout.go-to-dashboard = Return to the payments
 
@@ -227,8 +226,3 @@ SATURDAY = Saturday
 SUNDAY   = Sunday
 
 between.time.and.date = on
-
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.try.again = You can try again later or
-journeyRecovery.contact = contact us for help with pension scheme queries
