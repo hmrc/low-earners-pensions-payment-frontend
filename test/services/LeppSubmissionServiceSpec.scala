@@ -291,7 +291,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
 
         val result: ResponseWrapper[LeppSummary] = await(futureResult)
         result.value mustBe leppSummary.copy(currentLock = 0,
-          availableItems = None,
+          availableItems = Some(leppSummary.availableItems.get.tail),
           acceptedItems = Some(Seq(leppSummary.availableItems.get.head)))
       }
     }
