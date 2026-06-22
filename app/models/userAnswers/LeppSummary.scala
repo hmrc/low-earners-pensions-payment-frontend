@@ -58,7 +58,7 @@ object LeppSummary {
 
     LeppSummary(
       currentLock = currentLowEarnersOptimisticLock,
-      availableItems = notEmptySeq(leppItems.filter(_.status == Available)),
+      availableItems = notEmptySeq(leppItems.filter(_.status == Available).sortBy(_.taxYear)),
       paidItems = notEmptySeq(leppItems.filter(_.status == Paid)),
       suspendedItems = notEmptySeq(leppItems.filter(_.status == Suspended)),
       cancelledItems = notEmptySeq(leppItems.filter(_.status == Cancelled))

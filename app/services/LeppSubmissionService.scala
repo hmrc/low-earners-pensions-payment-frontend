@@ -54,7 +54,8 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
                  cid: CorrelationId): Future[ResponseWrapper[LeppSummary]] = {
       toSubmit.availableItems.getOrElse(Nil) match {
         case Nil =>
-          val remainingAvailableItems = leppSummary.availableItems.getOrElse(Nil).filterNot(x => toSubmit.acceptedItems.getOrElse(Nil).contains(x))
+          val remainingAvailableItems = leppSummary.availableItems.getOrElse(Nil)
+            .filterNot(item => toSubmit.acceptedItems.getOrElse(Nil).contains(item))
           Future.successful(SuccessWrapper(toSubmit.copy(availableItems = Some(remainingAvailableItems)), correlationId = cid))
         case nextItem +: remainingItems =>
           val acceptLeppPaymentRequest: AcceptLeppPaymentRequest = AcceptLeppPaymentRequest(
