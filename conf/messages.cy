@@ -133,7 +133,7 @@ barsCheckFailed.p2 = Please try again later
 bars.lockout.title = You''ve tried to enter your bank account details too many times
 bars.lockout.heading = You''ve tried to enter your bank account details too many times
 bars.lockout.p2 = You can try again after {0} to confirm your bank details.
-bars.lockout.go-to-dashboard = Return to the payments
+bars.lockout.go-to-dashboard = Return to your payments
 
 # Not eligible page
 ineligible.title = You cannot use this service
