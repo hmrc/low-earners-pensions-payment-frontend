@@ -277,7 +277,7 @@ class LeppBaseControllerSpec extends SpecBase {
     "handleForConfirmationPage" - {
       "should redirect to dashboard page when claims data isn't cached" in new Test {
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot(""))
+          _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -291,7 +291,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot(""))
+          _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -315,7 +315,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot("teapot time"))
+          _ => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -340,7 +340,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot("teapot time"))
+          _ => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 
         status(result) mustBe IM_A_TEAPOT

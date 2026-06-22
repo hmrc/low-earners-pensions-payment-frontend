@@ -34,12 +34,6 @@
     showBackLink = false
 ) {
 
-    <div class="govuk-panel govuk-panel--confirmation">
-        <h1 class="govuk-panel__title">
-            @messages("confirmation.heading")
-        </h1>
-    </div>
-
     @if(leppSummary.availableItems.getOrElse(Nil).nonEmpty){
         @heading("confirmation.failure.sub.heading", headerSize = "l")
         <p class="govuk-body">@messages("confirmation.failure.items.p1")</p>
@@ -56,6 +50,11 @@
             InsetTextViewModel("confirmation.part.confirmation.details")
         )
     } else {
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">
+                @messages("confirmation.heading")
+            </h1>
+        </div>
         <p class="govuk-body">@messages("confirmation.details")</p>
     }
 

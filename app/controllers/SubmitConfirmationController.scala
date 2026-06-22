@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
-import pages.{CheckYourAnswersPage, DashboardPage, SubmissionPage}
+import pages.SubmissionPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
@@ -39,17 +39,14 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
 
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
 
-    request.userAnswers.get(CheckYourAnswersPage) match {
-      case Some(value) =>
+    (_, _, leppSubmissionSummary) =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, true))
           _ <- sessionService.save(updatedAnswers)
         } yield {
-          if (value.acceptedItems.getOrElse(Nil).nonEmpty) {
-            Ok(confirmationView(value,
+          if (leppSubmissionSummary.acceptedItems.getOrElse(Nil).nonEmpty) {
+            Ok(confirmationView(leppSubmissionSummary,
               DateTimeFormats.getCurrentDateTimestamp(dateTime.now())))
           } else Redirect(routes.SomethingWentWrongController.onPageLoad())
         }
-      case None => Future.successful(DashboardPage.asRedirect)
-    }
   }

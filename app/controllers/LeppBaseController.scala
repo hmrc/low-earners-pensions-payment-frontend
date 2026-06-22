@@ -96,7 +96,7 @@ trait SessionDataHandling {
     }
   }
 
-  def handleForConfirmationPage(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+  def handleForConfirmationPage(f: BlockFor[(LeppSummary, BankAccountDetails, LeppSummary)]): Action[AnyContent] =
     handleWithSubmissionCheck { implicit req =>
       import req.userAnswers
 
@@ -105,7 +105,7 @@ trait SessionDataHandling {
       val cyaSubmissionOpt: Option[LeppSummary] = userAnswers.get(CheckYourAnswersPage)
 
       (leppDataOpt, bankDetailsOpt, cyaSubmissionOpt) match {
-        case (Some(_), Some(_), Some(_)) => f(req)
+        case (Some(leppData), Some(bankDetails), Some(cyaSubmission)) => f(req)(leppData,bankDetails,cyaSubmission)
         case (Some(_), Some(_), _) => CheckYourAnswersPage.asFutureRedirect
         case (Some(_), None, _) => WhatAreYourBankDetailsPage.asFutureRedirect
         case _ => DashboardPage.asFutureRedirect
