@@ -18,6 +18,7 @@ package controllers
 
 import common.IntegrationSpecBase
 import models.CorrelationId
+import models.userAnswers.UserAnswers
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.libs.json.Json
@@ -33,7 +34,16 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val correlationId: CorrelationId = CorrelationId("X-id")
-
+  
+  val userAnswersWithZeroSubmission: UserAnswers = UserAnswers(
+    id = "1",
+    data = Json.obj(
+      "leppSummary" -> Json.toJson(summaryModel),
+      "bankDetails" -> Json.toJson(bankAccountDetails),
+      "leppSubmissionSummary" -> Json.toJson(summaryModel)
+    )
+  )
+  
   "GET /confirmation" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
@@ -41,13 +51,54 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {
-      "render view correctly" in {
+      "redirect to error page when acceptPayment made no submissions" in {
         mockAuthSuccess()
         
         mockBarsVerifyStatus(status = OK,
           response = Json.obj("attempts" -> 1))
         
+        val application: Application = applicationWithUserAnswers(userAnswersWithZeroSubmission)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+        
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldEqual Some(routes.SomethingWentWrongController.onPageLoad().url)
+      }
+
+      "redirect to clear cache controller when already accepted payments" in {
+        mockAuthSuccess()
+
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
+
         val application: Application = applicationWithUserAnswers(userAnswersWithExistingSubmission)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldEqual Some(routes.ClearCacheController.onPageLoad().url)
+      }
+
+      "render view correctly with acceptPayments successful for all payments" in {
+        mockAuthSuccess()
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
+
+        val resultLeppSummaryModel = summaryModel.copy(availableItems = None, acceptedItems = summaryModel.availableItems)
+
+        val userAnswersForSubmission: UserAnswers = UserAnswers(
+          id = "1",
+          data = Json.obj(
+            "leppSummary" -> Json.toJson(summaryModel),
+            "bankDetails" -> Json.toJson(bankAccountDetails),
+            "leppSubmissionSummary" -> Json.toJson(resultLeppSummaryModel)
+          )
+        )
+        val application: Application = applicationWithUserAnswers(userAnswersForSubmission)
 
         lazy val result: Future[Result] = route(application, request).getOrElse(
           Future.failed(new RuntimeException("TEST_ERROR"))
@@ -57,7 +108,36 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
-        contentAsString(result) shouldEqual view("01 January 1970 at 1:00am")(request, messages).toString
+        contentAsString(result) shouldEqual view(resultLeppSummaryModel, "01 January 1970 at 1:00am")(request, messages).toString
+      }
+
+      "render view correctly  with acceptPayments partly successful" in {
+        mockAuthSuccess()
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
+
+        val resultLeppSummaryModel = summaryModel.copy(availableItems = None,
+          acceptedItems = Some(Seq(summaryModel.availableItems.get.head)))
+
+        val userAnswersForSubmission: UserAnswers = UserAnswers(
+          id = "1",
+          data = Json.obj(
+            "leppSummary" -> Json.toJson(summaryModel),
+            "bankDetails" -> Json.toJson(bankAccountDetails),
+            "leppSubmissionSummary" -> Json.toJson(resultLeppSummaryModel)
+          )
+        )
+        val application: Application = applicationWithUserAnswers(userAnswersForSubmission)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        val view = application.injector.instanceOf[SubmitConfirmationView]
+        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        status(result) shouldBe OK
+        contentAsString(result) shouldEqual view(resultLeppSummaryModel, "01 January 1970 at 1:00am")(request, messages).toString
       }
     }
   }

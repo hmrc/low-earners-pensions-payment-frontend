@@ -17,9 +17,12 @@
 package pages
 
 import controllers.routes
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object ConfirmationPage extends Page {
+case object SubmissionPage extends QuestionPage[Boolean] {
   override def route(mode: Mode): Call = routes.SubmitConfirmationController.onPageLoad()
+  override def path: JsPath = JsPath \ toString
+  override def toString: String = "isSubmitted"
 }

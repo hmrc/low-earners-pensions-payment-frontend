@@ -271,7 +271,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
     )
 
     "backend returns an error for any LEPP submissions" should {
-      "redirect to ClearCacheController" in {
+      "redirect to SubmitConfirmationController" in {
         mockAuthSuccess()
         mockBarsSuccess()
         mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
@@ -290,7 +290,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         )
         
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe Some(routes.ClearCacheController.onPageLoad().url)
+        redirectLocation(result) shouldBe Some(routes.SubmitConfirmationController.onPageLoad().url)
       }
     }
 

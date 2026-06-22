@@ -46,7 +46,31 @@ class SubmitConfirmationControllerSpec extends SpecBase {
       )
     )
     
+    "must redirect to ClearCacheController" in {
+      
+      val application = applicationBuilder(userAnswers = userAnswers).build()
+
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.SubmitConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
+
+      val userAnswers: UserAnswers = UserAnswers(
+        id = "1",
+        data = Json.obj(
+          "leppSummary" -> Json.toJson(summaryModel),
+          "bankDetails" -> Json.toJson(bankAccountDetails),
+          "leppSubmissionSummary" -> Json.toJson(summaryModel.copy(availableItems = None, acceptedItems = summaryModel.availableItems))
+        )
+      )
       
       val application = applicationBuilder(userAnswers = userAnswers).build()
 

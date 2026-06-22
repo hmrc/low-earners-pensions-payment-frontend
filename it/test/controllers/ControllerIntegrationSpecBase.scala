@@ -112,6 +112,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
     data = Json.obj(
       "leppSummary" -> Json.toJson(summaryModel),
       "bankDetails" -> Json.toJson(bankAccountDetails),
+      "leppSubmissionSummary" -> Json.toJson(summaryModel),
       "isSubmitted" -> JsBoolean(true)
     )
   )

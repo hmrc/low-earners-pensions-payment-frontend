@@ -61,8 +61,7 @@ class LeppBaseControllerSpec extends SpecBase {
       Seq(
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers")
       ).foreach(testSubmitUrl)
     }
     
@@ -77,8 +76,7 @@ class LeppBaseControllerSpec extends SpecBase {
         (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/dashboard"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/breakdown"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details")
       ).foreach(testBackLink)
     }
     
@@ -337,7 +335,7 @@ class LeppBaseControllerSpec extends SpecBase {
           data = Json.obj(
             "leppSummary" -> Json.toJson(summaryModel),
             "bankDetails" -> Json.toJson(detailsModel),
-            "isSubmitted" -> JsBoolean(true)
+            "leppSubmissionSummary" -> Json.toJson(summaryModel)
           )
         )
 

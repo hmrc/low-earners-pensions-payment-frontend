@@ -32,11 +32,9 @@ trait HttpHandler[Resp: Reads] {
 
   def statusHandler(method: String, url: String, response: HttpResponseWrapper): HttpResult
 
-  private val noCorrelationIdString: String = "NO_CORRELATION_ID_IN_RESPONSE"
-
   def correlationIdHandler[A](httpResponse: HttpResponse): HttpResult = {
     val correlationId: Option[String] = httpResponse.header(Constants.correlationIdKey)
-    Right(HttpResponseWrapper(httpResponse, CorrelationId(correlationId.getOrElse(noCorrelationIdString))))
+    Right(HttpResponseWrapper(httpResponse, CorrelationId(correlationId.getOrElse(Constants.noCorrelationIdString))))
   }
 
   val errorMap: ErrorResult => ErrorResult = err => err

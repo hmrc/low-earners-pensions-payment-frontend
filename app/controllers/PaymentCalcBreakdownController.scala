@@ -38,9 +38,9 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)(implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport {
+  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling{
 
-  def onPageLoad(id: Option[String] = None): Action[AnyContent] = handle { implicit request =>
+  def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
     implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
     barsVerifyStatusConnector.status() map { status =>
       request.userAnswers.get(DashboardPage) match {

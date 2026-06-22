@@ -29,13 +29,13 @@ class Navigator @Inject() {
     case DashboardPage => PaymentCalcBreakdownPage
     case PaymentCalcBreakdownPage => WhatAreYourBankDetailsPage
     case WhatAreYourBankDetailsPage => CheckYourAnswersPage
-    case CheckYourAnswersPage => ConfirmationPage
-    case _ => WhatYouWillNeedPage
+    case CheckYourAnswersPage => SubmissionPage
+    case _ => DashboardPage
   }
 
   private val checkRouteMap: Page => Page = {
     case WhatAreYourBankDetailsPage => CheckYourAnswersPage
-    case _ => WhatYouWillNeedPage
+    case _ => DashboardPage
   } 
 
   def nextPage(page: Page, mode: Mode): Call = mode match {

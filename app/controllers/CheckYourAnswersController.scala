@@ -16,11 +16,10 @@
 
 package controllers
 
-import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
-import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.ResponseWrapper.ErrorWrapper
 import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
@@ -66,17 +65,11 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
       
       handleWithBars(bankDetails)(() => {
-        val result: EitherT[Future, ErrorWrapper, Result] = for {
-          _ <- leppSubmissionService.submitMultiple(req.user.nino, bankDetails, leppData)
-          updatedUserAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, true)))
-          _ <- EitherT.right(sessionService.save(updatedUserAnswers))
+        for {
+          leppSummary <- leppSubmissionService.submitMultiple(req.user.nino, bankDetails, leppData)
+          updatedAnswers <- Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value))
+          _ <- sessionService.save(updatedAnswers)
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
-
-        result.leftSemiflatMap(_ =>
-          for {
-            _ <- sessionService.clear(req.userAnswers)
-          } yield Redirect(routes.ClearCacheController.onPageLoad())
-        ).merge
       })
   }
 

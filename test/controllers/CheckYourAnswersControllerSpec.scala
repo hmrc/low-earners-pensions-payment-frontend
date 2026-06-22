@@ -29,7 +29,7 @@ import navigation.Navigator
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.mockito.stubbing.OngoingStubbing
-import pages.{CheckYourAnswersPage, DashboardPage, WhatAreYourBankDetailsPage}
+import pages.{SubmissionPage, DashboardPage, WhatAreYourBankDetailsPage}
 import play.api.Application
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -123,7 +123,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val userAnswers: UserAnswers =
           emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
             .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
-            .set(page = CheckYourAnswersPage, value = true).success.value
+            .set(page = SubmissionPage, value = true).success.value
 
         val application: Application = applicationBuilder(userAnswers = userAnswers).build()
 

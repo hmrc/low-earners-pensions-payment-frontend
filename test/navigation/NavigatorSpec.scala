@@ -36,7 +36,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "should go to the correct location when in NormalMode for an unknown page" in {
-        navigator.nextPage(UnknownPage, NormalMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode) mustBe routes.DashboardController.onPageLoad()
       }
 
       "should go to the correct location when in CheckMode for a known page" in {
@@ -44,7 +44,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "should go to the correct location when in CheckMode for an unknown page" in {
-        navigator.nextPage(UnknownPage, CheckMode) mustBe routes.WhatYouWillNeedController.onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode) mustBe routes.DashboardController.onPageLoad()
       }
     }
   }
