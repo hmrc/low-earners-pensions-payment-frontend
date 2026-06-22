@@ -31,7 +31,7 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
   "GET /bank-details-not-verified-user" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/bank-details-not-verified-user"
+      path = "/accept-your-low-earners-pension-payment/bank-details-not-verified-user"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {

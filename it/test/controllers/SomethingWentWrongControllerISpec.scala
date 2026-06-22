@@ -29,7 +29,7 @@ class SomethingWentWrongControllerISpec extends ControllerIntegrationSpecBase {
   "GET /problem-with-service" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/problem-with-service"
+      path = "/accept-your-low-earners-pension-payment/problem-with-service"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {

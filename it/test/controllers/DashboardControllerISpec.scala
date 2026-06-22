@@ -37,7 +37,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
   "GET /payments" when {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/payments"
+      path = "/accept-your-low-earners-pension-payment/payments"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     val ineligibleRoute: String = controllers.auth.routes.IneligibleController.onPageLoad().url

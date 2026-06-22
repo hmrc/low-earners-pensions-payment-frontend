@@ -30,7 +30,7 @@ class IneligibleControllerISpec extends ControllerIntegrationSpecBase {
   "GET /not-eligible" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/not-eligible"
+      path = "/accept-your-low-earners-pension-payment/not-eligible"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {
