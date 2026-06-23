@@ -85,7 +85,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       }
 
     "when call to LEPP backend endpoint returns an error response" should {
-      val errorRoute: String = controllers.routes.SomethingWentWrongController.onPageLoad().url
+      val errorRoute: String = controllers.routes.ClearCacheController.defaultError().url
 
       Seq(
         (BAD_REQUEST, "BAD_REQUEST", errorRoute),

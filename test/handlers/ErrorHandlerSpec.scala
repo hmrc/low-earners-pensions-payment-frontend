@@ -16,7 +16,6 @@
 
 package handlers
 
-import handlers.ErrorHandler
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -30,8 +29,6 @@ import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.twirl.api.Html
 import views.html.SomethingWentWrongView
 import views.html.templates.ErrorTemplate
-
-import scala.concurrent.Future
 
 class ErrorHandlerSpec extends AnyWordSpec
   with Matchers

@@ -73,7 +73,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
   private def mapErrors[A](err: ErrorWrapper): Result = {
     err.value match {
       case `notEligibleError` => Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
-      case _ => Redirect(controllers.routes.SomethingWentWrongController.onPageLoad())
+      case _ => Redirect(controllers.routes.ClearCacheController.defaultError())
     }
   }
 }
