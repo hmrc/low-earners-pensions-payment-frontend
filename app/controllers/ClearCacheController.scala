@@ -25,21 +25,26 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ClearCacheController @Inject()(
-  override val messagesApi: MessagesApi,
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  sessionCacheService: SessionCacheService
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+class ClearCacheController @Inject()(override val messagesApi: MessagesApi,
+                                     val controllerComponents: MessagesControllerComponents,
+                                     identify: IdentifierAction,
+                                     getData: DataRetrievalAction,
+                                     sessionCacheService: SessionCacheService)
+                                    (using ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     sessionCacheService
       .clear(request.userAnswers)
       .map { _ =>
         Redirect(routes.DashboardController.onPageLoad().url)
+      }
+  }
+
+  def defaultError(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    sessionCacheService
+      .clear(request.userAnswers)
+      .map { _ =>
+        Redirect(routes.SomethingWentWrongController.onPageLoad())
       }
   }
 }

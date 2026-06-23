@@ -40,6 +40,8 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
                                              (implicit override val executionContext: ExecutionContext)
   extends IdentifierAction with AuthorisedFunctions with Logging:
 
+  override def parser: BodyParser[AnyContent] = playBodyParsers
+
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     val logContext: String = "[AuthenticatedIdentifierAction][invokeBlock] - "
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -67,6 +69,3 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
 
   private def hasEnrolments(enrolments: Enrolments): Boolean =
     enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty
-
-  override def parser: BodyParser[AnyContent] = playBodyParsers
-
