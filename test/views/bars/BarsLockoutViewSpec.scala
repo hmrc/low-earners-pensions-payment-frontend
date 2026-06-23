@@ -36,7 +36,7 @@ class BarsLockoutViewSpec extends SpecBase {
     "with correct LEPP gov banner" in new Setup {
       view.getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
       view.getElementsByClass("govuk-link hmrc-sign-out-nav__link").attr("href") mustBe
-        "/low-earners-pensions-payment/account/sign-out-survey"
+        "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
     "display correct guidance and text" in new Setup {

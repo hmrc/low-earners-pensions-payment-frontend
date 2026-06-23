@@ -93,14 +93,14 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
 
   "Auth request for GET endpoints" should {
     Seq(
-      "/low-earners-pensions-payment/start",
-      "/low-earners-pensions-payment/dashboard",
-      "/low-earners-pensions-payment/breakdown",
-      "/low-earners-pensions-payment/bank-details",
-      "/low-earners-pensions-payment/bank-details-check-failed",
-      "/low-earners-pensions-payment/bank-details-check-errors",
-      "/low-earners-pensions-payment/check-your-answers",
-      "/low-earners-pensions-payment/confirmation",
+      "/accept-your-low-earners-pension-payment/start",
+      "/accept-your-low-earners-pension-payment/payments",
+      "/accept-your-low-earners-pension-payment/payment-breakdown",
+      "/accept-your-low-earners-pension-payment/bank-details",
+      "/accept-your-low-earners-pension-payment/bank-details-not-verified-user",
+      "/accept-your-low-earners-pension-payment/bank-details-not-verified-service",
+      "/accept-your-low-earners-pension-payment/check-your-answers",
+      "/accept-your-low-earners-pension-payment/bank-details-received",
     ).foreach(url =>
       s"for GET of url: $url" when {
         Seq(
@@ -118,8 +118,8 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
 
   "Auth request for POST endpoints" should {
     Seq(
-      "/low-earners-pensions-payment/bank-details",
-      "/low-earners-pensions-payment/check-your-answers"
+      "/accept-your-low-earners-pension-payment/bank-details",
+      "/accept-your-low-earners-pension-payment/check-your-answers"
     ).foreach(url =>
       s"for POST of url: $url" when {
         Seq(

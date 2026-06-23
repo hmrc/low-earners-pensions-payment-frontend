@@ -48,7 +48,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
   "GET /bank-details" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/bank-details"
+      path = "/accept-your-low-earners-pension-payment/bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "with valid payment details" should {
@@ -92,7 +92,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
   "GET /change-bank-details" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/change-bank-details"
+      path = "/accept-your-low-earners-pension-payment/change-bank-details"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "page is loaded should pre-populate bank details and navigation links with edit mode" in {
@@ -128,7 +128,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
   "POST /bank-details" when {
     def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
       method = "POST",
-      path = "/low-earners-pensions-payment/bank-details"
+      path = "/accept-your-low-earners-pension-payment/bank-details"
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)
@@ -219,7 +219,7 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
 
     def request(data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(
       method = "POST",
-      path = "/low-earners-pensions-payment/change-bank-details"
+      path = "/accept-your-low-earners-pension-payment/change-bank-details"
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withFormUrlEncodedBody(data: _*)

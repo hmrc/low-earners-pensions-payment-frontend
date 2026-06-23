@@ -1,51 +1,49 @@
 # microservice specific routes
 
-->     /hmrc-frontend                       hmrcfrontend.Routes
+->     /hmrc-frontend                           hmrcfrontend.Routes
 
-GET    /assets/*file                        controllers.Assets.versioned(path = "/public", file: Asset)
-GET    /language/:lang                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET    /assets/*file                            controllers.Assets.versioned(path = "/public", file: Asset)
+GET    /language/:lang                          controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
 # Start page
-GET    /                                    controllers.WhatYouWillNeedController.start
-GET    /start                               controllers.WhatYouWillNeedController.onPageLoad()
+GET    /                                        controllers.WhatYouWillNeedController.start
+GET    /start                                   controllers.WhatYouWillNeedController.onPageLoad()
 
 # Dashboard page
-GET    /dashboard                           controllers.DashboardController.onPageLoad()
+GET    /payments                                controllers.DashboardController.onPageLoad()
 
 # Payment Calc Breakdown page
-GET    /breakdown                           controllers.PaymentCalcBreakdownController.onPageLoad(id: Option[String])
+GET    /payment-breakdown                       controllers.PaymentCalcBreakdownController.onPageLoad(id: Option[String])
 
 # Bank account details page
-GET    /bank-details                        controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST   /bank-details                        controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = NormalMode)
-GET    /change-bank-details                 controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST   /change-bank-details                 controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
+GET    /bank-details                            controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST   /bank-details                            controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = NormalMode)
+GET    /change-bank-details                     controllers.WhatAreYourBankDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST   /change-bank-details                     controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
 
-# Error page
-GET     /something-went-wrong               controllers.SomethingWentWrongController.onPageLoad()
-
-# Bars error pages
-GET    /bank-details-check-failed           controllers.bars.BarsCheckFailedController.onPageLoad()
-GET    /bank-details-check-errors           controllers.bars.BarsRequestErrorsController.onPageLoad()
+# Bank details error pages
+GET    /bank-details-not-verified-user          controllers.bars.BarsCheckFailedController.onPageLoad()
+GET    /bank-details-not-verified-service       controllers.bars.BarsRequestErrorsController.onPageLoad()
+GET    /bank-details-lockout                    controllers.bars.BarsLockoutController.onPageLoad()
 
 # Check your answers page
-GET    /check-your-answers                  controllers.CheckYourAnswersController.onPageLoad()
-POST   /check-your-answers                  controllers.CheckYourAnswersController.onSubmit()
+GET    /check-your-answers                      controllers.CheckYourAnswersController.onPageLoad()
+POST   /check-your-answers                      controllers.CheckYourAnswersController.onSubmit()
 
 # Submission page
-GET    /confirmation                        controllers.SubmitConfirmationController.onPageLoad()
+GET    /bank-details-received                   controllers.SubmitConfirmationController.onPageLoad()
+
+# Error page
+GET    /problem-with-service                    controllers.SomethingWentWrongController.onPageLoad()
 
 # Auth actions
-GET     /account/sign-out-survey            controllers.auth.AuthController.signOut()
-GET     /account/timeout                    controllers.auth.AuthController.sessionTimeout()
-GET     /unauthorised                       controllers.auth.UnauthorisedController.onPageLoad()
-GET     /ineligible                         controllers.auth.IneligibleController.onPageLoad()
-GET     /we-could-not-confirm-your-details  controllers.auth.IvUpliftFailureController.onPageLoad(journeyId: Option[String])
-GET     /service-timeout-idle               controllers.auth.SessionTimeoutController.onPageLoad()
+GET    /not-eligible                            controllers.auth.IneligibleController.onPageLoad()
+GET    /service-timed-out                       controllers.auth.SessionTimeoutController.onPageLoad()
+GET    /unauthorised                            controllers.auth.UnauthorisedController.onPageLoad()
+GET    /we-could-not-confirm-your-details       controllers.auth.IvUpliftFailureController.onPageLoad(journeyId: Option[String])
+GET    /account/sign-out-survey                 controllers.auth.AuthController.signOut()
+GET    /account/timeout                         controllers.auth.AuthController.sessionTimeout()
 
 # Session actions
-GET         /refresh-session                controllers.KeepAliveController.keepAlive()
-GET         /clear-cache                    controllers.ClearCacheController.onPageLoad()
-
-# BARs lockout
-GET         /bars-lockout                   controllers.bars.BarsLockoutController.onPageLoad()
+GET    /refresh-session                         controllers.KeepAliveController.keepAlive()
+GET    /clear-cache                             controllers.ClearCacheController.onPageLoad()

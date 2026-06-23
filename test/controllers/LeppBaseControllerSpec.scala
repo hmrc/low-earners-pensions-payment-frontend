@@ -59,9 +59,9 @@ class LeppBaseControllerSpec extends SpecBase {
         }
 
       Seq(
-        (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
-        (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers")
+        (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/bank-details"),
+        (CheckMode,  WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/change-bank-details"),
+        (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/check-your-answers")
       ).foreach(testSubmitUrl)
     }
     
@@ -72,11 +72,11 @@ class LeppBaseControllerSpec extends SpecBase {
       }
 
       Seq(
-        (NormalMode, DashboardPage, "/low-earners-pensions-payment/start"),
-        (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/dashboard"),
-        (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/breakdown"),
-        (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details")
+        (NormalMode, DashboardPage, "/accept-your-low-earners-pension-payment/start"),
+        (NormalMode, PaymentCalcBreakdownPage, "/accept-your-low-earners-pension-payment/payments"),
+        (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/payment-breakdown"),
+        (CheckMode,  WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/check-your-answers"),
+        (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/bank-details")
       ).foreach(testBackLink)
     }
     

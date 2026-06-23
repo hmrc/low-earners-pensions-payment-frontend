@@ -26,10 +26,10 @@ import scala.concurrent.Future
 
 class SomethingWentWrongControllerISpec extends ControllerIntegrationSpecBase {
 
-  "GET /something-went-wrong" when {
+  "GET /problem-with-service" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/something-went-wrong"
+      path = "/accept-your-low-earners-pension-payment/problem-with-service"
     ).withSession(SessionKeys.authToken -> "auth token")
 
     "a valid request is made" should {

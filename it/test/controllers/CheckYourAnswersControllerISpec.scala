@@ -43,7 +43,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
   "GET /check-your-answers" when {
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
-      path = "/low-earners-pensions-payment/check-your-answers"
+      path = "/accept-your-low-earners-pension-payment/check-your-answers"
     ).withSession(SessionKeys.authToken -> "auth token")
     
     "a valid request is made" should {
@@ -95,7 +95,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
   "POST /check-your-answers" when {
     def request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "POST",
-      path = "/low-earners-pensions-payment/check-your-answers"
+      path = "/accept-your-low-earners-pension-payment/check-your-answers"
     )
       .withSession(SessionKeys.authToken -> "auth token")
       .withHeaders("correlationId" -> testCorrelationId.value)
