@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeBarsLockoutAction
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
-import pages.{CheckYourAnswersPage, DashboardPage, WhatAreYourBankDetailsPage}
+import pages.{SubmissionPage, DashboardPage, WhatAreYourBankDetailsPage}
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -134,7 +134,7 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
 
     "must redirect to clear cache controller when already submitting the request" in {
 
-      val userAnswers = emptyUserAnswers.set(page = CheckYourAnswersPage, value = true).success.value
+      val userAnswers = emptyUserAnswers.set(page = SubmissionPage, value = true).success.value
       val application = applicationBuilder(userAnswers).build()
 
       running(application) {

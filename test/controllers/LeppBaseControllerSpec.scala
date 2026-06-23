@@ -61,8 +61,7 @@ class LeppBaseControllerSpec extends SpecBase {
       Seq(
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/bank-details"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/change-bank-details"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/check-your-answers")
       ).foreach(testSubmitUrl)
     }
     
@@ -77,8 +76,7 @@ class LeppBaseControllerSpec extends SpecBase {
         (NormalMode, PaymentCalcBreakdownPage, "/low-earners-pensions-payment/dashboard"),
         (NormalMode, WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/breakdown"),
         (CheckMode,  WhatAreYourBankDetailsPage, "/low-earners-pensions-payment/check-your-answers"),
-        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details"),
-        (NormalMode, ConfirmationPage, "/low-earners-pensions-payment/dashboard")
+        (NormalMode, CheckYourAnswersPage, "/low-earners-pensions-payment/bank-details")
       ).foreach(testBackLink)
     }
     
@@ -279,7 +277,7 @@ class LeppBaseControllerSpec extends SpecBase {
     "handleForConfirmationPage" - {
       "should redirect to dashboard page when claims data isn't cached" in new Test {
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot(""))
+          _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -293,7 +291,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot(""))
+          _ => _ => Future.successful(ImATeapot(""))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -317,7 +315,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot("teapot time"))
+          _ => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
@@ -337,12 +335,12 @@ class LeppBaseControllerSpec extends SpecBase {
           data = Json.obj(
             "leppSummary" -> Json.toJson(summaryModel),
             "bankDetails" -> Json.toJson(detailsModel),
-            "isSubmitted" -> JsBoolean(true)
+            "leppSubmissionSummary" -> Json.toJson(summaryModel)
           )
         )
 
         val result: Future[Result] = controller.handleForConfirmationPage(
-          _ => Future.successful(ImATeapot("teapot time"))
+          _ => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 
         status(result) mustBe IM_A_TEAPOT

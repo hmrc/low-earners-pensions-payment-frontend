@@ -53,7 +53,7 @@ abstract class LeppBaseController @Inject()(identify: IdentifierAction,
       case (_, PaymentCalcBreakdownPage) => DashboardPage
       case (_, WhatAreYourBankDetailsPage) => PaymentCalcBreakdownPage
       case (_, CheckYourAnswersPage) => WhatAreYourBankDetailsPage
-      case (_, ConfirmationPage) => DashboardPage
+      case (_, SubmissionPage) => DashboardPage
       case _ => WhatYouWillNeedPage
     }
     backPage.route(mode)
@@ -72,7 +72,7 @@ trait SessionDataHandling {
 
   protected[controllers] def handleWithSubmissionCheck(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     handle { implicit req =>
-      req.userAnswers.get(CheckYourAnswersPage) match {
+      req.userAnswers.get(SubmissionPage) match {
         case Some(true) =>
           Future.successful(Redirect(routes.ClearCacheController.onPageLoad()))
         case _ => f(req)
@@ -96,16 +96,16 @@ trait SessionDataHandling {
     }
   }
 
-  def handleForConfirmationPage(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    handle { implicit req =>
+  def handleForConfirmationPage(f: BlockFor[(LeppSummary, BankAccountDetails, LeppSummary)]): Action[AnyContent] =
+    handleWithSubmissionCheck { implicit req =>
       import req.userAnswers
 
       val leppDataOpt: Option[LeppSummary] = userAnswers.get(DashboardPage)
       val bankDetailsOpt: Option[BankAccountDetails] = userAnswers.get(WhatAreYourBankDetailsPage)
-      val cyaSubmissionOpt: Option[Boolean] = userAnswers.get(CheckYourAnswersPage)
+      val cyaSubmissionOpt: Option[LeppSummary] = userAnswers.get(CheckYourAnswersPage)
 
       (leppDataOpt, bankDetailsOpt, cyaSubmissionOpt) match {
-        case (Some(_), Some(_), Some(true)) => f(req)
+        case (Some(leppData), Some(bankDetails), Some(cyaSubmission)) => f(req)(leppData,bankDetails,cyaSubmission)
         case (Some(_), Some(_), _) => CheckYourAnswersPage.asFutureRedirect
         case (Some(_), None, _) => WhatAreYourBankDetailsPage.asFutureRedirect
         case _ => DashboardPage.asFutureRedirect

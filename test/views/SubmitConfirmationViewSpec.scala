@@ -17,6 +17,7 @@
 package views
 
 import base.SpecBase
+import models.userAnswers.LeppSummary
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalactic.Prettifier.default
@@ -24,6 +25,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import utils.CurrencyFormats
 import views.html.SubmitConfirmationView
 
 class SubmitConfirmationViewSpec extends SpecBase {
@@ -46,16 +48,27 @@ class SubmitConfirmationViewSpec extends SpecBase {
 
       view.text.contains(messages(app)("submitted.on"))
     }
+
+    "display correct accepted payments" in new Setup(summaryModel.copy(availableItems = None,
+      acceptedItems = summaryModel.availableItems)) {
+      
+      val taxYear: Int = summaryModel.availableItems.get.head.taxYear
+      val entitlement: BigDecimal = summaryModel.availableItems.get.head.entitlement
+      view.getElementById("confirmation_table_accepted_payments_header_taxYear").text() mustBe messages(app)("confirmation.table.header.taxYear")
+      view.getElementById("confirmation_table_accepted_payments_header_amount").text() mustBe messages(app)("confirmation.table.header.amount")
+      view.getElementById(s"taxYear_$taxYear").text() mustBe messages(app)("common.taxYearDates", s"$taxYear", s"${taxYear + 1}")
+      view.getElementById(s"entitlement_$taxYear").text() mustBe CurrencyFormats.format(entitlement)
+    }
   }
 
-  trait Setup {
+  trait Setup(leppSummary: LeppSummary = LeppSummary(1)) {
 
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[SubmitConfirmationView].apply("").body
+      app.injector.instanceOf[SubmitConfirmationView].apply(leppSummary, "").body
     )
   }
 

@@ -16,16 +16,17 @@
 
 package services
 
-import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import connectors.{AcceptLeppPaymentConnector, ConnectorResponse}
+import connectors.AcceptLeppPaymentConnector
 import models.ResponseWrapper.SuccessWrapper
 import models.backend.accept.*
-import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary}
+import models.userAnswers.{BankAccountDetails, LeppSummary}
 import models.{CorrelationId, ResponseWrapper}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.Constants
 
+import scala.+:
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -33,30 +34,29 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
   protected[services] def submitSingle(acceptLeppPaymentRequest: AcceptLeppPaymentRequest)
                                       (implicit hc: HeaderCarrier,
                                        ec: ExecutionContext,
-                                       cid: CorrelationId): ConnectorResponse[AcceptLeppPaymentResponse] = {
-    connector.acceptPayment(acceptLeppPaymentRequest).map(success =>
-        if (success.correlationId.value == "NO_CORRELATION_ID_IN_RESPONSE")
-          success.copy(correlationId = cid)
-        else
-          success
-    )
-  }
+                                       cid: CorrelationId): Future[ResponseWrapper[AcceptLeppPaymentResponse]] =
+    connector.acceptPayment(acceptLeppPaymentRequest).value.map {
+      case Right(success) if success.correlationId.value == Constants.noCorrelationIdString => success.copy(correlationId = cid)
+      case Right(success) => success
+      case Left(e) => SuccessWrapper(AcceptLeppPaymentResponse(0), e.correlationId)
+    }
 
   def submitMultiple(nino: Nino, bankAccountDetails: BankAccountDetails, leppSummary: LeppSummary)
                     (implicit hc: HeaderCarrier,
                      ec: ExecutionContext,
-                     cid: CorrelationId): ConnectorResponse[AcceptLeppPaymentResponse] = {
+                     cid: CorrelationId): Future[ResponseWrapper[LeppSummary]] = {
     def doSubmit(nino: Nino,
                  bankAccountDetails: BankAccountDetails,
                  currentLeppLock: BigInt,
-                 toSubmit: Seq[LeppItem])
+                 toSubmit: LeppSummary)
                 (implicit hc: HeaderCarrier,
                  ec: ExecutionContext,
-                 cid: CorrelationId): ConnectorResponse[AcceptLeppPaymentResponse] = {
-      toSubmit match {
-        case Nil => EitherT(Future.successful(Right(
-          SuccessWrapper(value = AcceptLeppPaymentResponse(currentLeppLock), correlationId = cid)
-        )))
+                 cid: CorrelationId): Future[ResponseWrapper[LeppSummary]] = {
+      toSubmit.availableItems.getOrElse(Nil) match {
+        case Nil =>
+          val remainingAvailableItems = leppSummary.availableItems.getOrElse(Nil)
+            .filterNot(item => toSubmit.acceptedItems.getOrElse(Nil).contains(item))
+          Future.successful(SuccessWrapper(toSubmit.copy(availableItems = Some(remainingAvailableItems)), correlationId = cid))
         case nextItem +: remainingItems =>
           val acceptLeppPaymentRequest: AcceptLeppPaymentRequest = AcceptLeppPaymentRequest(
             identifier = nino,
@@ -66,24 +66,29 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
               lowEarnersAccountDetails = bankAccountDetails
             )
           )
-          
+
           submitSingle(acceptLeppPaymentRequest).flatMap(success =>
             implicit val newCid: CorrelationId = success.correlationId
+            val (accepted, available) =
+              if(success.value.updatedLowEarnersOptimisticLock == 0) (Some(toSubmit.acceptedItems.getOrElse(Nil)), None)
+              else (Some(toSubmit.acceptedItems.getOrElse(Nil) :+ nextItem), Some(remainingItems))
             doSubmit(
               nino = nino,
               bankAccountDetails = bankAccountDetails,
               currentLeppLock = success.value.updatedLowEarnersOptimisticLock,
-              toSubmit = remainingItems
+              toSubmit = leppSummary.copy(currentLock = success.value.updatedLowEarnersOptimisticLock,
+                availableItems = available,
+                acceptedItems = accepted)
             )
           )
       }
     }
-    
+
     doSubmit(
       nino = nino,
       bankAccountDetails = bankAccountDetails,
       currentLeppLock = leppSummary.currentLock,
-      toSubmit = leppSummary.availableItems.getOrElse(Nil)
+      toSubmit = leppSummary
     )
   }
 }

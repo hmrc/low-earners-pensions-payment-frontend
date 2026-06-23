@@ -17,8 +17,10 @@
 package controllers
 
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import pages.SubmissionPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionCacheService
 import utils.{DateTime, DateTimeFormats}
 import views.html.SubmitConfirmationView
 
@@ -30,11 +32,21 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
                                              getData: DataRetrievalAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              confirmationView: SubmitConfirmationView,
-                                             dateTime: DateTime)
+                                             dateTime: DateTime,
+                                             val sessionService: SessionCacheService)
                                             (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling:
 
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
 
-    Future.successful(Ok(confirmationView(DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))))
+    (_, _, leppSubmissionSummary) =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, true))
+          _ <- sessionService.save(updatedAnswers)
+        } yield {
+          if (leppSubmissionSummary.acceptedItems.getOrElse(Nil).nonEmpty) {
+            Ok(confirmationView(leppSubmissionSummary,
+              DateTimeFormats.getCurrentDateTimestamp(dateTime.now())))
+          } else Redirect(routes.SomethingWentWrongController.onPageLoad())
+        }
   }

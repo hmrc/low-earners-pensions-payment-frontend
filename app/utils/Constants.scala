@@ -20,4 +20,5 @@ object Constants {
 
   val ptaEnrolmentKey: String = "HMRC-PI"
   val correlationIdKey: String = "correlationId"
+  val noCorrelationIdString: String = "NO_CORRELATION_ID_IN_RESPONSE"
 }

@@ -21,7 +21,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ErrorTemplate
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -31,8 +30,7 @@ class ClearCacheController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  sessionCacheService: SessionCacheService,
-  view: ErrorTemplate
+  sessionCacheService: SessionCacheService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -42,14 +40,6 @@ class ClearCacheController @Inject()(
       .clear(request.userAnswers)
       .map { _ =>
         Redirect(routes.DashboardController.onPageLoad().url)
-      }
-  }
-
-  def defaultError(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    sessionCacheService
-      .clear(request.userAnswers)
-      .map { _ =>
-        Ok(view(heading = request.messages(messagesApi).messages("journeyRecovery.startAgain.heading")))
       }
   }
 }
