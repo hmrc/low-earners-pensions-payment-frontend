@@ -47,3 +47,4 @@ GET    /account/timeout                         controllers.auth.AuthController.
 # Session actions
 GET    /refresh-session                         controllers.KeepAliveController.keepAlive()
 GET    /clear-cache                             controllers.ClearCacheController.onPageLoad()
+GET    /clear-cache-error                       controllers.ClearCacheController.defaultError()
