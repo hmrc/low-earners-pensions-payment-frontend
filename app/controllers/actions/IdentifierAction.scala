@@ -43,7 +43,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
   override def parser: BodyParser[AnyContent] = playBodyParsers
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-    val mc: MethodContext = MethodContext("invokeBlock")
+    given mc: MethodContext = MethodContext("invokeBlock")
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(Enrolment(Constants.ptaEnrolmentKey))
@@ -52,11 +52,11 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
           if(confidenceLevel >= config.confidenceLevelMinimum) {
             block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
           }else {
-            logger.info(mc, "User has insufficient confidence level. Redirecting to IV uplift journey")
+            logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
             Future.successful(Redirect(config.ivUpliftUrl))
           }
         case _ =>
-          logger.info(mc, "User doesn't have PTA enrolment, not authorised to access this service.")
+          logger.info("User doesn't have PTA enrolment, not authorised to access this service.")
           Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
       } recoverWith {
       case _: NoActiveSession =>

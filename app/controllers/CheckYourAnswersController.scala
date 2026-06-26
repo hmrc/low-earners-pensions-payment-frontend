@@ -77,7 +77,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            (implicit hc: HeaderCarrier,
                                             ec: ExecutionContext,
                                             cid: CorrelationId): Future[Result] = {
-    val mc: MethodContext = MethodContext("handleWithBars")
+    given mc: MethodContext = MethodContext("handleWithBars")
     
     barsService
       .checkBankAccountDetails(bankDetails.toBarsRequest)
@@ -85,10 +85,10 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
           barsVerifyStatusConnector
             .update().map { _ =>
-              logger.info(mc, s"Bars VerifyStatus update successful for correlationId : $cid" 
+              logger.info(s"Bars VerifyStatus update successful for correlationId : $cid" 
               )
             } recover { case e =>
-            logger.error(mc, s"Bars VerifyStatus update failed for: correlationId : $cid"
+            logger.error(s"Bars VerifyStatus update failed for: correlationId : $cid"
             )
           }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())

@@ -21,5 +21,5 @@ import scala.language.implicitConversions
 case class CorrelationId(value: String)
 
 object CorrelationId {
-  implicit def toString(correlationId: CorrelationId): String = correlationId.value
+  given toStringImpl: Conversion[CorrelationId, String] = (cid: CorrelationId) => cid.value
 }

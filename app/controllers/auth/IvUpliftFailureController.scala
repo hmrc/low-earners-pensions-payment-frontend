@@ -28,8 +28,9 @@ class IvUpliftFailureController @Inject()(val controllerComponents: MessagesCont
                                           view: IvUpliftFailureView) extends FrontendBaseController with I18nSupport with Logging:
   def onPageLoad(journeyId: Option[String]): Action[AnyContent] = Action:
     implicit * =>
+      given mc: MethodContext =  MethodContext("onPageLoad")
+      
       logger.info(
-        mc = MethodContext("onPageLoad"),
         msg = s"IV uplift journey failed for user with journeyId: ${journeyId.getOrElse("N/A")}"
       )
       Ok(view())

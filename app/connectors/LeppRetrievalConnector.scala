@@ -38,9 +38,9 @@ class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClient
                                       ec: ExecutionContext,
                                       correlationId: CorrelationId): ConnectorResponse[RetrieveLeppDetailsResponse] = {
     val getPaymentDetailsUrl = url"${config.getPaymentsUrl}"
-    val methodLoggingContext: MethodContext = MethodContext("retrieveLeppDetails")
+    given methodLoggingContext: MethodContext = MethodContext("retrieveLeppDetails")
 
-    logger.info(methodLoggingContext, s"Calling NPS for the payment details with correlationId - $correlationId")
+    logger.info(s"Calling NPS for the payment details with correlationId - $correlationId")
 
     EitherT(
       httpClient

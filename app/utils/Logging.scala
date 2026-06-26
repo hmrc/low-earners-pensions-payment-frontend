@@ -38,16 +38,16 @@ object MethodContext {
 trait Logging {
   private val classLoggingContext: ClassContext = ClassContext(this.getClass.getSimpleName.replace("$", ""))
   val logger: LoggerWithContext = LoggerWithContext(Logger(this.getClass), classLoggingContext)
-  def infoLogger(mc: MethodContext): String => Unit = (msg: String) => logger.info(mc, msg)
-  def warnLogger(mc: MethodContext): String => Unit = (msg: String) => logger.warn(mc, msg)
-  def errorLogger(mc: MethodContext): (String, Option[Throwable]) => Unit = (msg: String, exOpt: Option[Throwable]) =>
-    exOpt.fold(logger.warn(mc, msg))(ex => logger.error(mc, msg, ex))
+  def infoLogger(using mc: MethodContext): String => Unit = (msg: String) => logger.info(msg)
+  def warnLogger(using mc: MethodContext): String => Unit = (msg: String) => logger.warn(msg)
+  def errorLogger(using mc: MethodContext): (String, Option[Throwable]) => Unit = (msg: String, exOpt: Option[Throwable]) =>
+    exOpt.fold(logger.warn(msg))(ex => logger.error(msg, ex))
 }
 
 case class LoggerWithContext(underlying: Logger, cc: ClassContext) {
   private val logger: slf4j.Logger = underlying.logger
-  def info(mc: MethodContext, msg: String): Unit = logger.info(s"[$cc][$mc] - $msg")
-  def warn(mc: MethodContext, msg: String): Unit = logger.warn(s"[$cc][$mc] - $msg")
-  def error(mc: MethodContext, msg: String): Unit = logger.error(s"[$cc][$mc] - $msg")
-  def error(mc: MethodContext, msg: String, ex: Throwable): Unit = logger.error(s"[$cc][$mc] - $msg", ex)
+  def info(msg: String)(using mc: MethodContext): Unit = logger.info(s"[$cc][$mc] - $msg")
+  def warn(msg: String)(using mc: MethodContext): Unit = logger.warn(s"[$cc][$mc] - $msg")
+  def error(msg: String)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg")
+  def error(msg: String, ex: Throwable)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg", ex)
 }
