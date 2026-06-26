@@ -18,9 +18,22 @@ package utils
 
 import org.slf4j
 import play.api.Logger
-import utils.LogContext.{ClassContext, MethodContext}
 
 import scala.language.implicitConversions
+
+opaque type ClassContext = String
+
+object ClassContext {
+  def apply(str: String): ClassContext = str
+  given toStringImpl: Conversion[ClassContext, String] = (cc: ClassContext) => cc
+}
+
+opaque type MethodContext = String
+
+object MethodContext {
+  def apply(str: String): MethodContext = str
+  given toStringImpl: Conversion[MethodContext, String] = (mc: MethodContext) => mc
+}
 
 trait Logging {
   private val classLoggingContext: ClassContext = ClassContext(this.getClass.getSimpleName.replace("$", ""))
@@ -38,14 +51,3 @@ case class LoggerWithContext(underlying: Logger, cc: ClassContext) {
   def error(mc: MethodContext, msg: String): Unit = logger.error(s"[$cc][$mc] - $msg")
   def error(mc: MethodContext, msg: String, ex: Throwable): Unit = logger.error(s"[$cc][$mc] - $msg", ex)
 }
-
-enum LogContext(str: String) {
-  override def toString: String = str
-  case ClassContext(str: String) extends LogContext(str)
-  case MethodContext(str: String) extends LogContext(str)
-}
-
-object LogContext {
-  implicit def stringToMethodContext(str: String): MethodContext = MethodContext(str)
-}
-

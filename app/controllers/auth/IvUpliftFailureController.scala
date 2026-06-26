@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.Logging
+import utils.{Logging, MethodContext}
 import views.html.auth.IvUpliftFailureView
 
 @Singleton
@@ -28,5 +28,8 @@ class IvUpliftFailureController @Inject()(val controllerComponents: MessagesCont
                                           view: IvUpliftFailureView) extends FrontendBaseController with I18nSupport with Logging:
   def onPageLoad(journeyId: Option[String]): Action[AnyContent] = Action:
     implicit * =>
-      logger.info("onPageLoad", s"IV uplift journey failed for user with journeyId: ${journeyId.getOrElse("N/A")}")
+      logger.info(
+        mc = MethodContext("onPageLoad"),
+        msg = s"IV uplift journey failed for user with journeyId: ${journeyId.getOrElse("N/A")}"
+      )
       Ok(view())

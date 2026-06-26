@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
-import utils.Logging
+import utils.{Logging, MethodContext}
 
 import scala.concurrent.ExecutionContext
 
@@ -38,7 +38,7 @@ class LeppRetrievalConnector @Inject()(config: AppConfig, httpClient: HttpClient
                                       ec: ExecutionContext,
                                       correlationId: CorrelationId): ConnectorResponse[RetrieveLeppDetailsResponse] = {
     val getPaymentDetailsUrl = url"${config.getPaymentsUrl}"
-    val methodLoggingContext: String = "retrieveLeppDetails"
+    val methodLoggingContext: MethodContext = MethodContext("retrieveLeppDetails")
 
     logger.info(methodLoggingContext, s"Calling NPS for the payment details with correlationId - $correlationId")
 

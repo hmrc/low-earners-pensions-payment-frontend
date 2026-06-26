@@ -28,7 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{CorrelationIdHandler, Logging}
+import utils.{CorrelationIdHandler, Logging, MethodContext}
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.CheckYourAnswersView
@@ -76,19 +76,19 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
   protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])
                                            (implicit hc: HeaderCarrier,
                                             ec: ExecutionContext,
-                                            cid: CorrelationId): Future[Result] =
+                                            cid: CorrelationId): Future[Result] = {
+    val mc: MethodContext = MethodContext("handleWithBars")
+    
     barsService
       .checkBankAccountDetails(bankDetails.toBarsRequest)
       .leftMap {
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
           barsVerifyStatusConnector
             .update().map { _ =>
-              logger.info("[CheckYourAnswersController][handleWithBars] ",
-                s"Bars VerifyStatus update successful for correlationId : $cid" 
+              logger.info(mc, s"Bars VerifyStatus update successful for correlationId : $cid" 
               )
             } recover { case e =>
-            logger.error("[CheckYourAnswersController][handleWithBars] ",
-              s"Bars VerifyStatus update failed for: correlationId : $cid"
+            logger.error(mc, s"Bars VerifyStatus update failed for: correlationId : $cid"
             )
           }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())
@@ -97,4 +97,5 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       }
       .semiflatMap(_ => f())
       .merge
+  }
 }

@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.{Constants, Logging}
+import utils.{Constants, Logging, MethodContext}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +43,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
   override def parser: BodyParser[AnyContent] = playBodyParsers
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-    val logContext: String = "[AuthenticatedIdentifierAction][invokeBlock] - "
+    val mc: MethodContext = MethodContext("invokeBlock")
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(Enrolment(Constants.ptaEnrolmentKey))
@@ -52,17 +52,17 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
           if(confidenceLevel >= config.confidenceLevelMinimum) {
             block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
           }else {
-            logger.info("invokeBlock", "User has insufficient confidence level. Redirecting to IV uplift journey")
+            logger.info(mc, "User has insufficient confidence level. Redirecting to IV uplift journey")
             Future.successful(Redirect(config.ivUpliftUrl))
           }
         case _ =>
-          logger.info("invokeBlock", "User doesn't have PTA enrolment, not authorised to access this service.")
+          logger.info(mc, "User doesn't have PTA enrolment, not authorised to access this service.")
           Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
       } recoverWith {
       case _: NoActiveSession =>
         Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
       case err: AuthorisationException =>
-        logger.underlying.error(logContext + s"An authorisation error occurred with message", err)
+        logger.underlying.error(s"[${logger.cc}][$mc] - " + s"An authorisation error occurred with message", err)
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
     }
   }
