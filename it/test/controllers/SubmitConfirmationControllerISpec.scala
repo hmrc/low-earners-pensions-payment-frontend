@@ -64,7 +64,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         )
         
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldEqual Some(routes.SomethingWentWrongController.onPageLoad().url)
+        redirectLocation(result) shouldEqual Some(routes.ClearCacheController.defaultError().url)
       }
 
       "redirect to clear cache controller when already accepted payments" in {

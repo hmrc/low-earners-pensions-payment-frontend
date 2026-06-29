@@ -14,18 +14,17 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+
 @this(
-layout: templates.Layout
+    layout: templates.Layout,
+    header: h1
 )
 
 @(pageTitle: String = "", heading: String, message: String = "")(implicit rh: RequestHeader, messages: Messages)
 
-@layout(
-pageTitle = titleNoForm("journeyRecovery.startAgain.title"),
-withReportTechnicalIssueLink = false
-) {
-<h1 class="govuk-heading-l">@messages(heading)</h1>
-
-<p class="govuk-body">@messages("journeyRecovery.try.again") <a class="govuk-link" href="https://www.gov.uk/find-hmrc-contacts/pension-schemes-general-enquiries">@messages("journeyRecovery.contact")</a></p>
+@layout(pageTitle = titleNoForm(pageTitle)) {
+    @header(messages(heading))
+    <p class="govuk-body">@messages(message)</p>
 }
 

@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 class ClearCacheControllerSpec extends SpecBase with MockitoSugar {
 
   val userAnswers: UserAnswers = emptyUserAnswers
-    .set(page = WhatAreYourBankDetailsPage, value = BankAccountDetails("Pearl Harvey", "207106", "44311677", None))
+    .set(page = WhatAreYourBankDetailsPage, value = accountDetails)
     .success
     .value
 
@@ -35,13 +35,25 @@ class ClearCacheControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
-
         val request = FakeRequest(GET, routes.ClearCacheController.onPageLoad().url)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.DashboardController.onPageLoad().url
+      }
+    }
+  }
+
+  "defaultError" - {
+    "when the user clicked service name on banner" in {
+      val application = applicationBuilder(userAnswers = userAnswers).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.ClearCacheController.defaultError().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SomethingWentWrongController.onPageLoad().url
       }
     }
   }

@@ -47,6 +47,6 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
           if (leppSubmissionSummary.acceptedItems.getOrElse(Nil).nonEmpty) {
             Ok(confirmationView(leppSubmissionSummary,
               DateTimeFormats.getCurrentDateTimestamp(dateTime.now())))
-          } else Redirect(routes.SomethingWentWrongController.onPageLoad())
+          } else Redirect(routes.ClearCacheController.defaultError())
         }
   }

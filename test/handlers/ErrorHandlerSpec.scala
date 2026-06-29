@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package handlers
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
+import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import play.twirl.api.Html
+import views.html.SomethingWentWrongView
+import views.html.templates.ErrorTemplate
 
 class ErrorHandlerSpec extends AnyWordSpec
   with Matchers
@@ -35,8 +41,22 @@ class ErrorHandlerSpec extends AnyWordSpec
 
   private val fakeRequest = FakeRequest("GET", "/")
   private val handler     = app.injector.instanceOf[ErrorHandler]
+  private val messages = app.injector.instanceOf[MessagesApi].preferred(fakeRequest)
+  
+  "internalServerErrorTemplate" should{
+    "render the expected view" in {
+      implicit val request: RequestHeader = fakeRequest
+      val view: SomethingWentWrongView = app.injector.instanceOf[SomethingWentWrongView]
+      val result: Html = await(handler.internalServerErrorTemplate)
+      result shouldBe view()(fakeRequest, messages)
+      result.contentType shouldBe "text/html"
+    } 
+  }
 
   "standardErrorTemplate" should:
-    "render HTML" in:
-      val html = handler.standardErrorTemplate("title", "heading", "message")(fakeRequest).futureValue
-      html.contentType shouldBe "text/html"
+    "render the expected view" in:
+      implicit val request: RequestHeader = fakeRequest
+      val view: ErrorTemplate = app.injector.instanceOf[ErrorTemplate]
+      val result: Html = await(handler.standardErrorTemplate("title", "heading", "message"))
+      result shouldBe view("title", "heading", "message")(request, messages)
+      result.contentType shouldBe "text/html"

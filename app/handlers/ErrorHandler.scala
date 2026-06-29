@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package config
+package handlers
 
 import play.api.i18n.MessagesApi
-import play.api.mvc.RequestHeader
+import play.api.mvc.{AnyContentAsEmpty, Request, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
-import views.html.ErrorTemplate
+import views.html.SomethingWentWrongView
+import views.html.templates.ErrorTemplate
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(
-  errorTemplate: ErrorTemplate,
-  val messagesApi: MessagesApi
-)(using
-  val ec: ExecutionContext
-) extends FrontendErrorHandler:
+class ErrorHandler @Inject()(somethingWentWrongView: SomethingWentWrongView,
+                             errorTemplate: ErrorTemplate,
+                             val messagesApi: MessagesApi)
+                            (using val ec: ExecutionContext) extends FrontendErrorHandler:
 
-  override def standardErrorTemplate(
-    pageTitle: String,
-    heading: String,
-    message: String
-  )(implicit request: RequestHeader): Future[Html] =
+  override def internalServerErrorTemplate(using request: RequestHeader): Future[Html] = {
+    given req: Request[AnyContentAsEmpty.type] = Request(request, AnyContentAsEmpty)
+    Future.successful(somethingWentWrongView())
+  }
+
+  override def standardErrorTemplate(pageTitle: String,
+                                     heading: String, 
+                                     message: String)(using request: RequestHeader): Future[Html] =
     Future.successful(errorTemplate(pageTitle, heading, message))
