@@ -32,7 +32,7 @@ object BreakdownUtils {
 
   private[paymentBreakdown] def underPaymentSummaryListRows(item: LeppItem, originalAmount: BigDecimal)(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(SummaryListRow(
-      Key(HtmlContent(messages("breakdown.underpayment.l1", item.taxYear.toString, (item.taxYear + 1).toString))),
+      Key(HtmlContent(messages("breakdown.underpayment.l1"))),
       Value(HtmlContent(CurrencyFormats.format(item.entitlement + originalAmount)), classes = "right-align")))
       ++
       Seq(SummaryListRow(

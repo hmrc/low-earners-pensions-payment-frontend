@@ -55,8 +55,8 @@ breakdown.l1 = Your net pay pension contributions
 breakdown.l2 = Your relevant basic tax rate
 breakdown.l3 = Your payment
 
-breakdown.underpayment.l1 = Your new total top-up for the tax year 6 April {0} to 5 April {1}
-breakdown.underpayment.l2 = Top-up already received
+breakdown.underpayment.l1 = Your new total amount
+breakdown.underpayment.l2 = Amount already received
 breakdown.underpayment.l3 = Additional amount due
 
 breakdown.p2 = If you think the amounts are wrong, you can

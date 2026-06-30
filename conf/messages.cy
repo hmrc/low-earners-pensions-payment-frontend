@@ -55,8 +55,8 @@ breakdown.l1 = Eich cyfraniadau pensiwn cyflog net
 breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
 breakdown.l3 = Eich taliad
 
-breakdown.underpayment.l1 = Eich cyfanswm newydd atodol Ar gyfer blwyddyn dreth 6 Ebrill {0} to 5 Ebrill {1}
-breakdown.underpayment.l2 = Derbyniwyd y tâl ychwanegol eisoes
+breakdown.underpayment.l1 = Eich cyfanswm newydd
+breakdown.underpayment.l2 = Swm a dderbyniwyd eisoes
 breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
 breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir

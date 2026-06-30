@@ -102,7 +102,7 @@ class BreakdownUtilsSpec extends SpecBase {
         val summaryListRows: Seq[SummaryListRow] = BreakdownUtils.underPaymentSummaryListRows(underPaymentItem, originalAmount)
         summaryListRows must have length 3
         summaryListRows.head.key.content.asHtml.toString mustBe
-          fakeMessages("breakdown.underpayment.l1", taxYear.toString, (taxYear+1).toString)
+          fakeMessages("breakdown.underpayment.l1")
         summaryListRows.head.value.content.asHtml.toString mustBe "£300"
         summaryListRows(1).key.content.asHtml.toString mustBe fakeMessages("breakdown.underpayment.l2")
         summaryListRows(1).value.content.asHtml.toString mustBe "£100"
@@ -137,7 +137,7 @@ class BreakdownUtilsSpec extends SpecBase {
         val summaryListRows: Seq[SummaryListRow] = summaryList.rows
         commonAssertions(summaryListRows)
         summaryListRows(2).key.content.asHtml.toString mustBe
-          fakeMessages("breakdown.underpayment.l1", taxYear.toString, (taxYear+1).toString)
+          fakeMessages("breakdown.underpayment.l1")
         summaryListRows(2).value.content.asHtml.toString mustBe "£300"
         summaryListRows(3).key.content.asHtml.toString mustBe fakeMessages("breakdown.underpayment.l2")
         summaryListRows(3).value.content.asHtml.toString mustBe "£100"
