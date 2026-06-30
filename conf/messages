@@ -47,7 +47,7 @@ dashboard.lockout.title = Important
 dashboard.lockout.message = You''ve tried to enter your bank account details too many times. You can try again after {0}.
 
 # Calculation Breakdown page
-breakdown.title = Payment calculation breakdown page
+breakdown.title = Your payment breakdown
 breakdown.heading = You''re eligible for a total of {0}
 breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
 breakdown.u1 = For the tax year 6 April {0} to 5 April {1}
@@ -64,7 +64,7 @@ breakdown.p2.a1 = contact us (opens in new tab)
 breakdown.p3 = To accept these payments, you need to provide us with your bank details.
 
 # Bank account details page
-bankDetails.title = Bank details
+bankDetails.title = What are your bank details?
 bankDetails.heading = What are your bank details?
 bankDetails.securityInset = For your security, we do not save your bank details.
 bankDetails.accountName = Name on the account
