@@ -26,11 +26,20 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(paymentSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean = false, itemId: Option[String] = None)(implicit request: Request[_], messages: Messages)
+@(
+    paymentSummary: LeppSummary, 
+    continueUrl: String, 
+    backUrl: Option[String] = None, 
+    barsLockFlag: Boolean = false, 
+    itemId: Option[String] = None
+)(
+    implicit request: Request[_],
+    messages: Messages
+)
 
 @layout(
     pageTitle = titleNoForm(messages("breakdown.title")),
-    backLinkUrl = None
+    backLinkUrl = backUrl
 ) {
     @heading(messages("breakdown.heading", paymentSummary.totalEntitlementString), headerSize = "l")
 

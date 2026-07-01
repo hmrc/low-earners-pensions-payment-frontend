@@ -53,7 +53,11 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
           FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(None).url)
         
         val result = route(application, request).value
-        contentAsString(result) mustEqual view(summaryModel, routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          summaryModel,
+          routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
+          Some(routes.DashboardController.onPageLoad().url)
+        )(request, messages(application)).toString
         status(result) mustEqual OK
       }
     }
@@ -67,8 +71,13 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
           FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(Some("P-25-1")).url)
 
         val result = route(application, request).value
-        contentAsString(result) mustEqual view(summaryModel,
-          routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url, false, Some("P-25-1"))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          summaryModel,
+          routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
+          Some(routes.DashboardController.onPageLoad().url),
+          false,
+          Some("P-25-1")
+        )(request, messages(application)).toString
         status(result) mustEqual OK
       }
     }
