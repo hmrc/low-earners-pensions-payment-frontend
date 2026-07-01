@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
@@ -65,11 +66,13 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
       
       handleWithBars(bankDetails)(() => {
-        for {
-          leppSummary <- leppSubmissionService.submitMultiple(req.user.nino, bankDetails, leppData)
-          updatedAnswers <- Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value))
-          _ <- sessionService.save(updatedAnswers)
+        val result = for {
+          leppSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppData, bankDetails)
+          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value)))
+          _ <- EitherT.right(sessionService.save(updatedAnswers))
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
+        
+        result.leftMap(_ => Redirect(routes.ClearCacheController.defaultError())).merge
       })
   }
 
