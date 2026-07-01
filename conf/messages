@@ -17,7 +17,6 @@ whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
 dashboard.title = Your low earner''s pension payments
 dashboard.heading = Your low earner''s pension payments
 dashboard.moreInformation = For more information,
-dashboard.contactUs = contact us (opens in new tab)
 dashboard.availablePayments.heading = Available payments
 dashboard.availablePayments.noneAvailable = You do not have any available payments.
 dashboard.availablePayments.totalAvailableText.start = You have a total of
@@ -60,7 +59,6 @@ breakdown.underpayment.l2 = Amount already received
 breakdown.underpayment.l3 = Additional amount due
 
 breakdown.p2 = If you think the amounts are wrong, you can
-breakdown.p2.a1 = contact us (opens in new tab)
 breakdown.p3 = To accept these payments, you need to provide us with your bank details.
 
 # Bank account details page
@@ -121,7 +119,7 @@ barsRequestErrors.u1.l1 = a bank account roll number was not supplied for a buil
 barsRequestErrors.u1.l2 = the supplied account does not support direct credit
 barsRequestErrors.u1.l3 = no account with the supplied details could be found
 barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
-barsRequestErrors.p2 = If this issue persists you may have to contact HMRC
+barsRequestErrors.p2 = If this issue persists you may have to
 
 # Bars check failure page
 barsCheckFailed.title = We could not verify your bank account details
@@ -146,12 +144,6 @@ ineligible.guidance.postform = . We will respond to you within 5 working days.
 somethingWentWrong.title = Sorry, there is a problem with the service
 somethingWentWrong.heading = Sorry, there is a problem with the service
 somethingWentWrong.p1 = You can try again later.
-
-# Journey recovery page
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.try.again = You can try again later or
-journeyRecovery.contact = contact us for help with pension scheme queries
 
 # Session timeout page
 sessionTimeout.title = For your security, we signed you out
@@ -194,6 +186,7 @@ month.12 = December
 # Common content
 common.signOut = Sign out
 common.taxYearDates = 6 April {0} to 5 April {1}
+common.contactUs = contact us (opens in new tab).
 site.start = Start now
 site.change = Change
 site.continue = Continue

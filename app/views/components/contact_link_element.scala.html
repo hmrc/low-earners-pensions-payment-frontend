@@ -22,8 +22,11 @@
     config: AppConfig
 )
 
-@()(implicit messages: Messages)
+@(preContentOpt: Option[String] = None)(implicit messages: Messages)
 
-@messages("dashboard.moreInformation")
-@linkElement(config.contactUrl, "dashboard.contactUs")
+@for(preContent <- preContentOpt) {
+    @messages(preContent)
+}
+
+@linkElement(config.contactUrl, "common.contactUs")
 

@@ -23,7 +23,8 @@
 @this(
     layout: templates.Layout,
     heading: h1,
-    govukSummaryList: GovukSummaryList
+    govukSummaryList: GovukSummaryList,
+    contactLinkElement: contact_link_element
 )
 
 @(
@@ -50,10 +51,7 @@
     }
 
     <p class="govuk-body">@messages("breakdown.p2")
-        <a class="govuk-link govuk-link--no-visited-state"
-           target="_blank" rel="noopener noreferrer"
-           href="https://www.gov.uk/contact-hmrc">@messages("breakdown.p2.a1")
-        </a>
+        @contactLinkElement()
     </p>
     <p class="govuk-body">@messages("breakdown.p3")</p>
 
