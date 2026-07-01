@@ -32,19 +32,20 @@ case class AuditDetail(
 )
 
 object AuditDetail {
-  private def taxYearString(taxYear: Int) = s"6 April $taxYear to 5 April ${taxYear+1}"
+  private def taxYearString(taxYear: BigInt) = s"6 April $taxYear to 5 April ${taxYear+1}"
   
   def apply(bankAccountDetails: BankAccountDetails,
             nino: Nino,
-            leppItem: LeppItem,
+            taxYear: BigInt,
+            entitlement: BigDecimal,
             paymentOutcome: PaymentOutcome): AuditDetail = AuditDetail(
     accountName = bankAccountDetails.accountName,
     accountNumber = bankAccountDetails.accountNumber,
     name = bankAccountDetails.accountName,
     nino = nino.nino, 
-    paymentAmount = leppItem.entitlement,
+    paymentAmount = entitlement,
     sortCode = bankAccountDetails.sortCode,
-    taxYear = taxYearString(leppItem.taxYear),
+    taxYear = taxYearString(taxYear),
     paymentOutcome = paymentOutcome
   )
   

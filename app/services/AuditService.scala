@@ -19,15 +19,19 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configuration) {
   
-  def auditSubmissionSuccess(nino: Nino, bankAccountDetails: BankAccountDetails, leppItem: LeppItem)
+  def auditSubmissionSuccess(nino: Nino,
+                             bankAccountDetails: BankAccountDetails,
+                             taxYear: BigInt,
+                             entitlement: BigDecimal)
                             (using HeaderCarrier, ExecutionContext): Unit = {
     val auditDetail: AuditDetail = AuditDetail(
       bankAccountDetails = bankAccountDetails,
       nino = nino,
-      leppItem = leppItem,
+      taxYear = taxYear,
+      entitlement = entitlement,
       paymentOutcome = pass
     )
-    
+
     val event: AuditEvent[AuditDetail] = AuditEvent(
       auditType = SUBMISSION_AUDIT_TYPE,
       transactionName = SUBMISSION_TRANSACTION_NAME,
@@ -40,7 +44,8 @@ class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configur
   
   def auditSubmissionFailure(nino: Nino,
                              bankAccountDetails: BankAccountDetails,
-                             leppItem: LeppItem,
+                             taxYear: BigInt,
+                             entitlement: BigDecimal,
                              wasSkipped: Boolean = false)
                             (using HeaderCarrier, ExecutionContext): Unit = {
     val paymentOutcome: PaymentOutcome = if (wasSkipped) skipped else fail
@@ -48,17 +53,18 @@ class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configur
     val auditDetail: AuditDetail = AuditDetail(
       bankAccountDetails = bankAccountDetails,
       nino = nino,
-      leppItem = leppItem,
+      taxYear = taxYear,
+      entitlement = entitlement,
       paymentOutcome = paymentOutcome
     )
-    
+
     val event: AuditEvent[AuditDetail] = AuditEvent(
       auditType = SUBMISSION_AUDIT_TYPE,
       transactionName = SUBMISSION_TRANSACTION_NAME,
       path = SUBMISSION_AUDIT_PATH,
       detail = auditDetail
     )
-    
+
     auditEvent(event)
   }
 
