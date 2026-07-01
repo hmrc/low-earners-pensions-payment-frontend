@@ -17,20 +17,22 @@
 package views.components.dashboard
 
 import base.SpecBase
+import config.AppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import views.html.components.dashboard.contact_link_element
+import views.html.components.contact_link_element
 
 class ContactLinkElementSpec extends SpecBase {
   "link_element" - {
     "should return the expected HTML element" in new Setup {
       val element: Document = view()
       element.html() must include("For more information,")
-      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" href="/">contact us (opens in new tab)</a>""")
+      val expectedContactLink: String = app.injector.instanceOf[AppConfig].contactUrl
+      element.html() must include(s"""<a class="govuk-link govuk-link--no-visited-state" href="$expectedContactLink">contact us (opens in new tab)</a>""")
     }
   }
   trait Setup {
