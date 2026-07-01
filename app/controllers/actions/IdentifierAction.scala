@@ -23,7 +23,7 @@ import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{ItmpName, Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.{Constants, Logging, MethodContext}
@@ -46,12 +46,19 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     given mc: MethodContext = MethodContext("invokeBlock")
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
+    val retrievals: Retrieval[Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName]] =
+      Retrievals.internalId and 
+        Retrievals.nino and
+        Retrievals.confidenceLevel and
+        Retrievals.authorisedEnrolments and
+        Retrievals.itmpName
+    
     authorised(Enrolment(Constants.ptaEnrolmentKey))
-      .retrieve(Retrievals.internalId and Retrievals.nino and Retrievals.confidenceLevel and Retrievals.authorisedEnrolments) {
-        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments if hasEnrolments(enrolments) =>
+      .retrieve(retrievals) {
+        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt if hasEnrolments(enrolments) =>
           if(confidenceLevel >= config.confidenceLevelMinimum) {
-            block(IdentifierRequest(request, AuthUser.apply(internalId, nino)))
-          }else {
+            block(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)))
+          } else {
             logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
             Future.successful(Redirect(config.ivUpliftUrl))
           }

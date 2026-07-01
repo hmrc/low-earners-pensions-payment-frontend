@@ -48,8 +48,7 @@ class BarsLockoutActionSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
       running(application) {
-
-        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser.apply("1", nino))
+        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser.apply("1", nino, None))
 
         val barsAction = new BarsLockoutActionRefiner(
           barsVerifyStatusConnector = mockBarsConnector,
@@ -77,7 +76,7 @@ class BarsLockoutActionSpec extends SpecBase {
 
       running(application) {
 
-        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser.apply("1", nino))
+        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser("1", nino, None))
 
         val barsAction = new BarsLockoutActionRefiner(
           barsVerifyStatusConnector = mockBarsConnector,
