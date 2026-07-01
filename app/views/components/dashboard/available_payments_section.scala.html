@@ -31,6 +31,8 @@
 
 @(leppSummary: LeppSummary, tableRef: String, continueUrl: String, barsLockFlag: Boolean)(implicit messages: Messages)
 
+@hasAvailableItems = @{leppSummary.availableItems.getOrElse(Nil).nonEmpty}
+
 @suspendedInsetContent = {
  @messages("dashboard.availablePayments.suspendedInset")
  @contactLinkElement()
@@ -48,7 +50,7 @@
   tableRef = tableRef
  ))
 
- @availableSummarySection(leppSummary.totalEntitlementString, continueUrl, barsLockFlag)
+ @availableSummarySection(leppSummary.totalEntitlementString, continueUrl, barsLockFlag, hasAvailableItems)
 
 } else {
  @heading(msgKey = messages("dashboard.availablePayments.heading"), headerSize = "m")
