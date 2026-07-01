@@ -270,8 +270,8 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
       headers = Map("correlationId" -> testCorrelationId)
     )
 
-    "backend returns an error for any LEPP submissions" should {
-      "redirect to SubmitConfirmationController" in {
+    "backend returns an error for first LEPP submission" should {
+      "redirect to ClearCacheController" in {
         mockAuthSuccess()
         mockBarsSuccess()
         mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
@@ -289,6 +289,109 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
           Future.failed(new RuntimeException("TEST_ERROR"))
         )
         
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe Some(routes.ClearCacheController.defaultError().url)
+      }
+    }
+
+    "backend returns an error for a non-first LEPP submission" should {
+      "redirect to SubmitConfirmationController" in {
+        mockAuthSuccess()
+        mockBarsSuccess()
+        mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
+
+        val summaryModel: LeppSummary = LeppSummary(
+          currentLock = 67,
+          availableItems = Some(Seq(
+            LeppItem(
+              id = "id-1",
+              taxYear = 2025,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Available,
+              claimDate = None
+            ),
+            LeppItem(
+              id = "id-2",
+              taxYear = 2026,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Available,
+              claimDate = None
+            )
+          )),
+          paidItems = Some(Seq(
+            LeppItem(
+              id = "id-3",
+              taxYear = 2024,
+              contributions = 1000,
+              taxRate = 20,
+              entitlement = 200,
+              status = Paid,
+              claimDate = Some(LocalDate.of(2025, 1, 1))
+            )
+          ))
+        )
+
+        val userAnswers: UserAnswers = UserAnswers(
+          id = "1",
+          data = Json.obj(
+            "leppSummary" -> Json.toJson(summaryModel),
+            "bankDetails" -> Json.toJson(bankAccountDetails)
+          )
+        )
+
+        val application: Application = applicationWithUserAnswers(userAnswers)
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        mockBackendResponse(
+          taxYear = 2025,
+          requestBody = Some(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock":67,
+              | "lowEarnersAccountDetails":{
+              |   "accountName":"Taxwell Payer",
+              |   "accountNumber":"12345678",
+              |   "sortCode":"112233",
+              |   "rollNumber":"1234678"
+              |   }
+              |}
+            """.stripMargin
+          ),
+          responseStatus = CREATED,
+          responseBody =
+            """
+              |{
+              | "updatedLowEarnersOptimisticLock": 68
+              |}
+            """.stripMargin
+        )
+
+        mockBackendResponse(
+          taxYear = 2026,
+          requestBody = Some(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock": 68,
+              | "lowEarnersAccountDetails":{
+              |   "accountName":"Taxwell Payer",
+              |   "accountNumber":"12345678",
+              |   "sortCode":"112233",
+              |   "rollNumber":"1234678"
+              | }
+              |}
+            """.stripMargin
+          ),
+          responseStatus = IM_A_TEAPOT,
+          responseBody = "TEAPOT_TIME"
+        )
+
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe Some(routes.SubmitConfirmationController.onPageLoad().url)
       }

@@ -17,12 +17,12 @@
 package pages
 
 import controllers.routes
-import models.userAnswers.LeppSummary
+import models.userAnswers.{LeppSummary, SubmissionSummary}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object CheckYourAnswersPage extends QuestionPage[LeppSummary] {
+case object CheckYourAnswersPage extends QuestionPage[SubmissionSummary] {
   override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
   override def path: JsPath = JsPath \ toString
   override def toString: String = "leppSubmissionSummary"

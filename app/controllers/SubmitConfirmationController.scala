@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import models.userAnswers.LeppItem
 import pages.SubmissionPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,16 +38,26 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
                                             (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling:
 
+  private def filterForIds(items: Option[Seq[LeppItem]], ids: Seq[String]): Seq[LeppItem] = 
+    items.getOrElse(Nil).filter(item => ids.contains(item.id))
+  
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
-
-    (_, _, leppSubmissionSummary) =>
+    (leppData, _, leppSubmissionSummary) =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, true))
           _ <- sessionService.save(updatedAnswers)
         } yield {
-          if (leppSubmissionSummary.acceptedItems.getOrElse(Nil).nonEmpty) {
-            Ok(confirmationView(leppSubmissionSummary,
-              DateTimeFormats.getCurrentDateTimestamp(dateTime.now())))
+          import leppData.availableItems
+          
+          val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, leppSubmissionSummary.acceptedIds)
+          val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, leppSubmissionSummary.notAcceptedIds)
+          
+          if (acceptedItems.nonEmpty) {
+            Ok(confirmationView(
+              acceptedItems = acceptedItems,
+              notAcceptedItems = notAcceptedItems,
+              formattedTimestamp = DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))
+            )
           } else Redirect(routes.ClearCacheController.defaultError())
         }
   }

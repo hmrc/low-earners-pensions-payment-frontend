@@ -38,6 +38,15 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         entitlement = 200,
         status = Available,
         claimDate = None
+      ),
+      LeppItem(
+        id = "A-26-1",
+        taxYear = 2026,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Available,
+        claimDate = None
       )
     )),
     paidItems = Some(Seq(
