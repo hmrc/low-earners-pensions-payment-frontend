@@ -23,17 +23,14 @@ import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
 import models.errors.ErrorResult
 import models.errors.ErrorResult.{BackendErrorResult, ServiceErrorResult, leppSubmissionError}
-import models.requests.{AuthUser, DataRequest}
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary}
 import models.{CorrelationId, ResponseWrapper}
-import org.mockito.{ArgumentMatchers, Mockito}
 import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.{calls, verify, when}
+import org.mockito.Mockito.{verify, when}
 import org.mockito.stubbing.OngoingStubbing
-import play.api.test.FakeRequest
+import org.mockito.{ArgumentMatchers, Mockito}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HttpException
 import utils.Constants
 
 import scala.concurrent.ExecutionContext.Implicits.global

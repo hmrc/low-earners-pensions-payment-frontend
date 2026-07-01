@@ -17,8 +17,8 @@
 package views
 
 import base.SpecBase
+import models.userAnswers.LeppItem
 import models.userAnswers.LeppItemStatus.Available
-import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalactic.Prettifier.default

@@ -17,7 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
-import play.api.libs.json.{JsError, JsObject, JsResult, JsSuccess, JsValue, Json}
+import play.api.libs.json.*
 
 class SubmissionSummarySpec extends SpecBase {
   "SubmissionSummary" - {

@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.userAnswers.{LeppSummary, SubmissionSummary}
+import models.userAnswers.SubmissionSummary
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode

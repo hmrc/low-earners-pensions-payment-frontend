@@ -30,10 +30,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, CONFLICT_ERROR, INTERNAL_ERROR}
 import utils.Logging
-import scala.language.implicitConversions
 
 import java.net.URL
 import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
 @Singleton
 class AcceptLeppPaymentConnector @Inject()(config: AppConfig, httpClient: HttpClientV2) 

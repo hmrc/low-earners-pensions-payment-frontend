@@ -16,7 +16,7 @@
 
 package models.audit
 
-import models.userAnswers.{BankAccountDetails, LeppItem}
+import models.userAnswers.BankAccountDetails
 import play.api.libs.json.{Json, OWrites}
 import uk.gov.hmrc.domain.Nino
 

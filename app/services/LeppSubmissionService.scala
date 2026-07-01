@@ -22,7 +22,6 @@ import models.CorrelationId
 import models.backend.accept.*
 import models.errors.ErrorResult
 import models.errors.ErrorResult.leppSubmissionError
-import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
@@ -90,7 +89,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
                  currentLock: BigInt,
                  submissionSummary: SubmissionSummary): ConnectorResponse[SubmissionSummary] = toAccept match {
       case head :: tail => 
-        import head.{id, taxYear, entitlement}
+        import head.{entitlement, id, taxYear}
         
         logger.info(msg = s"Attempting to accept available payment for request with taxYear: $taxYear, and cid: $cid")
 

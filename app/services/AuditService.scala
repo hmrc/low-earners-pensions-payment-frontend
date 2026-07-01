@@ -16,18 +16,18 @@
 
 package services
 
+import com.google.inject.{Inject, Singleton}
+import models.audit.*
+import models.audit.PaymentOutcome.*
+import models.userAnswers.BankAccountDetails
 import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.bootstrap.config.AppName
-import models.audit.*
-import models.audit.PaymentOutcome.*
-import models.userAnswers.{BankAccountDetails, LeppItem}
-import uk.gov.hmrc.domain.Nino
-import com.google.inject.{Inject, Singleton}
 
 import scala.concurrent.{ExecutionContext, Future}
 
