@@ -22,6 +22,7 @@ import models.CorrelationId
 import models.backend.accept.*
 import models.errors.ErrorResult
 import models.errors.ErrorResult.leppSubmissionError
+import models.requests.DataRequest
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,9 +35,9 @@ import scala.concurrent.ExecutionContext
 class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
                                       auditService: AuditService) extends Logging {
 
-  protected[services] def acceptPayment(request: AcceptLeppPaymentRequest, entitlement: BigDecimal)
-                                       (using requestCid: CorrelationId)
-                                       (using HeaderCarrier, ExecutionContext): ConnectorResponse[AcceptLeppPaymentResponse] = {
+  protected[services] def acceptPayment[A](request: AcceptLeppPaymentRequest, entitlement: BigDecimal)
+                                          (using requestCid: CorrelationId, dataRequest: DataRequest[A])
+                                          (using HeaderCarrier, ExecutionContext): ConnectorResponse[AcceptLeppPaymentResponse] = {
     given methodContext: MethodContext = MethodContext("acceptPayment")
 
     resultWithCid(connector.acceptPayment(request)).bimap(
@@ -49,7 +50,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
             s"and error status ${err.value.status}"
         )
         auditService.auditSubmissionFailure(
-          nino = request.identifier,
+          user = dataRequest.user,
           bankAccountDetails = request.body.lowEarnersAccountDetails,
           taxYear = request.taxYear,
           entitlement = entitlement
@@ -62,7 +63,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
             s"and cid: ${success.correlationId}"
         )
         auditService.auditSubmissionSuccess(
-          nino = request.identifier,
+          user = dataRequest.user,
           bankAccountDetails = request.body.lowEarnersAccountDetails,
           taxYear = request.taxYear,
           entitlement = entitlement
@@ -72,7 +73,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
   }
   
   def acceptMultiplePayments[A](nino: Nino, leppSummary: LeppSummary, accountDetails: BankAccountDetails)
-                               (using cid: CorrelationId)
+                               (using cid: CorrelationId, dataRequest: DataRequest[A])
                                (using HeaderCarrier, ExecutionContext): ConnectorResponse[SubmissionSummary] = {
     given methodContext: MethodContext = MethodContext("acceptMultiple")
     
@@ -103,7 +104,7 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
             )
             tail.foreach(item =>
               auditService.auditSubmissionFailure(
-                nino = nino,
+                user = dataRequest.user,
                 bankAccountDetails = accountDetails,
                 taxYear = taxYear,
                 entitlement = entitlement,

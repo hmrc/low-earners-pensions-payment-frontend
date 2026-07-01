@@ -23,13 +23,16 @@ import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
 import models.errors.ErrorResult
 import models.errors.ErrorResult.{BackendErrorResult, ServiceErrorResult, leppSubmissionError}
+import models.requests.{AuthUser, DataRequest}
 import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
-import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary}
+import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary, UserAnswers}
 import models.{CorrelationId, ResponseWrapper}
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.{verify, when}
 import org.mockito.stubbing.OngoingStubbing
 import org.mockito.{ArgumentMatchers, Mockito}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
 import utils.Constants
 
@@ -75,6 +78,12 @@ class LeppSubmissionServiceSpec extends SpecBase {
       correlationId = CorrelationId("N/A")
     )
     
+    given dataRequest: DataRequest[AnyContentAsEmpty.type] = DataRequest[AnyContentAsEmpty.type](
+      request = FakeRequest(),
+      user = AuthUser(userId = "some-id", nino = nino, itmpNameOpt = None),
+      userAnswers = UserAnswers("some-id")
+    )
+    
     def acceptPaymentResult: ConnectorResponse[AcceptLeppPaymentResponse] = testService.acceptPayment(
       request = acceptRequest,
       entitlement = 1234.56
@@ -110,7 +119,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         )
         
         verify(mockAuditService).auditSubmissionSuccess(
-          nino = ArgumentMatchers.any(),
+          user = ArgumentMatchers.any(),
           bankAccountDetails = ArgumentMatchers.any(),
           taxYear = ArgumentMatchers.any(),
           entitlement = ArgumentMatchers.any()
@@ -130,7 +139,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorResult) mustBe errorResult
         verify(mockAuditService).auditSubmissionFailure(
-          nino = ArgumentMatchers.any(),
+          user = ArgumentMatchers.any(),
           bankAccountDetails = ArgumentMatchers.any(),
           taxYear = ArgumentMatchers.any(),
           entitlement = ArgumentMatchers.any(),
@@ -290,7 +299,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         result mustBe a[Right[_, _]]
         result.getOrElse(SuccessWrapper(SubmissionSummary.empty, testCorrelationId)).value mustBe expectedResult
         verify(mockAuditService, Mockito.atLeast(3)).auditSubmissionSuccess(
-          nino = ArgumentMatchers.any(),
+          user = ArgumentMatchers.any(),
           bankAccountDetails = ArgumentMatchers.any(),
           taxYear = ArgumentMatchers.any(),
           entitlement = ArgumentMatchers.any()
@@ -352,7 +361,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         result mustBe a[Right[_, _]]
         result.getOrElse(dummySummaryResult).value mustBe SubmissionSummary(Seq("A-25-1"), Seq("A-25-2", "A-25-3"))
         verify(mockAuditService, Mockito.atMost(2)).auditSubmissionSuccess(
-          nino = ArgumentMatchers.any(),
+          user = ArgumentMatchers.any(),
           bankAccountDetails = ArgumentMatchers.any(),
           taxYear = ArgumentMatchers.any(),
           entitlement = ArgumentMatchers.any()
@@ -387,7 +396,7 @@ class LeppSubmissionServiceSpec extends SpecBase {
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(dummyErrorResult).value mustBe leppSubmissionError
         verify(mockAuditService, Mockito.never()).auditSubmissionSuccess(
-          nino = ArgumentMatchers.any(),
+          user = ArgumentMatchers.any(),
           bankAccountDetails = ArgumentMatchers.any(),
           taxYear = ArgumentMatchers.any(),
           entitlement = ArgumentMatchers.any()

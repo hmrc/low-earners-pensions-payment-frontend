@@ -19,10 +19,10 @@ package services
 import com.google.inject.{Inject, Singleton}
 import models.audit.*
 import models.audit.PaymentOutcome.*
+import models.requests.AuthUser
 import models.userAnswers.BankAccountDetails
 import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -37,14 +37,14 @@ class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configur
   private val SUBMISSION_TRANSACTION_NAME: String = "submit-for-payment"
   private val SUBMISSION_AUDIT_PATH: String = controllers.routes.CheckYourAnswersController.onSubmit().url
   
-  def auditSubmissionSuccess(nino: Nino,
+  def auditSubmissionSuccess(user: AuthUser,
                              bankAccountDetails: BankAccountDetails,
                              taxYear: BigInt,
                              entitlement: BigDecimal)
                             (using HeaderCarrier, ExecutionContext): Unit = {
     val auditDetail: AuditDetail = AuditDetail(
       bankAccountDetails = bankAccountDetails,
-      nino = nino,
+      authUser = user,
       taxYear = taxYear,
       entitlement = entitlement,
       paymentOutcome = pass
@@ -60,7 +60,7 @@ class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configur
     auditEvent(event)
   }
   
-  def auditSubmissionFailure(nino: Nino,
+  def auditSubmissionFailure(user: AuthUser,
                              bankAccountDetails: BankAccountDetails,
                              taxYear: BigInt,
                              entitlement: BigDecimal,
@@ -70,7 +70,7 @@ class AuditService @Inject()(auditConnector: AuditConnector, appConfig: Configur
 
     val auditDetail: AuditDetail = AuditDetail(
       bankAccountDetails = bankAccountDetails,
-      nino = nino,
+      authUser = user,
       taxYear = taxYear,
       entitlement = entitlement,
       paymentOutcome = paymentOutcome

@@ -16,9 +16,9 @@
 
 package models.audit
 
+import models.requests.AuthUser
 import models.userAnswers.BankAccountDetails
 import play.api.libs.json.{Json, OWrites}
-import uk.gov.hmrc.domain.Nino
 
 case class AuditDetail(
   accountName: String,
@@ -35,19 +35,29 @@ object AuditDetail {
   private def taxYearString(taxYear: BigInt) = s"6 April $taxYear to 5 April ${taxYear+1}"
   
   def apply(bankAccountDetails: BankAccountDetails,
-            nino: Nino,
+            authUser: AuthUser,
             taxYear: BigInt,
             entitlement: BigDecimal,
-            paymentOutcome: PaymentOutcome): AuditDetail = AuditDetail(
-    accountName = bankAccountDetails.accountName,
-    accountNumber = bankAccountDetails.accountNumber,
-    name = bankAccountDetails.accountName,
-    nino = nino.nino, 
-    paymentAmount = entitlement,
-    sortCode = bankAccountDetails.sortCode,
-    taxYear = taxYearString(taxYear),
-    paymentOutcome = paymentOutcome
-  )
+            paymentOutcome: PaymentOutcome): AuditDetail = {
+    val nameString: String = authUser.itmpNameOpt.map(name => {
+      val givenName: String = name.givenName.getOrElse("")
+      val middleName: String = name.middleName.getOrElse("")
+      val familyName: String = name.familyName.getOrElse("")
+      
+      s"$givenName $middleName $familyName".replace("  ", " ")
+    }).getOrElse("")
+    
+    AuditDetail(
+      accountName = bankAccountDetails.accountName,
+      accountNumber = bankAccountDetails.accountNumber,
+      name = nameString,
+      nino = authUser.nino.nino,
+      paymentAmount = entitlement,
+      sortCode = bankAccountDetails.sortCode,
+      taxYear = taxYearString(taxYear),
+      paymentOutcome = paymentOutcome
+    )
+  }
   
   
   implicit val writes: OWrites[AuditDetail] = Json.writes[AuditDetail]
