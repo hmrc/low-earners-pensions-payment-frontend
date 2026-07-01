@@ -17,7 +17,7 @@
 package models.userAnswers
 
 import models.backend.retrieve.LowEarnersCalculation
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
 import utils.CurrencyFormats
 
 import java.time.LocalDate
