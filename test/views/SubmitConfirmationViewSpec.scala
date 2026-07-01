@@ -17,7 +17,8 @@
 package views
 
 import base.SpecBase
-import models.userAnswers.LeppSummary
+import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalactic.Prettifier.default
@@ -49,8 +50,30 @@ class SubmitConfirmationViewSpec extends SpecBase {
       view.text.contains(messages(app)("submitted.on"))
     }
 
-    "display correct accepted payments" in new Setup(summaryModel.copy(availableItems = None,
-      acceptedItems = summaryModel.availableItems)) {
+    "display correct accepted payments" in new Setup(
+      acceptedItems = Seq(
+        LeppItem(
+          id = "A-25-1",
+          taxYear = 2025,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Available,
+          claimDate = None
+        )
+      ),
+      notAcceptedItems = Seq(
+        LeppItem(
+          id = "A-26-1",
+          taxYear = 2026,
+          contributions = 1000,
+          taxRate = 20,
+          entitlement = 200,
+          status = Available,
+          claimDate = None
+        )
+      )
+    ) {
       
       val taxYear: Int = summaryModel.availableItems.get.head.taxYear
       val entitlement: BigDecimal = summaryModel.availableItems.get.head.entitlement
@@ -61,14 +84,13 @@ class SubmitConfirmationViewSpec extends SpecBase {
     }
   }
 
-  trait Setup(leppSummary: LeppSummary = LeppSummary(1)) {
-
+  trait Setup(acceptedItems: Seq[LeppItem] = Nil, notAcceptedItems: Seq[LeppItem] = Nil) {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[SubmitConfirmationView].apply(leppSummary, "").body
+      app.injector.instanceOf[SubmitConfirmationView].apply(acceptedItems, notAcceptedItems, "").body
     )
   }
 
