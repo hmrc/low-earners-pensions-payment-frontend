@@ -70,7 +70,7 @@ class ConfirmationUtilsSpec extends SpecBase {
       "should default claim date field when it does not exist for historic item" in new Test {
         val rows: Seq[Seq[TableRow]] = ConfirmationUtils.acceptedTableRows(
           tableRef = "ref",
-          items = Some(Seq(leppItem.copy(claimDate = None)))
+          items = Seq(leppItem.copy(claimDate = None))
         )
         rows must have length 1
         rows.head must have length 2
@@ -82,7 +82,7 @@ class ConfirmationUtilsSpec extends SpecBase {
       "should return available until date field when data is not historic" in new Test {
         val rows: Seq[Seq[TableRow]] = ConfirmationUtils.acceptedTableRows(
           tableRef = "ref",
-          items = Some(Seq(leppItem.copy(claimDate = None)))
+          items = Seq(leppItem.copy(claimDate = None))
         )
         rows must have length 1
         rows.head must have length 2
