@@ -1,228 +1,228 @@
-service.name = Accept your low earner''s pension payment
-service.text = This is your new service
+service.name = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
+service.text = Dyma eich gwasanaeth newydd
 
 # What you will need page
-whatYouWillNeed.title = Accept your low earner''s pension payment
-whatYouWillNeed.heading = Accept your low earner''s pension payment
-whatYouWillNeed.p1 = The low earner''s pension payment is an annual payment to people who:
-whatYouWillNeed.u1.l1 = had taxable earnings below or close to their Personal Allowance
-whatYouWillNeed.u1.l2 = paid into a net pay workplace pension scheme
-whatYouWillNeed.u1.l3 = did not get tax relief on some or all of their pension contributions
-whatYouWillNeed.p2 = The payment will be sent directly to your bank account, once you have provided us with your bank details.
-whatYouWillNeed.t1 = This payment is not classed as income. It will not affect any benefits that you receive, your National Insurance position, or your taxable income.
-whatYouWillNeed.h2.p1 = Before you continue
-whatYouWillNeed.h2.p2 = To use this service, you''ll need your bank details.
+whatYouWillNeed.title = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
+whatYouWillNeed.heading = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
+whatYouWillNeed.p1 = Mae taliad pensiwn i''r sawl sy''n ennill incwm isel yn daliad blynyddol i bobl sydd:
+whatYouWillNeed.u1.l1 = wedi cael enillion trethadwy sy''n is neu''n agos at eu Lwfans Personol
+whatYouWillNeed.u1.l2 = wedi talu i mewn i gynllun pensiwn gweithle cyflog net
+whatYouWillNeed.u1.l3 = heb gael rhyddhad treth ar rai o''u cyfraniadau pensiwn, neu bob un ohonynt
+whatYouWillNeed.p2 = Bydd y taliad yn cael ei anfon yn uniongyrchol i''ch cyfrif banc, unwaith y byddwch wedi rhoi''ch manylion banc i ni.
+whatYouWillNeed.t1 = Nid yw''r taliad hwn yn cael ei ystyried fel incwm. Ni fydd yn effeithio ar unrhyw fudd-daliadau rydych yn eu cael, eich sefyllfa Yswiriant Gwladol, na''ch incwm trethadwy.
+whatYouWillNeed.h2.p1 = Cyn i chi barhau
+whatYouWillNeed.h2.p2 = I ddefnyddio''r gwasanaeth hwn bydd angen eich manylion banc arnoch.
 
 # Payments dashboard page
-dashboard.title = Your low earner''s pension payments
-dashboard.heading = Your low earner''s pension payments
-dashboard.moreInformation = For more information,
-dashboard.contactUs = contact us (opens in new tab)
-dashboard.availablePayments.heading = Available payments
-dashboard.availablePayments.noneAvailable = You do not have any available payments.
-dashboard.availablePayments.totalAvailableText.start = You have a total of
-dashboard.availablePayments.totalAvailableText.end = in payments available to accept.
-dashboard.availablePayments.acceptText = To accept these payments, you need to provide us with your bank details.
-dashboard.availablePayments.button.acceptPayments = Accept payments
-dashboard.availablePayments.button.viewPayments = View payments
-dashboard.availablePayments.suspendedInset = Your payments are suspended.
-dashboard.paymentHistory.heading = Payment history
-dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in the bank account you provided within 7 working days.
-dashboard.paymentHistory.noneAvailable = You do not have any previous payments.
-dashboard.paymentHistory.cancelledInset.start = We cancelled
-dashboard.paymentHistory.cancelledInset.end = of your payments.
-dashboard.table.header.taxYear = Tax year
-dashboard.table.header.amount = Amount
-dashboard.table.header.availableUntil = Available until
-dashboard.table.header.dateAccepted = Date accepted
-dashboard.table.header.status = Status
-dashboard.table.header.action = Action
-dashboard.table.link.checkCalculation = Check calculation
-dashboard.table.status.available = Available
-dashboard.table.status.paid = Paid
-dashboard.table.status.suspended = Suspended
-dashboard.table.status.cancelled = Cancelled
-dashboard.table.availableUntil = 5 April {0}
-dashboard.lockout.title = Important
-dashboard.lockout.message = You''ve tried to enter your bank account details too many times. You can try again after {0}.
+dashboard.title = Eich taliadau pensiwn i''r sawl sy''n ennill incwm isel
+dashboard.heading = Eich taliadau pensiwn i''r sawl sy''n ennill incwm isel
+dashboard.moreInformation = I gael rhagor o wybodaeth,
+dashboard.contactUs = cysylltwch â ni (yn agor tab newydd).
+dashboard.availablePayments.heading = Taliadau sydd ar gael
+dashboard.availablePayments.noneAvailable = Nid oes gennych unrhyw daliadau ar gael.
+dashboard.availablePayments.totalAvailableText.start = Mae gennych gyfanswm o
+dashboard.availablePayments.totalAvailableText.end = mewn taliadau ar gael i’w derbyn.
+dashboard.availablePayments.acceptText = I dderbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
+dashboard.availablePayments.button.acceptPayments = Derbyn taliadau
+dashboard.availablePayments.button.viewPayments = Gweld taliadau
+dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi’u gohirio.
+dashboard.paymentHistory.heading = Hanes taliadau
+dashboard.paymentHistory.paidInset = Bydd taliadau gyda''r statws ''Wedi talu'' yn y cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
+dashboard.paymentHistory.noneAvailable = Nid oes gennych unrhyw daliadau blaenorol.
+dashboard.paymentHistory.cancelledInset.start = Fe wnaethon ni ganslo
+dashboard.paymentHistory.cancelledInset.end = o''ch taliadau.
+dashboard.table.header.taxYear = Blwyddyn dreth
+dashboard.table.header.amount = Swm
+dashboard.table.header.availableUntil = Ar gael hyd nes
+dashboard.table.header.dateAccepted = Dyddiad derbyn
+dashboard.table.header.status = Statws
+dashboard.table.header.action = Gweithred
+dashboard.table.link.checkCalculation = Gwirio cyfrifiad
+dashboard.table.status.available = Ar gael
+dashboard.table.status.paid = Wedi''i dalu
+dashboard.table.status.suspended = Wedi''i ohirio
+dashboard.table.status.cancelled = Wedi canslo
+dashboard.table.availableUntil = 5 Ebrill {0}
+dashboard.lockout.title = Pwysig
+dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau. Gallwch chi roi cynnig arall arni ar ôl {0}.
 
 # Calculation Breakdown page
-breakdown.title = Payment calculation breakdown page
-breakdown.heading = You''re eligible for a total of {0}
-breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
-breakdown.u1 = For the tax year 6 April {0} to 5 April {1}
-breakdown.l1 = Your net pay pension contributions
-breakdown.l2 = Your relevant basic tax rate
-breakdown.l3 = Your payment
+breakdown.title = Dadansoddiad eich taliad
+breakdown.heading = Rydych yn gymwys i gael cyfanswm o {0}
+breakdown.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
+breakdown.u1 = Ar gyfer blwyddyn dreth 6 Ebrill {0} to 5 Ebrill {1}
+breakdown.l1 = Eich cyfraniadau pensiwn cyflog net
+breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
+breakdown.l3 = Eich taliad
 
-breakdown.underpayment.l1 = Your new total top-up for the tax year 6 April {0} to 5 April {1}
-breakdown.underpayment.l2 = Top-up already received
-breakdown.underpayment.l3 = Additional amount due
+breakdown.underpayment.l1 = Eich cyfanswm newydd
+breakdown.underpayment.l2 = Swm a dderbyniwyd eisoes
+breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
-breakdown.p2 = If you think the amounts are wrong, you can
-breakdown.p2.a1 = contact us (opens in new tab)
-breakdown.p3 = To accept these payments, you need to provide us with your bank details.
+breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir
+breakdown.p2.a1 = cysylltwch â ni (yn agor tab newydd)..
+breakdown.p3 = Derbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
 
 # Bank account details page
-bankDetails.title = Bank details
-bankDetails.heading = What are your bank details?
-bankDetails.securityInset = For your security, we do not save your bank details.
-bankDetails.accountName = Name on the account
-bankDetails.accountName.hint = Exactly as it appears on your bank statement
-bankDetails.sortCode = Sort code
-bankDetails.sortCode.hint = Must be 6 digits long
-bankDetails.accountNumber = Account number
-bankDetails.accountNumber.hint = Must be between 6 and 8 digits long
-bankDetails.rollNumber = Building society roll number (if you have one)
-bankDetails.rollNumber.hint = You can find it on your card, statement or passbook
-bankDetails.accountName.formError.required = Enter the name on the account
-bankDetails.sortCode.formError.required = Enter a sort code
-bankDetails.accountNumber.formError.required = Enter an account number
-bankDetails.accountName.formError.length = The name on the account must be between 1 and 18 characters
-bankDetails.sortCode.formError.length = The sort code must have 6 digits
-bankDetails.accountNumber.formError.length = The account number must be between 6 and 8 digits
-bankDetails.rollNumber.formError.length = The building society roll number must be between 1 and 18 characters
-bankDetails.accountName.formError.format = The name on the account must only include letters a to z, hyphens, spaces and apostrophes
-bankDetails.sortCode.formError.format = The sort code must only include numbers
-bankDetails.accountNumber.formError.format = The account number must only include numbers
-bankDetails.rollNumber.formError.format = The building society roll number must only include letters a to z, numbers, hyphens, spaces, forward slashes and full stops
+bankDetails.title = Beth yw’ch manylion banc?
+bankDetails.heading = Beth yw’ch manylion banc?
+bankDetails.securityInset = Er eich diogelwch, nid ydym yn cadw eich manylion banc.
+bankDetails.accountName = Enw ar y cyfrif
+bankDetails.accountName.hint = Yn union fel y mae''n ymddangos ar eich cyfriflen banc
+bankDetails.sortCode = Cod didoli
+bankDetails.sortCode.hint = Mae''n rhaid iddo fod yn 6 digid o hyd
+bankDetails.accountNumber = Rhif y cyfrif
+bankDetails.accountNumber.hint = Mae''n rhaid iddo fod rhwng 6 ac 8 digid o hyd
+bankDetails.rollNumber = Rhif y gymdeithas adeiladu (os oes gennych un)
+bankDetails.rollNumber.hint = Bydd hwn i''w weld ar eich cerdyn, cyfriflen neu baslyfr
+bankDetails.accountName.formError.required = Nodwch yr enw sydd ar y cyfrif
+bankDetails.sortCode.formError.required = Nodwch god didoli
+bankDetails.accountNumber.formError.required = Nodwch rif cyfrif
+bankDetails.accountName.formError.length = Mae''n rhaid i''r enw ar y cyfrif fod rhwng 1 a 18 nod o hyd
+bankDetails.sortCode.formError.length = Mae''n rhaid i''r cod didoli fod yn 6 digid
+bankDetails.accountNumber.formError.length = Mae''n rhaid i rif y cyfrif fod rhwng 6 ac 8 digid
+bankDetails.rollNumber.formError.length = Mae''n rhaid i rif rôl y gymdeithas adeiladu fod rhwng 1 ac 18 o gymeriadau
+bankDetails.accountName.formError.format = Mae''n rhaid i''r enw sydd ar y cyfrif gynnwys y llythrennau a i z, cysylltnodau, bylchau a chollnodau yn unig
+bankDetails.sortCode.formError.format = Mae''n rhaid i''r cod didoli gynnwys rhifau yn unig
+bankDetails.accountNumber.formError.format = Dim ond rhifau y dylai rhif y cyfrif eu cynnwys
+bankDetails.rollNumber.formError.format = Mae''n rhaid i rif rôl y gymdeithas adeiladu gynnwys y llythrennau a i z, rhifau, cysylltnodau, bylchau, blaenslaesau ac atalnodau llawn yn unig
 
 # Check your answers page
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
-checkYourAnswers.bankDetails = Your bank details
-checkYourAnswers.changeAccountName = change-account-name
-checkYourAnswers.changeAccountNumber = change-account-number
-checkYourAnswers.changeSortCode = change-sort-code
-checkYourAnswers.changeRollNumber = change-roll-number
-checkYourAnswers.hiddenText.accountName = change-account-name
-checkYourAnswers.hiddenText.accountNumber = change-account-number
-checkYourAnswers.hiddenText.sortCode = change-sort-code
-checkYourAnswers.hiddenText.rollNumber = change-roll-number
+checkYourAnswers.title = Gwiriwch eich atebion
+checkYourAnswers.heading = Gwiriwch eich atebion
+checkYourAnswers.bankDetails = Eich manylion banc
+checkYourAnswers.changeAccountName = newid-enw-y-cyfrif
+checkYourAnswers.changeAccountNumber = newid-rhif-cyfrif
+checkYourAnswers.changeSortCode = newid-cod-didoli
+checkYourAnswers.changeRollNumber = rhif-rôl-newid
+checkYourAnswers.hiddenText.accountName = newid-enw-y-cyfrif
+checkYourAnswers.hiddenText.accountNumber = newid-rhif-cyfrif
+checkYourAnswers.hiddenText.sortCode = newid-cod-didoli
+checkYourAnswers.hiddenText.rollNumber = rhif-rôl-newid
 
 # Confirmation page
-confirmation.title = We''ve received your bank details
-confirmation.heading = We''ve received your bank details
-confirmation.what-next.heading = What you can do next
-confirmation.what-next.opt1 = View your payments
-confirmation.failure.items.p1 = To accept them again, return to your payments and select ''Accept''.
-confirmation.failure.sub.heading = Some of your payments could not be processed
-confirmation.table.availableUntil = 5 April {0}
-confirmation.table.header.taxYear = Tax year
-confirmation.table.header.amount = Amount
-confirmation.table.header.availableUntil = Available until
-confirmation.details = The following payments were processed successfully. We''ll send them separately, to the bank account you provided, within 7 working days.
+confirmation.title = Rydym wedi cael eich manylion banc
+confirmation.heading = Rydym wedi cael eich manylion banc
+confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
+confirmation.what-next.opt1 = Bwrw golwg dros eich taliadau
+confirmation.failure.items.p1 = I''w derbyn eto, ewch yn ôl i''ch taliadau a dewiswch ''Derbyn''.
+confirmation.failure.sub.heading = Ni ellid prosesu rhai o''ch taliadau
+confirmation.table.availableUntil = 5 Ebrill {0}
+confirmation.table.header.taxYear = Blwyddyn dreth
+confirmation.table.header.amount = Swm
+confirmation.table.header.availableUntil = Ar gael tan
+confirmation.details = Cafodd y taliadau canlynol eu prosesu'n llwyddiannus. Byddwn yn eu hanfon ar wahân, i''r cyfrif banc a ddarparwyd gennych, o fewn 7 diwrnod gwaith.
 
 # Bars request errors page
-barsRequestErrors.title = We could not verify your bank account details
-barsRequestErrors.heading = We could not verify your bank account details
-barsRequestErrors.p1 = An error occurred while attempting to verify your bank account details. This could be because:
-barsRequestErrors.u1.l1 = a bank account roll number was not supplied for a building society account
-barsRequestErrors.u1.l2 = the supplied account does not support direct credit
-barsRequestErrors.u1.l3 = no account with the supplied details could be found
-barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
-barsRequestErrors.p2 = If this issue persists you may have to contact HMRC
+barsRequestErrors.title = Ni allwn wirio manylion eich cyfrif banc
+barsRequestErrors.heading = Ni allwn wirio manylion eich cyfrif banc
+barsRequestErrors.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc. Gallai hyn fod oherwydd y rhesymau canlynol:
+barsRequestErrors.u1.l1 = ni ddarparwyd rhif rôl y cyfrif banc ar gyfer cyfrif cymdeithas adeiladu
+barsRequestErrors.u1.l2 = nid yw''r cyfrif a ddarparwyd yn derbyn credyd uniongyrchol
+barsRequestErrors.u1.l3 = methwyd dod o hyd i unrhyw gyfrif gyda''r manylion a ddarparwyd
+barsRequestErrors.u1.l4 = nid oedd yr enw ar y cyfrif yn cyfateb i''r hyn a ddarparwyd
+barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi gysylltu â ni
 
 # Bars check failure page
-barsCheckFailed.title = We could not verify your bank account details
-barsCheckFailed.heading = We could not verify your bank account details
-barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
-barsCheckFailed.p2 = Please try again later
+barsCheckFailed.title = Ni allem wirio manylion eich cyfrif banc
+barsCheckFailed.heading = Ni allem wirio manylion eich cyfrif banc
+barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc
+barsCheckFailed.p2 = Ceisiwch eto yn nes ymlaen
 
 # BARS lockout page
-bars.lockout.title = You''ve tried to enter your bank account details too many times
-bars.lockout.heading = You''ve tried to enter your bank account details too many times
-bars.lockout.p2 = You can try again after {0} to confirm your bank details.
-bars.lockout.go-to-dashboard = Return to your payments
+bars.lockout.title = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
+bars.lockout.heading = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
+bars.lockout.p2 = Gallwch chi roi cynnig arall arni ar ôl {0} i gadarnhau manylion eich banc.
+bars.lockout.go-to-dashboard = Dychwelyd i''ch taliadau
 
 # Not eligible page
-ineligible.title = You cannot use this service
-ineligible.heading = You cannot use this service
-ineligible.guidance.preform = If you believe this is wrong you may
-ineligible.guidance.formLink = contact us (opens in a new link)
-ineligible.guidance.postform = . We will respond to you within 5 working days.
+ineligible.title = Ni allwch ddefnyddio''r gwasanaeth hwn
+ineligible.heading = Ni allwch ddefnyddio''r gwasanaeth hwn
+ineligible.guidance.preform = Os ydych chi''n credu bod hyn yn anghywir, efallai y byddwch chi
+ineligible.guidance.formLink = cysylltwch â ni (yn agor tab newydd).
+ineligible.guidance.postform = . Byddwn yn ymateb i chi o fewn 5 diwrnod gwaith.
 
 # Something went wrong page
-somethingWentWrong.title = Sorry, there is a problem with the service
-somethingWentWrong.heading = Sorry, there is a problem with the service
-somethingWentWrong.p1 = You can try again later.
+somethingWentWrong.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
+somethingWentWrong.heading = Mae'n ddrwg gennym, mae problem gyda'r gwasanaeth
+somethingWentWrong.p1 = Gallwch chi roi cynnig arall arni yn nes ymlaen.
 
 # Journey recovery page
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.try.again = You can try again later or
-journeyRecovery.contact = contact us for help with pension scheme queries
+journeyRecovery.startAgain.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
+journeyRecovery.startAgain.heading = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
+journeyRecovery.try.again = Gallwch chi roi cynnig arall arni yn nes ymlaen neu
+journeyRecovery.contact = cysylltwch â ni i gael help gydag ymholiadau am gynlluniau pensiwn
 
 # Session timeout page
-sessionTimeout.title = For your security, we signed you out
-sessionTimeout.heading = For your security, we signed you out
-sessionTimeout.signIn = Sign in
+sessionTimeout.title = Er eich diogelwch, fe wnaethon ni eich allgofnodi
+sessionTimeout.heading = Er eich diogelwch, fe wnaethon ni eich allgofnodi
+sessionTimeout.signIn = Mewngofnodwch
 
 # Unauthorised page
-unauthorised.title = You can''t access this service with this account
-unauthorised.heading = You can''t access this service with this account
-unauthorised.guidance.preform = If you think you need access to this service, you can
-unauthorised.guidance.formLink = request it through the feedback form
-unauthorised.guidance.postform = . We will respond to you within 5 working days.
+unauthorised.title = Ni allwch gael mynediad i''r gwasanaeth hwn gyda''r cyfrif hwn
+unauthorised.heading = Ni allwch gael mynediad i''r gwasanaeth hwn gyda''r cyfrif hwn
+unauthorised.guidance.preform = Os ydych chi'n meddwl bod angen mynediad i''r gwasanaeth hwn arnoch chi, gallwch chi
+unauthorised.guidance.formLink = gofynnwch amdano drwy''r ffurflen adborth
+unauthorised.guidance.postform = . Byddwn yn ymateb i chi o fewn 5 diwrnod gwaith.
 
 # Uplift failure page
-ivUpliftFailure.title = There''s a problem
-ivUpliftFailure.p1 = You cannot access this service. This may be because:
-ivUpliftFailure.li1 = you took too long to enter information and the service has timed out
-ivUpliftFailure.li2 = you have failed to answer enough questions correctly
-ivUpliftFailure.li3 = we could not match your details to our system
+ivUpliftFailure.title = Mae problem
+ivUpliftFailure.p1 = Ni allwch gael mynediad i''r gwasanaeth hwn. Gallai hyn fod oherwydd:
+ivUpliftFailure.li1 = fe gymeroch chi ormod o amser i roi gwybodaeth ac mae'r gwasanaeth wedi dod i ben
+ivUpliftFailure.li2 = rydych chi wedi methu ag ateb digon o gwestiynau''n gywir
+ivUpliftFailure.li3 = ni allem baru eich manylion â''n system
 
 # Timeout dialogue
-timeout.title = You''re about to be signed out
-timeout.message = For your security, we will sign you out in
-timeout.keepAlive = Stay signed in
+timeout.title = Rydych chi ar fin cael eich allgofnodi
+timeout.message = Er eich diogelwch, byddwn yn eich allgofnodi
+timeout.keepAlive = Arhoswch wedi''ch mewngofnodi
 
 # Months
-month.1 = January
-month.2 = February
-month.3 = March
-month.4 = April
-month.5 = May
-month.6 = June
-month.7 = July
-month.8 = August
-month.9 = September
-month.10 = October
-month.11 = November
-month.12 = December
+month.1 = Ionawr
+month.2 = Chwefror
+month.3 = Mawrth
+month.4 = Ebrill
+month.5 = Mai
+month.6 = Mehefin
+month.7 = Gorffennaf
+month.8 = Awst
+month.9 = Medi
+month.10 = Hydref
+month.11 = Tachwedd
+month.12 = Rhagfyr
 
 # Common content
-common.signOut = Sign out
-common.taxYearDates = 6 April {0} to 5 April {1}
-site.start = Start now
-site.change = Change
-site.continue = Continue
-site.tryAgain = Try again
-site.print = Print this page
+common.signOut = Arwyddo allan
+common.taxYearDates = 6 Ebrill {0} to 5 Ebrill {1}
+site.start = Dechreuwch nawr
+site.change = Newid
+site.continue = Parhau
+site.tryAgain = Ceisiwch eto
+site.print = Argraffwch y dudalen hon
 site.acceptAndSubmit = Submit
-error.title.prefix = Error:
-submitted.on = Submitted on
+error.title.prefix = Gwall:
+submitted.on = Cyflwynwyd ar
 
 # Months
-JANUARY = January
-FEBRUARY = February
-MARCH = March
-APRIL = April
-MAY = May
-JUNE = June
-JULY = July
-AUGUST = August
-SEPTEMBER = September
-OCTOBER = October
-NOVEMBER = November
-DECEMBER = December
+JANUARY = Ionawr
+FEBRUARY = Chwefror
+MARCH = Mawrth
+APRIL = Ebrill
+MAY = Mai
+JUNE = Mehefin
+JULY = Gorffennaf
+AUGUST = Awst
+SEPTEMBER = Medi
+OCTOBER = Hydref
+NOVEMBER = Tachwedd
+DECEMBER = Rhagfyr
 
-MONDAY = Monday
-TUESDAY = Tuesday
-WEDNESDAY = Wednesday
-THURSDAY = Thursday
-FRIDAY   = Friday
-SATURDAY = Saturday
-SUNDAY   = Sunday
+MONDAY = Dydd Llun
+TUESDAY = Dydd Mawrth
+WEDNESDAY = Mercher
+THURSDAY = dydd Iau
+FRIDAY   = Gwener
+SATURDAY = Dydd Sadwrn
+SUNDAY   = Sul
 
-between.time.and.date = on
+between.time.and.date = ymlaen

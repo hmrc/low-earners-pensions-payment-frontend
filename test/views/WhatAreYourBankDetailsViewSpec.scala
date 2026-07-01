@@ -52,7 +52,7 @@ class WhatAreYourBankDetailsViewSpec extends SpecBase {
 
   "WhatAreYourBankDetailsView" - {
     "should display correct page title" in new Test {
-      view.title() must include("Bank details - Accept your low earner's pension payment")
+      view.title() must include("What are your bank details? - Accept your low earner's pension payment")
     }
     
     "should render header and inset text correctly" in new Test {
