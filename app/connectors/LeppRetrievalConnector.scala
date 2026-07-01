@@ -28,6 +28,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import utils.Constants.correlationIdKey
 import utils.ErrorCodes.{BAD_REQUEST_ERROR, INTERNAL_ERROR, NOT_FOUND_ERROR}
 import utils.{Logging, MethodContext}
+import scala.language.implicitConversions
 
 import scala.concurrent.ExecutionContext
 

@@ -26,6 +26,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
+import scala.language.implicitConversions
 
 import java.net.URI
 import scala.concurrent.ExecutionContext
