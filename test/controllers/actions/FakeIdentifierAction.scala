@@ -29,7 +29,7 @@ class FakeIdentifierAction(failRequest: Boolean = false, nino: String) extends I
     if (failRequest) {
       Future.successful(Redirect("some-url"))
     } else {
-      block(IdentifierRequest(request, AuthUser.apply("1", nino)))
+      block(IdentifierRequest(request, AuthUser("1", nino, None)))
     }
   }
 
