@@ -199,7 +199,8 @@ site.change = Newid
 site.continue = Parhau
 site.tryAgain = Ceisiwch eto
 site.print = Argraffwch y dudalen hon
-site.acceptAndSubmit = Submit
+site.acceptAndSubmit = Cyflwyno
+site.govuk = GOV.UK
 error.title.prefix = Gwall:
 submitted.on = Cyflwynwyd ar
 
