@@ -17,78 +17,133 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import connectors.AcceptLeppPaymentConnector
-import models.ResponseWrapper.SuccessWrapper
+import connectors.{AcceptLeppPaymentConnector, ConnectorResponse, rawConnectorFailure, rawConnectorSuccess}
+import models.CorrelationId
 import models.backend.accept.*
-import models.userAnswers.{BankAccountDetails, LeppSummary}
-import models.{CorrelationId, ResponseWrapper}
+import models.errors.ErrorResult
+import models.errors.ErrorResult.leppSubmissionError
+import models.requests.DataRequest
+import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, SubmissionSummary}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.Constants
+import utils.Constants.noCorrelationIdString
+import utils.{Logging, MethodContext}
 
-import scala.+:
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector) {
-  protected[services] def submitSingle(acceptLeppPaymentRequest: AcceptLeppPaymentRequest)
-                                      (implicit hc: HeaderCarrier,
-                                       ec: ExecutionContext,
-                                       cid: CorrelationId): Future[ResponseWrapper[AcceptLeppPaymentResponse]] =
-    connector.acceptPayment(acceptLeppPaymentRequest).value.map {
-      case Right(success) if success.correlationId.value == Constants.noCorrelationIdString => success.copy(correlationId = cid)
-      case Right(success) => success
-      case Left(e) => SuccessWrapper(AcceptLeppPaymentResponse(0), e.correlationId)
-    }
+class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
+                                      auditService: AuditService) extends Logging {
 
-  def submitMultiple(nino: Nino, bankAccountDetails: BankAccountDetails, leppSummary: LeppSummary)
-                    (implicit hc: HeaderCarrier,
-                     ec: ExecutionContext,
-                     cid: CorrelationId): Future[ResponseWrapper[LeppSummary]] = {
-    def doSubmit(nino: Nino,
-                 bankAccountDetails: BankAccountDetails,
-                 currentLeppLock: BigInt,
-                 toSubmit: LeppSummary)
-                (implicit hc: HeaderCarrier,
-                 ec: ExecutionContext,
-                 cid: CorrelationId): Future[ResponseWrapper[LeppSummary]] = {
-      toSubmit.availableItems.getOrElse(Nil) match {
-        case Nil =>
-          val remainingAvailableItems = leppSummary.availableItems.getOrElse(Nil)
-            .filterNot(item => toSubmit.acceptedItems.getOrElse(Nil).contains(item))
-          Future.successful(SuccessWrapper(toSubmit.copy(availableItems = Some(remainingAvailableItems)), correlationId = cid))
-        case nextItem +: remainingItems =>
-          val acceptLeppPaymentRequest: AcceptLeppPaymentRequest = AcceptLeppPaymentRequest(
-            identifier = nino,
-            taxYear = nextItem.taxYear,
-            body = AcceptLeppPaymentRequestBody(
-              currentLowEarnersOptimisticLock = currentLeppLock,
-              lowEarnersAccountDetails = bankAccountDetails
-            )
-          )
+  protected[services] def acceptPayment[A](request: AcceptLeppPaymentRequest, entitlement: BigDecimal)
+                                          (using requestCid: CorrelationId, dataRequest: DataRequest[A])
+                                          (using HeaderCarrier, ExecutionContext): ConnectorResponse[AcceptLeppPaymentResponse] = {
+    given methodContext: MethodContext = MethodContext("acceptPayment")
 
-          submitSingle(acceptLeppPaymentRequest).flatMap(success =>
-            implicit val newCid: CorrelationId = success.correlationId
-            val (accepted, available) =
-              if(success.value.updatedLowEarnersOptimisticLock == 0) (Some(toSubmit.acceptedItems.getOrElse(Nil)), None)
-              else (Some(toSubmit.acceptedItems.getOrElse(Nil) :+ nextItem), Some(remainingItems))
-            doSubmit(
-              nino = nino,
-              bankAccountDetails = bankAccountDetails,
-              currentLeppLock = success.value.updatedLowEarnersOptimisticLock,
-              toSubmit = leppSummary.copy(currentLock = success.value.updatedLowEarnersOptimisticLock,
-                availableItems = available,
-                acceptedItems = accepted)
-            )
-          )
-      }
-    }
+    resultWithCid(connector.acceptPayment(request)).bimap(
+      err =>
+        logger.warn(
+          msg = s"Failed to accept available payment for request with " +
+            s"tax year: ${request.taxYear}, " +
+            s"cid: ${err.correlationId}, " +
+            s"error code ${err.value.code}, " +
+            s"and error status ${err.value.status}"
+        )
+        auditService.auditSubmissionFailure(
+          user = dataRequest.user,
+          bankAccountDetails = request.body.lowEarnersAccountDetails,
+          taxYear = request.taxYear,
+          entitlement = entitlement
+        )
+        err,
+      success =>
+        logger.info(
+          msg = s"Successfully accepted available payment for request with" +
+            s"tax year: ${request.taxYear}, " +
+            s"and cid: ${success.correlationId}"
+        )
+        auditService.auditSubmissionSuccess(
+          user = dataRequest.user,
+          bankAccountDetails = request.body.lowEarnersAccountDetails,
+          taxYear = request.taxYear,
+          entitlement = entitlement
+        )
+        success
+    )
+  }
+  
+  def acceptMultiplePayments[A](nino: Nino, leppSummary: LeppSummary, accountDetails: BankAccountDetails)
+                               (using cid: CorrelationId, dataRequest: DataRequest[A])
+                               (using HeaderCarrier, ExecutionContext): ConnectorResponse[SubmissionSummary] = {
+    given methodContext: MethodContext = MethodContext("acceptMultiple")
+    
+    val toAccept: Seq[LeppItem] = leppSummary.availableItems.getOrElse(Nil)
 
-    doSubmit(
+    logger.info(s"Attempting to accept all ${toAccept.length} available payments for request with cid: $cid")
+
+    val partialAcceptRequest: (BigInt, BigInt) => AcceptLeppPaymentRequest = AcceptLeppPaymentRequest(
       nino = nino,
-      bankAccountDetails = bankAccountDetails,
-      currentLeppLock = leppSummary.currentLock,
-      toSubmit = leppSummary
+      bankAccountDetails = accountDetails
+    )
+    
+    def doSubmit(toAccept: Seq[LeppItem],
+                 currentLock: BigInt,
+                 submissionSummary: SubmissionSummary): ConnectorResponse[SubmissionSummary] = toAccept match {
+      case head :: tail => 
+        import head.{entitlement, id, taxYear}
+        
+        logger.info(msg = s"Attempting to accept available payment for request with taxYear: $taxYear, and cid: $cid")
+
+        val acceptRequest: AcceptLeppPaymentRequest = partialAcceptRequest(currentLock, taxYear)
+        val result: ConnectorResponse[AcceptLeppPaymentResponse] = acceptPayment(acceptRequest, entitlement)
+        
+        result.biflatMap(
+          err =>
+            logger.warn(
+              msg = s"Failed to accept all available payments for request with cid: $cid returning submission summary"
+            )
+            tail.foreach(item =>
+              auditService.auditSubmissionFailure(
+                user = dataRequest.user,
+                bankAccountDetails = accountDetails,
+                taxYear = taxYear,
+                entitlement = entitlement,
+                wasSkipped = true
+              )
+            )
+            if (submissionSummary.isEmpty) {
+              rawConnectorFailure[SubmissionSummary](leppSubmissionError)
+            } else {
+              rawConnectorSuccess(submissionSummary.copy(notAcceptedIds = toAccept.map(_.id)))
+            },
+          success =>
+            val updatedLock: BigInt = success.value.updatedLowEarnersOptimisticLock
+            doSubmit(
+              toAccept = tail,
+              currentLock = updatedLock,
+              submissionSummary = submissionSummary.addAccepted(id)
+            )
+        )
+      case Nil =>
+        logger.info(msg = s"No available payments to accept for request with cid: $cid. Returning submission summary")
+        rawConnectorSuccess(submissionSummary)
+    }
+    
+    doSubmit(
+      toAccept = toAccept,
+      currentLock = leppSummary.currentLock,
+      submissionSummary = SubmissionSummary.empty
+    )
+  }
+  
+  protected[services] def resultWithCid(result: ConnectorResponse[AcceptLeppPaymentResponse])
+                                       (using cid: CorrelationId)
+                                       (using ExecutionContext): ConnectorResponse[AcceptLeppPaymentResponse] = {
+    val resultCid = (responseCid: CorrelationId) => if (responseCid.value == noCorrelationIdString) cid else responseCid
+    
+    result.bimap(
+      err => err.copy(correlationId = resultCid(err.correlationId)),
+      succ => succ.copy(correlationId = resultCid(succ.correlationId)),
     )
   }
 }

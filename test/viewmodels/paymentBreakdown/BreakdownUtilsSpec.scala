@@ -17,8 +17,8 @@
 package viewmodels.paymentBreakdown
 
 import base.SpecBase
-import models.userAnswers.{LeppItem, LeppSummary}
 import models.userAnswers.LeppItemStatus.{Available, Paid}
+import models.userAnswers.{LeppItem, LeppSummary}
 import play.api.Application
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}

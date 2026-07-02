@@ -16,6 +16,20 @@
 
 package models.backend.accept
 
+import models.userAnswers.BankAccountDetails
 import uk.gov.hmrc.domain.Nino
 
 case class AcceptLeppPaymentRequest(identifier: Nino, taxYear: BigInt, body: AcceptLeppPaymentRequestBody)
+
+object AcceptLeppPaymentRequest {
+  def apply(nino: Nino, bankAccountDetails: BankAccountDetails)
+           (currentLock: BigInt, taxYear: BigInt): AcceptLeppPaymentRequest =
+    AcceptLeppPaymentRequest(
+      identifier = nino,
+      taxYear = taxYear,
+      body = AcceptLeppPaymentRequestBody(
+        currentLowEarnersOptimisticLock = currentLock,
+        lowEarnersAccountDetails = bankAccountDetails
+      )
+    )
+}

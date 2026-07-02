@@ -16,7 +16,7 @@
 
 @import views.html.components._
 @import viewmodels.confirmation.ConfirmationUtils
-@import models.userAnswers.LeppSummary
+@import models.userAnswers.LeppItem
 
 @this(
     table: GovukTable,
@@ -27,20 +27,27 @@
     resultsFooter: results_footer
 )
 
-@(leppSummary: LeppSummary, formattedTimestamp: String)(implicit request: Request[_], messages: Messages)
+@(
+    acceptedItems: Seq[LeppItem],
+    notAcceptedItems: Seq[LeppItem],
+    formattedTimestamp: String
+)(
+    implicit request: Request[_],
+    messages: Messages
+)
 
 @layout(
     pageTitle = titleNoForm(messages("confirmation.title")),
     showBackLink = false
 ) {
 
-    @if(leppSummary.availableItems.getOrElse(Nil).nonEmpty){
+    @if(notAcceptedItems.nonEmpty){
         @heading("confirmation.failure.sub.heading", headerSize = "l")
         <p class="govuk-body">@messages("confirmation.failure.items.p1")</p>
 
         @table(TableViewModel(
             caption = "",
-            rows = ConfirmationUtils.availableTableRows("confirmation_table_available_payments", leppSummary.availableItems.get),
+            rows = ConfirmationUtils.availableTableRows("confirmation_table_available_payments", notAcceptedItems),
             columnHeaders = ConfirmationUtils.tableHeaders("confirmation_table_available_payments",
                                 Seq("taxYear", "availableUntil", "amount")),
             tableRef = "confirmation_table_available_payments"
@@ -60,7 +67,7 @@
 
     @table(TableViewModel(
         caption = "",
-        rows = ConfirmationUtils.acceptedTableRows("confirmation_table_accepted_payments", leppSummary.acceptedItems),
+        rows = ConfirmationUtils.acceptedTableRows("confirmation_table_accepted_payments", acceptedItems),
         columnHeaders = ConfirmationUtils.tableHeaders("confirmation_table_accepted_payments", Seq("taxYear", "amount")),
         tableRef = "confirmation_table_accepted_payments"
     ))

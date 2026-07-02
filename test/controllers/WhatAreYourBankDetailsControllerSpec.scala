@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.actions.FakeBarsLockoutAction
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
-import pages.{SubmissionPage, DashboardPage, WhatAreYourBankDetailsPage}
+import pages.{DashboardPage, SubmissionPage, WhatAreYourBankDetailsPage}
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

@@ -23,6 +23,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsObject
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 import uk.gov.hmrc.domain.Nino
@@ -38,18 +39,20 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
   }
 
   "Data Retrieval Action" - {
-
-    val userAnswers = UserAnswers("id", lastUpdated = Instant.now())
+    val userAnswers: UserAnswers = UserAnswers("id", lastUpdated = Instant.now())
 
     "when there is no data in the cache" - {
-
       "must set userAnswers to 'None' in the request" in {
-
-        val sessionRepository = mock[SessionRepository]
+        val sessionRepository: SessionRepository = mock[SessionRepository]
         when(sessionRepository.get(any())) thenReturn Future(None)
-        val action = new Harness(sessionRepository)
+        val action: Harness = new Harness(sessionRepository)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), AuthUser("id", Nino("AA123456C")))).futureValue
+        val result: DataRequest[AnyContentAsEmpty.type] = action.callTransform(
+          IdentifierRequest(
+            request = FakeRequest(),
+            user = AuthUser(userId = "id", nino = Nino("AA123456C"), itmpNameOpt = None)
+          )
+        ).futureValue
 
         result.userAnswers.data mustBe JsObject.empty
         result.userAnswers.id mustBe "id"
@@ -57,14 +60,16 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     }
 
     "when there is data in the cache" - {
-
       "must build a userAnswers object and add it to the request" in {
-
-        val sessionRepository = mock[SessionRepository]
+        val sessionRepository: SessionRepository = mock[SessionRepository]
         when(sessionRepository.get(any())) thenReturn Future(Some(userAnswers))
-        val action = new Harness(sessionRepository)
+        val action: Harness = new Harness(sessionRepository)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), AuthUser("1", Nino("AA123456C")))).futureValue
+        val result: DataRequest[AnyContentAsEmpty.type] = action.callTransform(
+          IdentifierRequest(
+            request = FakeRequest(),
+            user = AuthUser("1", Nino("AA123456C"), None)))
+          .futureValue
 
         result.userAnswers mustBe userAnswers
       }

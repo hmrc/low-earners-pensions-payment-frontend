@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{BarsLockoutAction, FakeBarsLockoutAction}
-import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
+import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary, UserAnswers}
 import pages.{DashboardPage, WhatAreYourBankDetailsPage}
 import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.AnyContentAsEmpty
@@ -29,7 +29,6 @@ import viewmodels.NormalMode
 class SubmitConfirmationControllerSpec extends SpecBase {
 
   "Submit confirmation controller" - {
-
     val bankAccountDetails: BankAccountDetails = BankAccountDetails(
       accountName = "name",
       accountNumber = "number",
@@ -47,7 +46,6 @@ class SubmitConfirmationControllerSpec extends SpecBase {
     )
     
     "must redirect to ClearCacheController" in {
-      
       val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
@@ -62,24 +60,24 @@ class SubmitConfirmationControllerSpec extends SpecBase {
     }
 
     "must return OK and the correct view for a GET" in {
-
       val userAnswers: UserAnswers = UserAnswers(
         id = "1",
         data = Json.obj(
           "leppSummary" -> Json.toJson(summaryModel),
           "bankDetails" -> Json.toJson(bankAccountDetails),
-          "leppSubmissionSummary" -> Json.toJson(summaryModel.copy(availableItems = None, acceptedItems = summaryModel.availableItems))
+          "leppSubmissionSummary" -> Json.toJson(SubmissionSummary(Seq("A-25-1")))
         )
       )
       
       val application = applicationBuilder(userAnswers = userAnswers).build()
 
       running(application) {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(GET, controllers.routes.SubmitConfirmationController.onPageLoad().url)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
+          GET,
+          controllers.routes.SubmitConfirmationController.onPageLoad().url
+        )
 
         val result = route(application, request).value
-
         status(result) mustEqual OK
       }
     }

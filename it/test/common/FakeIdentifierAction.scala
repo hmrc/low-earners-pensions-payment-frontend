@@ -29,7 +29,7 @@ class FakeIdentifierAction @Inject()(bodyParsers: BodyParsers.Default) extends I
       block(
         IdentifierRequest(
           request = request,
-          user = AuthUser(userId = "userId", nino = "AA111111A")
+          user = AuthUser(userId = "userId", nino = "AA111111A", itmpNameOpt = None)
         )
       )
   }

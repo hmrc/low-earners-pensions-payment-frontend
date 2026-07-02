@@ -33,6 +33,7 @@ import utils.Logging
 
 import java.net.URL
 import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
 @Singleton
 class AcceptLeppPaymentConnector @Inject()(config: AppConfig, httpClient: HttpClientV2) 

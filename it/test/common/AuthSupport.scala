@@ -40,7 +40,8 @@ trait AuthSupport extends WireMockMethods {
       |   "internalId",
       |   "nino",
       |   "confidenceLevel",
-      |   "authorisedEnrolments"
+      |   "authorisedEnrolments",
+      |   "optionalItmpName"
       | ]
       |}
     """.stripMargin
@@ -68,7 +69,8 @@ trait AuthSupport extends WireMockMethods {
       Json.obj("confidenceLevel" -> 250) ++
         Json.obj("nino" -> nino) ++
         Json.obj("internalId" -> "anId") ++
-        Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment)))
+        Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment))) ++
+        Json.obj("optionalItmpName" -> Json.obj("givenName" -> JsString("Name")))
 
     when(method = POST, uri = authoriseUri)
       .withRequestBody(authRequestJson)

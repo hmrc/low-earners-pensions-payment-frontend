@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package models.audit
 
-import controllers.routes
-import models.userAnswers.SubmissionSummary
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import viewmodels.Mode
+import play.api.libs.json.{JsString, Writes}
 
-case object CheckYourAnswersPage extends QuestionPage[SubmissionSummary] {
-  override def route(mode: Mode): Call = routes.CheckYourAnswersController.onPageLoad()
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = "leppSubmissionSummary"
+enum PaymentOutcome {
+  case pass, fail, skipped
+}
+
+object PaymentOutcome {
+  implicit val writes: Writes[PaymentOutcome] = (o: PaymentOutcome) => JsString(o.toString)
 }

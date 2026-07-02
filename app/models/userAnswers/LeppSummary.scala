@@ -25,8 +25,7 @@ case class LeppSummary(currentLock: BigInt,
                        availableItems: Option[Seq[LeppItem]] = None,
                        paidItems: Option[Seq[LeppItem]] = None,
                        suspendedItems: Option[Seq[LeppItem]] = None,
-                       cancelledItems: Option[Seq[LeppItem]] = None,
-                       acceptedItems: Option[Seq[LeppItem]] = None) {
+                       cancelledItems: Option[Seq[LeppItem]] = None) {
   val availablePaymentItems: Seq[LeppItem] = Seq(availableItems, suspendedItems).flatten.flatten
   val hasAvailablePayments: Boolean = availablePaymentItems.nonEmpty
 

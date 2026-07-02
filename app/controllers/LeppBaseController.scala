@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
-import models.userAnswers.{BankAccountDetails, LeppSummary}
+import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary}
 import pages.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
@@ -96,16 +96,16 @@ trait SessionDataHandling {
     }
   }
 
-  def handleForConfirmationPage(f: BlockFor[(LeppSummary, BankAccountDetails, LeppSummary)]): Action[AnyContent] =
+  def handleForConfirmationPage(f: BlockFor[(LeppSummary, BankAccountDetails, SubmissionSummary)]): Action[AnyContent] =
     handleWithSubmissionCheck { implicit req =>
       import req.userAnswers
 
       val leppDataOpt: Option[LeppSummary] = userAnswers.get(DashboardPage)
       val bankDetailsOpt: Option[BankAccountDetails] = userAnswers.get(WhatAreYourBankDetailsPage)
-      val cyaSubmissionOpt: Option[LeppSummary] = userAnswers.get(CheckYourAnswersPage)
+      val cyaSubmissionOpt: Option[SubmissionSummary] = userAnswers.get(CheckYourAnswersPage)
 
       (leppDataOpt, bankDetailsOpt, cyaSubmissionOpt) match {
-        case (Some(leppData), Some(bankDetails), Some(cyaSubmission)) => f(req)(leppData,bankDetails,cyaSubmission)
+        case (Some(leppData), Some(bankDetails), Some(cyaSubmission)) => f(req)(leppData,bankDetails, cyaSubmission)
         case (Some(_), Some(_), _) => CheckYourAnswersPage.asFutureRedirect
         case (Some(_), None, _) => WhatAreYourBankDetailsPage.asFutureRedirect
         case _ => DashboardPage.asFutureRedirect

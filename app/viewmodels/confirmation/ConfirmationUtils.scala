@@ -24,16 +24,15 @@ import viewmodels.govuk.All.TableRowViewModel
 
 object ConfirmationUtils {
   def tableHeaders(tableRef: String, headerNames: Seq[String])
-                  (implicit messages: Messages): Seq[HeadCell] = headerNames.map(headerName => {
+                  (using messages: Messages): Seq[HeadCell] = headerNames.map(headerName => {
     HeadCell(
       content = Text(messages(s"confirmation.table.header.$headerName")),
       attributes = Map("id" -> s"${tableRef}_header_$headerName")
     )
   })
 
-  def availableTableRows(tableRef: String,
-                items: Seq[LeppItem])
-               (implicit messages: Messages): Seq[Seq[TableRow]] = items.map(item =>
+  def availableTableRows(tableRef: String, items: Seq[LeppItem])
+                        (using messages: Messages): Seq[Seq[TableRow]] = items.map(item =>
     Seq(
       TableRowViewModel(Text(messages("common.taxYearDates", s"${item.taxYear}",
         s"${item.taxYear + 1}"))).copy(attributes = Map("id" -> s"taxYear_${item.taxYear}")),
@@ -43,9 +42,8 @@ object ConfirmationUtils {
         .copy(attributes = Map("id" -> s"entitlement_${item.taxYear}"))
     ))
 
-  def acceptedTableRows(tableRef: String,
-                         items: Option[Seq[LeppItem]])
-                        (implicit messages: Messages): Seq[Seq[TableRow]] = items.getOrElse(Nil).map {item =>
+  def acceptedTableRows(tableRef: String, items: Seq[LeppItem])
+                       (using messages: Messages): Seq[Seq[TableRow]] = items.map {item =>
       Seq(
         TableRowViewModel(Text(messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}")))
           .copy(attributes = Map("id" -> s"taxYear_${item.taxYear}")),

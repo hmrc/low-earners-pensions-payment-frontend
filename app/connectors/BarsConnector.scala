@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.net.URI
 import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
 @Singleton
 class BarsConnector @Inject()(config: AppConfig,

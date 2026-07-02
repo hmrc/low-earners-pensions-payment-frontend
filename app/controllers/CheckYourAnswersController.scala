@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
@@ -28,7 +29,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{CorrelationIdHandler, Logging}
+import utils.{CorrelationIdHandler, Logging, MethodContext}
 import viewmodels.NormalMode
 import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.CheckYourAnswersView
@@ -65,30 +66,32 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
       
       handleWithBars(bankDetails)(() => {
-        for {
-          leppSummary <- leppSubmissionService.submitMultiple(req.user.nino, bankDetails, leppData)
-          updatedAnswers <- Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value))
-          _ <- sessionService.save(updatedAnswers)
+        val result = for {
+          leppSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppData, bankDetails)
+          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value)))
+          _ <- EitherT.right(sessionService.save(updatedAnswers))
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
+        
+        result.leftMap(_ => Redirect(routes.ClearCacheController.defaultError())).merge
       })
   }
 
   protected[controllers] def handleWithBars(bankDetails: BankAccountDetails)(f: () => Future[Result])
                                            (implicit hc: HeaderCarrier,
                                             ec: ExecutionContext,
-                                            cid: CorrelationId): Future[Result] =
+                                            cid: CorrelationId): Future[Result] = {
+    given mc: MethodContext = MethodContext("handleWithBars")
+    
     barsService
       .checkBankAccountDetails(bankDetails.toBarsRequest)
       .leftMap {
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
           barsVerifyStatusConnector
             .update().map { _ =>
-              logger.info("[CheckYourAnswersController][handleWithBars] ",
-                s"Bars VerifyStatus update successful for correlationId : $cid" 
+              logger.info(s"Bars VerifyStatus update successful for correlationId : $cid" 
               )
             } recover { case e =>
-            logger.error("[CheckYourAnswersController][handleWithBars] ",
-              s"Bars VerifyStatus update failed for: correlationId : $cid"
+            logger.error(s"Bars VerifyStatus update failed for: correlationId : $cid"
             )
           }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())
@@ -97,4 +100,5 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       }
       .semiflatMap(_ => f())
       .merge
+  }
 }

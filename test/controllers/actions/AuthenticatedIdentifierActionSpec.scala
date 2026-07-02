@@ -28,6 +28,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.ConfidenceLevel.{L200, L250}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve.ItmpName
 import uk.gov.hmrc.auth.core.syntax.retrieved.authSyntaxForRetrieved
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Constants
@@ -36,14 +37,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
-
   private val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   def authResult(internalId: Option[String],
                  nino: Option[String],
                  confidenceLevel: ConfidenceLevel,
-                 enrolments: Enrolment*): Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments =
-    internalId and nino and confidenceLevel and Enrolments(enrolments.toSet)
+                 enrolments: Enrolment*): Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName] =
+    internalId and nino and confidenceLevel and Enrolments(enrolments.toSet) and Option.empty[ItmpName]
 
   val ptaEnrolment: Enrolment =
     Enrolment(Constants.ptaEnrolmentKey, Seq(EnrolmentIdentifier("Some_Id", "A2100001")), "Activated")
@@ -51,7 +51,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
   val invalidEnrolment: Enrolment =
     Enrolment("INVALID", Seq.empty, "Activated")
 
-  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments): Unit =
+  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName]): Unit =
     setAuthValue(Future.successful(value))
 
   def setAuthValue[A](value: Future[A]): Unit =

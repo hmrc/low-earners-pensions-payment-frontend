@@ -16,17 +16,18 @@
 
 package models.requests
 
+import uk.gov.hmrc.auth.core.retrieve.ItmpName
 import uk.gov.hmrc.domain.Nino
 
-final case class AuthUser(
-                         userId: String,
-                         nino: Nino
-                         )
+final case class AuthUser(userId: String,
+                          nino: Nino,
+                          itmpNameOpt: Option[ItmpName])
 
 object AuthUser {
-  def apply(userId: String, nino: String): AuthUser =
+  def apply(userId: String, nino: String, itmpNameOpt: Option[ItmpName]): AuthUser =
     new AuthUser(
       userId = userId,
-      nino = Nino(nino)
+      nino = Nino(nino),
+      itmpNameOpt = itmpNameOpt
     )
 }

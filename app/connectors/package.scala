@@ -15,11 +15,19 @@
  */
 
 import cats.data.EitherT
+import models.CorrelationId
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
+import models.errors.ErrorResult
 
 import scala.concurrent.Future
 
 package object connectors {
   type DownstreamResponse[R] = Either[ErrorWrapper, SuccessWrapper[R]]
   type ConnectorResponse[R] = EitherT[Future, ErrorWrapper, SuccessWrapper[R]]
+  
+  def rawConnectorSuccess[R](value: R)(using cid: CorrelationId): ConnectorResponse[R] =
+    EitherT(Future.successful(Right(SuccessWrapper(value, cid))))
+    
+  def rawConnectorFailure[R](err: ErrorResult)(using cid: CorrelationId): ConnectorResponse[R] =
+    EitherT(Future.successful(Left(ErrorWrapper(err, cid))))
 }

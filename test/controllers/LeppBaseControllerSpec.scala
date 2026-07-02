@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
-import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
+import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import pages.*
@@ -335,7 +335,7 @@ class LeppBaseControllerSpec extends SpecBase {
           data = Json.obj(
             "leppSummary" -> Json.toJson(summaryModel),
             "bankDetails" -> Json.toJson(detailsModel),
-            "leppSubmissionSummary" -> Json.toJson(summaryModel)
+            "leppSubmissionSummary" -> Json.toJson(SubmissionSummary.empty)
           )
         )
 
