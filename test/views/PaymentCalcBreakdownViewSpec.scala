@@ -29,7 +29,6 @@ import play.api.test.FakeRequest
 import views.html.PaymentCalcBreakdownView
 
 class PaymentCalcBreakdownViewSpec extends SpecBase {
-
   val leppItem: LeppItem = LeppItem(
     id = "id-1",
     taxYear = 2025,
@@ -40,10 +39,14 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     claimDate = None,
     originalAmount = Some(100)
   )
-  val summary = LeppSummary(1, Some(Seq(leppItem)), Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid))))
+  
+  val summary: LeppSummary = LeppSummary(
+    1, 
+    Some(Seq(leppItem)), 
+    Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid)))
+  )
   
   "view" - {
-
     "with correct LEPP gov banner" in new Setup {
       view.getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
       view.getElementsByClass("govuk-link hmrc-sign-out-nav__link").attr("href") mustBe
@@ -99,13 +102,12 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
   }
 
   trait Setup(barsLock: Boolean = false, id: Option[String] = None) {
-
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", barsLock, id).body
+      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", Some("back-url"), barsLock, id).body
     )
   }
 }
