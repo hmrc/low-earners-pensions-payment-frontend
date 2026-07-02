@@ -50,7 +50,7 @@ dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc or
 breakdown.title = Dadansoddiad eich taliad
 breakdown.heading = Rydych yn gymwys i gael cyfanswm o {0}
 breakdown.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
-breakdown.u1 = Ar gyfer blwyddyn dreth 6 Ebrill {0} to 5 Ebrill {1}
+breakdown.u1 = Ar gyfer blwyddyn dreth 6 Ebrill {0} i 5 Ebrill {1}
 breakdown.l1 = Eich cyfraniadau pensiwn cyflog net
 breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
 breakdown.l3 = Eich taliad
@@ -193,13 +193,14 @@ month.12 = Rhagfyr
 
 # Common content
 common.signOut = Arwyddo allan
-common.taxYearDates = 6 Ebrill {0} to 5 Ebrill {1}
+common.taxYearDates = 6 Ebrill {0} i 5 Ebrill {1}
 site.start = Dechreuwch nawr
 site.change = Newid
 site.continue = Parhau
 site.tryAgain = Ceisiwch eto
 site.print = Argraffwch y dudalen hon
-site.acceptAndSubmit = Submit
+site.acceptAndSubmit = Cyflwyno
+site.govuk = GOV.UK
 error.title.prefix = Gwall:
 submitted.on = Cyflwynwyd ar
 
