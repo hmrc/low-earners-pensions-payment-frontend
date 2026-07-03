@@ -106,8 +106,8 @@ class LeppSubmissionService @Inject()(connector: AcceptLeppPaymentConnector,
               auditService.auditSubmissionFailure(
                 user = dataRequest.user,
                 bankAccountDetails = accountDetails,
-                taxYear = taxYear,
-                entitlement = entitlement,
+                taxYear = item.taxYear,
+                entitlement = item.entitlement,
                 wasSkipped = true
               )
             )
