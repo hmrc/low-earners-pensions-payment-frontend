@@ -72,6 +72,7 @@ class AppConfig @Inject()(config: Configuration):
   private val barsBaseUrl: String = servicesConfig.baseUrl("bars")
   private val barsEnv: String = config.get("microservice.services.bars.env")
   def barsUrl: String = barsBaseUrl + (if (barsEnv == "local") "" else "/bank-account-reputation")
+  val barsUserAgent: String = loadConfig("microservice.services.bars.userAgent")
 
   //BARS config
   private val backendUrl: String = servicesConfig.baseUrl("lepp-backend")
