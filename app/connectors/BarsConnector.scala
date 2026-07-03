@@ -44,7 +44,7 @@ class BarsConnector @Inject()(config: AppConfig,
         .post(URI.create(s"${config.barsUrl}/verify/personal").toURL)
         .withBody(Json.toJson(request))
         .setHeader(
-          "User-Agent" -> config.appName,
+          "User-Agent" -> config.barsUserAgent,
           "X-Tracking-Id" -> cid
         )
         .execute[DownstreamResponse[BarsResponse]]
