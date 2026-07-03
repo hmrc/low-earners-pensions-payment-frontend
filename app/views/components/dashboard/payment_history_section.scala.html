@@ -36,7 +36,7 @@
   @messages("dashboard.paymentHistory.cancelledInset.start")
   <strong class="govuk-!-font-weight-bold">@leppSummary.cancelledItems.getOrElse(Nil).length</strong>
   @messages("dashboard.paymentHistory.cancelledInset.end")
-  @contactLinkElement()
+  @contactLinkElement(Some("dashboard.moreInformation"))
  </p>
 }
 

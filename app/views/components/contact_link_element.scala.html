@@ -15,11 +15,18 @@
  *@
 
 @import views.html.components.link_element
+@import config.AppConfig
 
-@this(linkElement: link_element)
+@this(
+    linkElement: link_element,
+    config: AppConfig
+)
 
-@()(implicit messages: Messages)
+@(preContentOpt: Option[String] = None)(implicit messages: Messages)
 
-@messages("dashboard.moreInformation")
-@linkElement("/", "dashboard.contactUs")
+@for(preContent <- preContentOpt) {
+    @messages(preContent)
+}
+
+@linkElement(config.contactUrl, "common.contactUs")
 

@@ -20,7 +20,8 @@
 
 @this(
     layout: templates.Layout,
-    heading: h1
+    heading: h1,
+    contactLinkElement: contact_link_element
 )
 
 @(viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
@@ -39,7 +40,7 @@
         <li>@messages("barsRequestErrors.u1.l4")</li>
     </ul>
 
-    <p class="govuk-body">@messages("barsRequestErrors.p2")</p>
+    <p class="govuk-body">@contactLinkElement(Some("barsRequestErrors.p2"))</p>
 
     <a href="@viewModel.onSubmit"
        role="button"

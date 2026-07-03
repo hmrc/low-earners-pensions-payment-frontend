@@ -17,7 +17,6 @@ whatYouWillNeed.h2.p2 = I ddefnyddio''r gwasanaeth hwn bydd angen eich manylion 
 dashboard.title = Eich taliadau pensiwn i''r sawl sy''n ennill incwm isel
 dashboard.heading = Eich taliadau pensiwn i''r sawl sy''n ennill incwm isel
 dashboard.moreInformation = I gael rhagor o wybodaeth,
-dashboard.contactUs = cysylltwch â ni (yn agor tab newydd).
 dashboard.availablePayments.heading = Taliadau sydd ar gael
 dashboard.availablePayments.noneAvailable = Nid oes gennych unrhyw daliadau ar gael.
 dashboard.availablePayments.totalAvailableText.start = Mae gennych gyfanswm o
@@ -60,7 +59,6 @@ breakdown.underpayment.l2 = Swm a dderbyniwyd eisoes
 breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
 breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir
-breakdown.p2.a1 = cysylltwch â ni (yn agor tab newydd)..
 breakdown.p3 = Derbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
 
 # Bank account details page
@@ -121,7 +119,7 @@ barsRequestErrors.u1.l1 = ni ddarparwyd rhif rôl y cyfrif banc ar gyfer cyfrif 
 barsRequestErrors.u1.l2 = nid yw''r cyfrif a ddarparwyd yn derbyn credyd uniongyrchol
 barsRequestErrors.u1.l3 = methwyd dod o hyd i unrhyw gyfrif gyda''r manylion a ddarparwyd
 barsRequestErrors.u1.l4 = nid oedd yr enw ar y cyfrif yn cyfateb i''r hyn a ddarparwyd
-barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi gysylltu â ni
+barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi
 
 # Bars check failure page
 barsCheckFailed.title = Ni allem wirio manylion eich cyfrif banc
@@ -146,12 +144,6 @@ ineligible.guidance.postform = . Byddwn yn ymateb i chi o fewn 5 diwrnod gwaith.
 somethingWentWrong.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
 somethingWentWrong.heading = Mae'n ddrwg gennym, mae problem gyda'r gwasanaeth
 somethingWentWrong.p1 = Gallwch chi roi cynnig arall arni yn nes ymlaen.
-
-# Journey recovery page
-journeyRecovery.startAgain.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
-journeyRecovery.startAgain.heading = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
-journeyRecovery.try.again = Gallwch chi roi cynnig arall arni yn nes ymlaen neu
-journeyRecovery.contact = cysylltwch â ni i gael help gydag ymholiadau am gynlluniau pensiwn
 
 # Session timeout page
 sessionTimeout.title = Er eich diogelwch, fe wnaethon ni eich allgofnodi
@@ -194,6 +186,7 @@ month.12 = Rhagfyr
 # Common content
 common.signOut = Arwyddo allan
 common.taxYearDates = 6 Ebrill {0} i 5 Ebrill {1}
+common.contactUs = cysylltwch â ni (yn agor tab newydd).
 site.start = Dechreuwch nawr
 site.change = Newid
 site.continue = Parhau

@@ -47,7 +47,8 @@ import scala.concurrent.Future
           )
 
           status(result) shouldBe BAD_REQUEST
-          contentAsString(result) should include("If this issue persists you may have to contact HMRC")
+          contentAsString(result) should include("If this issue persists you may have to")
+          contentAsString(result) should include("contact us (opens in new tab).")
         }
 
       }
