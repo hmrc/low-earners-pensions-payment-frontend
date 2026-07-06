@@ -17,7 +17,8 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, StartPageCheckEligibilityAction}
+import controllers.base.BarsLeppBaseController
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.BankAccountDetails
 import navigation.Navigator
@@ -36,22 +37,22 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  barsLockout: BarsLockoutAction,
                                                  getData: DataRetrievalAction,
+                                                 checkEligibilityAction: AcceptPaymentCheckEligibilityAction,
                                                  val sessionService: SessionCacheService,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
                                                  navigator: Navigator,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibilityAction){
 
   private val form: Form[BankAccountDetails] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = handleWithLeppData { implicit req =>
-    _ =>
-      req.userAnswers.get(WhatAreYourBankDetailsPage) match {
-        case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
-        case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
-      }
+  def onPageLoad(mode: Mode): Action[AnyContent] = handle { implicit req =>
+    req.userAnswers.get(WhatAreYourBankDetailsPage) match {
+      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
+      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = handle { implicit req =>
