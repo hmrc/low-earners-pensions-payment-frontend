@@ -46,7 +46,7 @@ class BarsCheckFailedControllerISpec extends ControllerIntegrationSpecBase {
         )
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
-        contentAsString(result) should include("Please try again later")
+        contentAsString(result) should include("Try again later")
       }
     }
   }

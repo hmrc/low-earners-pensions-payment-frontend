@@ -126,7 +126,7 @@ barsRequestErrors.p2 = If this issue persists you may have to
 barsCheckFailed.title = We could not verify your bank account details
 barsCheckFailed.heading = We could not verify your bank account details
 barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
-barsCheckFailed.p2 = Please try again later
+barsCheckFailed.p2 = Try again later
 
 # BARS lockout page
 bars.lockout.title = You''ve tried to enter your bank account details too many times
