@@ -19,7 +19,8 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.base.BarsLeppBaseController
 import models.ResponseWrapper.ErrorWrapper
 import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
@@ -40,6 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            barsLockout: BarsLockoutAction,
                                            getData: DataRetrievalAction,
+                                           checkEligibility: AcceptPaymentCheckEligibilityAction,
                                            view: CheckYourAnswersView,
                                            correlationIdHandler: CorrelationIdHandler,
                                            barsService: BarsService,
@@ -49,10 +51,10 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                            val controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) with Logging {
 
   def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit req =>
-    (_, bankDetails) =>
+    bankDetails =>
       Future.successful(Ok(
         view(
           summaryList = cyaSummaryList(bankDetails),
@@ -62,13 +64,14 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
   }
 
   def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req =>
-    (leppData, bankDetails) =>
+    bankDetails =>
+      import req.leppSummary
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
       
       handleWithBars(bankDetails)(() => {
         val result = for {
-          leppSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppData, bankDetails)
-          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value)))
+          submissionSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppSummary, bankDetails)
+          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, submissionSummary.value)))
           _ <- EitherT.right(sessionService.save(updatedAnswers))
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
         
