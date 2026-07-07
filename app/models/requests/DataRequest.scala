@@ -19,7 +19,10 @@ package models.requests
 import models.userAnswers.UserAnswers
 import play.api.mvc.{Request, WrappedRequest}
 
+import java.time.Instant
+
 case class DataRequest[A](request: Request[A],
                           user: AuthUser,
-                          userAnswers: UserAnswers) extends WrappedRequest[A](request)
+                          userAnswers: UserAnswers,
+                          barsLockoutExpiryOpt: Option[Instant] = None) extends WrappedRequest[A](request)
 

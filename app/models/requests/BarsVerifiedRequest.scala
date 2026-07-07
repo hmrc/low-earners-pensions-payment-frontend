@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package models.barsLockout
+package models.requests
 
-import models.requests.IdentifierRequest
+import java.time.Instant
 
-class BarsVerifiedRequest[A](
-                              override val request:           IdentifierRequest[A]
-) extends IdentifierRequest[A](request, request.user)
+class BarsVerifiedRequest[A](override val request: IdentifierRequest[A],
+                             val barsLockoutExpiryOpt: Option[Instant] = None)
+  extends IdentifierRequest[A](request, request.user)

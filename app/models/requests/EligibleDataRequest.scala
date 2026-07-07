@@ -19,17 +19,21 @@ package models.requests
 import models.userAnswers.{LeppSummary, UserAnswers}
 import play.api.mvc.{Request, WrappedRequest}
 
+import java.time.Instant
+
 case class EligibleDataRequest[A](request: Request[A],
                                   user: AuthUser,
                                   userAnswers: UserAnswers,
-                                  leppSummary: LeppSummary) extends WrappedRequest[A](request)
+                                  leppSummary: LeppSummary,
+                                  barsLockoutExpiryOpt: Option[Instant] = None) extends WrappedRequest[A](request)
 
 object EligibleDataRequest {
   def apply[A](request: DataRequest[A], leppSummary: LeppSummary): EligibleDataRequest[A] = EligibleDataRequest(
     request = request.request,
     user = request.user,
     userAnswers = request.userAnswers,
-    leppSummary = leppSummary
+    leppSummary = leppSummary,
+    barsLockoutExpiryOpt = request.barsLockoutExpiryOpt
   )
 }
 
