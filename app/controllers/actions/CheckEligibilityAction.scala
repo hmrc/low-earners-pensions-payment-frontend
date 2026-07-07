@@ -22,12 +22,12 @@ import connectors.ConnectorResponse
 import models.CorrelationId
 import models.requests.{DataRequest, EligibleDataRequest}
 import pages.DashboardPage
-import play.api.mvc.{ActionFilter, ActionRefiner, Result, Results}
+import play.api.mvc.{ActionFilter, ActionRefiner, Headers, Result, Results}
 import services.{LeppRetrievalService, SessionCacheService}
 import models.userAnswers.LeppSummary
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.CorrelationIdHandler
+import utils.{Constants, CorrelationIdHandler}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,12 +71,16 @@ class StartPageCheckEligibilityAction @Inject()(sessionDataService: SessionCache
       updatedUserAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
       _ <- EitherT.right(sessionDataService.save(updatedUserAnswers))
     } yield leppSummary
+    
+    val requestHeadersWithCid: Headers = request.headers.replace(Constants.correlationIdKey -> cid.value)
+    val requestWithCid = request.request.withHeaders(requestHeadersWithCid)
+    val dataRequestWithCid: DataRequest[A] = request.copy(request = requestWithCid)
 
     result.biflatMap(
       err => EitherT(Future.successful(notEligibleRedirect)),
       success =>
         if(success.value.isNonEmpty)
-          EitherT(Future.successful(Right(EligibleDataRequest[A](request, success.value))))
+          EitherT(Future.successful(Right(EligibleDataRequest[A](dataRequestWithCid, success.value))))
         else
           EitherT(Future.successful(notEligibleRedirect))
     ).value
