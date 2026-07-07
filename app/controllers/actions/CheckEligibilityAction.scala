@@ -22,7 +22,7 @@ import connectors.ConnectorResponse
 import models.CorrelationId
 import models.requests.{DataRequest, EligibleDataRequest}
 import pages.DashboardPage
-import play.api.mvc.{ActionFilter, ActionRefiner, Headers, Result, Results}
+import play.api.mvc.{ActionFilter, ActionRefiner, Headers, Request, Result, Results}
 import services.{LeppRetrievalService, SessionCacheService}
 import models.userAnswers.LeppSummary
 import uk.gov.hmrc.http.HeaderCarrier
@@ -72,8 +72,7 @@ class StartPageCheckEligibilityAction @Inject()(sessionDataService: SessionCache
       _ <- EitherT.right(sessionDataService.save(updatedUserAnswers))
     } yield leppSummary
     
-    val requestHeadersWithCid: Headers = request.headers.replace(Constants.correlationIdKey -> cid.value)
-    val requestWithCid = request.request.withHeaders(requestHeadersWithCid)
+    val requestWithCid: Request[A] = ActionUtils.requestWithCid(request.request)(using cid)
     val dataRequestWithCid: DataRequest[A] = request.copy(request = requestWithCid)
 
     result.biflatMap(
