@@ -16,11 +16,10 @@
 
 package controllers.actions
 
-import com.google.inject.ImplementedBy
 import connectors.BarsVerifyStatusConnector
 import models.CorrelationId
-import models.barsLockout.BarsVerifiedRequest
-import models.requests.IdentifierRequest
+import models.barsLockout.BarsVerifyStatusResponse
+import models.requests.{BarsVerifiedRequest, IdentifierRequest}
 import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result, Results}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -30,39 +29,74 @@ import utils.CorrelationIdHandler
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[BarsLockoutActionRefiner])
-trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedRequest]
+trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedRequest] with Logging with Results {
+  val barsVerifyStatusConnector: BarsVerifyStatusConnector
+  val correlationIdHandler: CorrelationIdHandler
+  
+  def handleWithBarsStatus[A](f: BarsVerifyStatusResponse => Either[Result, BarsVerifiedRequest[A]])
+                             (using cid: CorrelationId)
+                             (using HeaderCarrier, ExecutionContext): Future[Either[Result, BarsVerifiedRequest[A]]] = {
+    
+    barsVerifyStatusConnector
+      .status()
+      .map(status => f(status))
+      .recover { case e =>
+        println(e)
+        logger.error(
+          s"[BarsLockoutActionRefiner] " +
+            s"failed to retrieve BarsVerifyStatus for " +
+            s"correlationId: $cid, " +
+            s"reason:${e.getMessage}"
+        )
+        Left(InternalServerError)
+      }
+  }
+}
 
 @Singleton
-class BarsLockoutActionRefiner @Inject()(
-  barsVerifyStatusConnector: BarsVerifyStatusConnector,
-  correlationIdHandler: CorrelationIdHandler
-)(implicit ec: ExecutionContext)
-    extends BarsLockoutAction
-    with Logging
-    with Results {
+class NoRedirectBarsLockoutAction @Inject()(val barsVerifyStatusConnector: BarsVerifyStatusConnector,
+                                            val correlationIdHandler: CorrelationIdHandler)
+                                           (implicit ec: ExecutionContext)
+  extends BarsLockoutAction {
 
-  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
-    given headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    given correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
-  
-    barsVerifyStatusConnector.status().map { status =>
-      status.lockoutExpiryDateTime match {
-        case Some(_) =>
-          Left(Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad()))
-        case None =>
-          Right(
-            new BarsVerifiedRequest(
-              request = request
-            )
-          )
-      }
-    }.recover { case e =>
-      
-      logger.error(
-        s"[BarsLockoutActionRefiner] failed to retrieve BarsVerifyStatus for correlationId: $correlationId, reason:${e.getMessage}"
+  override protected[actions] def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
+    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given cid: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
+
+    handleWithBarsStatus { status =>
+      Right(
+        new BarsVerifiedRequest(
+          request = request.copy(request = ActionUtils.requestWithCid(request.request)),
+          barsLockoutExpiryOpt = status.lockoutExpiryDateTime
+        )
       )
-      Left(InternalServerError)
+    }
+  }
+
+  override protected def executionContext: ExecutionContext = ec
+}
+
+@Singleton
+class RedirectBarsLockoutAction @Inject()(val barsVerifyStatusConnector: BarsVerifyStatusConnector,
+                                          val correlationIdHandler: CorrelationIdHandler)
+                                         (implicit ec: ExecutionContext) 
+  extends BarsLockoutAction {
+
+  override protected[actions] def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
+    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given cid: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
+
+    handleWithBarsStatus { status =>
+      status.lockoutExpiryDateTime match {
+        case Some(_) => Left(
+          Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad())
+        )
+        case None => Right(
+          new BarsVerifiedRequest(
+            request = request.copy(request = ActionUtils.requestWithCid(request.request))
+          )
+        )
+      }
     }
   }
 
