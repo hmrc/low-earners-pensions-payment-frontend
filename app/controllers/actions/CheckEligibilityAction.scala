@@ -20,11 +20,12 @@ import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.ConnectorResponse
 import models.CorrelationId
+import models.ResponseWrapper.ErrorWrapper
 import models.requests.{DataRequest, EligibleDataRequest}
 import pages.DashboardPage
 import play.api.mvc.{ActionFilter, ActionRefiner, Headers, Request, Result, Results}
 import services.{LeppRetrievalService, SessionCacheService}
-import models.userAnswers.LeppSummary
+import models.userAnswers.{LeppSummary, UserAnswers}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.{Constants, CorrelationIdHandler}
@@ -50,10 +51,24 @@ class AcceptPaymentCheckEligibilityAction @Inject()()(using ec: ExecutionContext
 }
 
 @Singleton
-class StartPageCheckEligibilityAction @Inject()(sessionDataService: SessionCacheService,
-                                                correlationIdHandler: CorrelationIdHandler,
-                                                leppRetrievalService: LeppRetrievalService)
-                                               (using ec: ExecutionContext)
+class StartPageCheckEligibilityActionBuilder @Inject()(sessionDataService: SessionCacheService,
+                                                       correlationIdHandler: CorrelationIdHandler,
+                                                       leppRetrievalService: LeppRetrievalService)
+                                                      (using ec: ExecutionContext) {
+  def create(withCaching: Boolean): StartPageCheckEligibilityAction =
+    StartPageCheckEligibilityAction(withCaching)(
+      sessionDataService = sessionDataService,
+      correlationIdHandler = correlationIdHandler,
+      leppRetrievalService = leppRetrievalService
+    )
+}
+
+@Singleton
+class StartPageCheckEligibilityAction (withCaching: Boolean) 
+                                      (sessionDataService: SessionCacheService,
+                                       correlationIdHandler: CorrelationIdHandler,
+                                       leppRetrievalService: LeppRetrievalService)
+                                      (using ec: ExecutionContext)
   extends CheckEligibilityAction with Results {
   
   override protected def executionContext: ExecutionContext = ec
@@ -66,13 +81,21 @@ class StartPageCheckEligibilityAction @Inject()(sessionDataService: SessionCache
       Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
     )
     
+    def cachingResult(userAnswers: UserAnswers): Future[Unit] = if(withCaching){
+      sessionDataService.save(userAnswers)
+    } else {
+     Future.successful(())
+    }
+    
     val result: ConnectorResponse[LeppSummary] = for {
+      _ <- EitherT.right(Future.successful(sessionDataService.clear(request.userAnswers)))
       leppSummary <- leppRetrievalService.retrieveLeppDetails()
-      updatedUserAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
-      _ <- EitherT.right(sessionDataService.save(updatedUserAnswers))
+      emptyUserAnswers = UserAnswers(id = request.userAnswers.id)
+      updatedUserAnswers <- EitherT.right(Future.fromTry(emptyUserAnswers.set(DashboardPage, leppSummary.value)))
+      _ <- EitherT.right(cachingResult(updatedUserAnswers))
     } yield leppSummary
     
-    val requestWithCid: Request[A] = ActionUtils.requestWithCid(request.request)(using cid)
+    val requestWithCid: Request[A] = ActionUtils.requestWithCid(request.request)
     val dataRequestWithCid: DataRequest[A] = request.copy(request = requestWithCid)
 
     result.biflatMap(

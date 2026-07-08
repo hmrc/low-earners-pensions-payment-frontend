@@ -5,7 +5,7 @@ import models.CorrelationId
 import models.requests.{AuthUser, DataRequest, EligibleDataRequest}
 import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, verify, when}
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, AnyContentAsEmpty, Result, Results}
 import play.api.test.FakeRequest
@@ -21,13 +21,13 @@ import scala.concurrent.Future
 class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
   
   private trait Test {
-    private val mockSessionService: SessionCacheService = mock[SessionCacheService]
-    private val mockCorrelationIdHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
-    private val mockLeppRetrievalService: LeppRetrievalService = mock[LeppRetrievalService]
+    val mockSessionService: SessionCacheService = mock[SessionCacheService]
+    val mockCorrelationIdHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
+    val mockLeppRetrievalService: LeppRetrievalService = mock[LeppRetrievalService]
 
     val user: AuthUser = AuthUser(userId = "id", nino = generateNino(), itmpNameOpt = None)
 
-    val request: DataRequest[AnyContent] = DataRequest[AnyContent](
+    lazy val request: DataRequest[AnyContent] = DataRequest[AnyContent](
       request = FakeRequest(),
       user = user,
       userAnswers = UserAnswers(
@@ -36,11 +36,15 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
       )
     )
     
-    val testObject: StartPageCheckEligibilityAction = new StartPageCheckEligibilityAction(
+    val testObject: StartPageCheckEligibilityAction = new StartPageCheckEligibilityAction(withCaching = true)(
       sessionDataService = mockSessionService,
       correlationIdHandler = mockCorrelationIdHandler,
       leppRetrievalService = mockLeppRetrievalService
     )
+    
+    when(
+      mockSessionService.clear(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any())
+    ).thenReturn(Future.successful(true))
     
     when(
       mockCorrelationIdHandler.getCorrelationId(ArgumentMatchers.any())
@@ -65,13 +69,14 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
         data => rawConnectorSuccess(data)
       )
     )
+
+    lazy val result: Either[Result, EligibleDataRequest[AnyContent]] = await(testObject.refine(request))
   }
   
   "StartPageCheckEligibilityAction" - {
     "refine" - {
       "should redirect to NotEligible page when user has no LEPP data" in new Test {
         mockLeppRetrieval(None)
-        val result: Either[Result, EligibleDataRequest[AnyContent]] = await(testObject.refine(request))
         
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(ImATeapot("")) mustBe Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
@@ -79,7 +84,6 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
       
       "should redirect to NotEligible page when user has no applicable LEPP data" in new Test {
         mockLeppRetrieval(Some(LeppSummary(currentLock = 1)))
-        val result: Either[Result, EligibleDataRequest[AnyContent]] = await(testObject.refine(request))
 
         result mustBe a[Left[_, _]]
         result.swap.getOrElse(ImATeapot("")) mustBe Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
@@ -87,9 +91,8 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
 
       "should return EligibleDataRequest if LEPP exists" in new Test {
         mockLeppRetrieval(Some(summaryModel))
-        val result: Either[Result, EligibleDataRequest[AnyContent]] = await(testObject.refine(request))
-
-        val dummyRequest: EligibleDataRequest[AnyContentAsEmpty.type] = EligibleDataRequest(
+        
+        val dummyRequest: EligibleDataRequest[AnyContent] = EligibleDataRequest(
           request = DataRequest(
             request = FakeRequest(),
             user = user,
@@ -99,7 +102,22 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
         )
         
         result mustBe a[Right[_, _]]
-        result.getOrElse(dummyRequest) mustBe EligibleDataRequest(request = request, leppSummary = summaryModel)
+        val resultingRequest: EligibleDataRequest[AnyContent] = result.getOrElse(dummyRequest)
+        resultingRequest.user mustBe request.user
+        resultingRequest.leppSummary mustBe summaryModel
+      }
+      
+      "should not cache data if flag is set to false" in new Test {
+        override val testObject: StartPageCheckEligibilityAction = new StartPageCheckEligibilityAction(withCaching = false)(
+          sessionDataService = mockSessionService,
+          correlationIdHandler = mockCorrelationIdHandler,
+          leppRetrievalService = mockLeppRetrievalService
+        )
+
+        mockLeppRetrieval(Some(summaryModel))
+
+        result mustBe a[Right[_, _]]
+        verify(mockSessionService, never()).save(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
   }
