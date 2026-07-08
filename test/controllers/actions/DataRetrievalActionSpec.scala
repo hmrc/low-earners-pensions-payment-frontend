@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.requests.{AuthUser, DataRequest, IdentifierRequest}
+import models.requests.{AuthUser, BarsVerifiedRequest, DataRequest, IdentifierRequest}
 import models.userAnswers.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -72,6 +72,29 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
           .futureValue
 
         result.userAnswers mustBe userAnswers
+      }
+    }
+
+    "when request is a BarsVerifiedRequest" - {
+      "should populate BARS lockout expiry field from BarsVerifiedRequest" in {
+        val sessionRepository: SessionRepository = mock[SessionRepository]
+        when(sessionRepository.get(any())) thenReturn Future(Some(userAnswers))
+        val action: Harness = new Harness(sessionRepository)
+        
+        val timestamp: Instant = Instant.ofEpochMilli(10000)
+
+        val result: DataRequest[AnyContentAsEmpty.type] = action.callTransform(
+            new BarsVerifiedRequest(
+              request = IdentifierRequest(
+                request = FakeRequest(),
+                user = AuthUser(userId = "id", nino = Nino("AA123456C"), itmpNameOpt = None)
+              ),
+              barsLockoutExpiryOpt = Some(timestamp)
+            )
+          ).futureValue
+
+        result.userAnswers mustBe userAnswers
+        result.barsLockoutExpiryOpt mustBe Some(timestamp)
       }
     }
   }
