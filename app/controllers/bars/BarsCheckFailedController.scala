@@ -17,8 +17,8 @@
 package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
-import controllers.base.BarsLeppBaseController
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.common.BarsLeppBaseController
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.bars.BarsCheckFailedView
@@ -27,13 +27,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BarsCheckFailedController @Inject()(identify: IdentifierAction,
-                                          barsLockout: BarsLockoutAction,
+                                          barsLockout: RedirectBarsLockoutAction,
                                           getData: DataRetrievalAction,
-                                          checkEligibilityAction: AcceptPaymentCheckEligibilityAction,
+                                          checkEligibility: AcceptPaymentCheckEligibilityAction,
                                           view: BarsCheckFailedView,
                                           val controllerComponents: MessagesControllerComponents)
                                          (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibilityAction) {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) {
   
   def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit request => _ =>
     Future.successful(InternalServerError(view()))

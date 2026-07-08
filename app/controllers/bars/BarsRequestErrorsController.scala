@@ -18,7 +18,7 @@ package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
 import controllers.actions.*
-import controllers.base.BarsLeppBaseController
+import controllers.common.BarsLeppBaseController
 import pages.BarsRequestErrorsPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
-                                            barsLockout: BarsLockoutAction,
+                                            barsLockout: RedirectBarsLockoutAction,
                                             getData: DataRetrievalAction,
                                             checkEligibilityAction: AcceptPaymentCheckEligibilityAction,
                                             view: BarsRequestErrorsView,
