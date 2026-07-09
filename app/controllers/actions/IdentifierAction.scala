@@ -18,6 +18,8 @@ package controllers.actions
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import config.AppConfig
+import connectors.UserAllowListConnector
+import controllers.routes
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
@@ -35,6 +37,7 @@ trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
 
 @Singleton
 class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthConnector,
+                                              userAllowListConnector: UserAllowListConnector,
                                               config: AppConfig,
                                               playBodyParsers: BodyParsers.Default)
                                              (implicit override val executionContext: ExecutionContext)
@@ -57,7 +60,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       .retrieve(retrievals) {
         case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt if hasEnrolments(enrolments) =>
           if(confidenceLevel >= config.confidenceLevelMinimum) {
-            block(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)))
+            isValidUser(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)), block)
           } else {
             logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
             Future.successful(Redirect(config.ivUpliftUrl))
@@ -74,5 +77,16 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     }
   }
 
+  private def isValidUser[A](request: IdentifierRequest[A], block: IdentifierRequest[A] => Future[Result])
+                            (implicit hc: HeaderCarrier): Future[Result] =
+    if (config.privateBetaEnabled) {
+      userAllowListConnector.check("nino", request.user.nino.value) flatMap {
+        case true => block(request)
+        case false => Future.successful(Redirect(routes.PrivateBetaUnauthorisedController.onPageLoad()))
+      }
+    } else {
+      block(request)
+    }
+    
   private def hasEnrolments(enrolments: Enrolments): Boolean =
     enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty

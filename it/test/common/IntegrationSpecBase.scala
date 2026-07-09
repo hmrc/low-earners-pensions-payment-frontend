@@ -122,4 +122,13 @@ class IntegrationSpecBase extends AnyWordSpec
       get(urlEqualTo(url))
         .willReturn(response)
     )
+
+  def stubPostWithAuth(url: String, requestBody: String, response: ResponseDefinitionBuilder): StubMapping =
+    wireMockServer.stubFor(
+      post(urlEqualTo(url))
+        .withHeader("Content-Type", equalTo("application/json"))
+        .withHeader(AUTHORIZATION, equalTo("token"))
+        .withRequestBody(equalTo(requestBody))
+        .willReturn(response)
+    )  
 }

@@ -48,3 +48,6 @@ GET    /account/timeout                         controllers.auth.AuthController.
 GET    /refresh-session                         controllers.KeepAliveController.keepAlive()
 GET    /clear-cache                             controllers.ClearCacheController.onPageLoad()
 GET    /clear-cache-error                       controllers.ClearCacheController.defaultError()
+
+# Private Beta
+GET    /private-beta-unauthorised               controllers.PrivateBetaUnauthorisedController.onPageLoad()

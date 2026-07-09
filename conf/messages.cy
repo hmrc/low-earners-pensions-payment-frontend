@@ -122,8 +122,8 @@ barsRequestErrors.u1.l4 = nid oedd yr enw ar y cyfrif yn cyfateb i''r hyn a ddar
 barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi
 
 # Bars check failure page
-barsCheckFailed.title = Ni allem wirio manylion eich cyfrif banc
-barsCheckFailed.heading = Ni allem wirio manylion eich cyfrif banc
+barsCheckFailed.title = Ni allwn wirio manylion eich cyfrif banc
+barsCheckFailed.heading = Ni allwn wirio manylion eich cyfrif banc
 barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc
 barsCheckFailed.p2 = Ceisiwch eto yn nes ymlaen
 

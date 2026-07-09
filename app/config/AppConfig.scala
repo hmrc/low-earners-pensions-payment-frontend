@@ -21,6 +21,7 @@ import play.api.i18n.Lang
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.ConfidenceLevel.L250
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.webchat.config.Service
 
 import javax.inject.{Inject, Singleton}
 
@@ -95,3 +96,10 @@ class AppConfig @Inject()(config: Configuration):
   val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"
 
   val contactUrl: String = config.get[String]("urls.contactUrl")
+  
+  // Private Beta
+  val privateBetaEnabled: Boolean = config.get[Boolean]("feature-switch.privateBetaEnabled")
+
+  // User allow list
+  val userAllowListService: Service = config.get[Service]("microservice.services.user-allow-list")
+  val internalAuthToken: String = config.get[String]("internal-auth.token")
