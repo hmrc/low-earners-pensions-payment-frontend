@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package controllers.actions.fakes
 
+import controllers.actions.DataRetrievalAction
 import models.requests.{DataRequest, IdentifierRequest}
 import models.userAnswers.UserAnswers
 

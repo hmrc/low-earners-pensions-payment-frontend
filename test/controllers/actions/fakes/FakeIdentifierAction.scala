@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package common
+package controllers.actions.fakes
 
 import controllers.actions.IdentifierAction
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
+import play.api.mvc.Results.Redirect
+import play.api.test.Helpers.stubBodyParser
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: BodyParsers.Default) extends IdentifierAction {
-  override def invokeBlock[A](request: Request[A],
-                              block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-      block(
-        IdentifierRequest(
-          request = request,
-          user = AuthUser(userId = "userId", nino = "AA111111A", itmpNameOpt = None)
-        )
-      )
+class FakeIdentifierAction(failRequest: Boolean = false, nino: String) extends IdentifierAction:
+
+  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+    if (failRequest) {
+      Future.successful(Redirect("some-url"))
+    } else {
+      block(IdentifierRequest(request, AuthUser("1", nino, None)))
+    }
   }
 
+  override def parser: BodyParser[AnyContent] = stubBodyParser()
 
-  override def parser: BodyParser[AnyContent] = bodyParsers
-
-  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.global
-}
+  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
