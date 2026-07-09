@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import controllers.base.LeppBaseController
+import controllers.common.LeppBaseController
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 
