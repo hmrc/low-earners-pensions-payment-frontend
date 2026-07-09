@@ -141,7 +141,7 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     "must redirect to BARS lockout controller when user made too many bars check attempts" in {
       val application: Application = applicationBuilder(
         userAnswers = userAnswers,
-        redirectBarsLockoutAction = FakeRedirectBarsLockoutAction(3)
+        redirectBarsLockout = FakeRedirectBarsLockoutAction(3)
       ).build()
 
       running(application) {

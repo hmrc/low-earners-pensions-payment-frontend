@@ -16,7 +16,8 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction, StartPageCheckEligibilityAction, StartPageCheckEligibilityActionBuilder}
+import controllers.common.EligibleLeppBaseController
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import play.api.i18n.I18nSupport
@@ -30,18 +31,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WhatYouWillNeedController @Inject()(identify: IdentifierAction,
                                           getData: DataRetrievalAction,
+                                          checkEligibility: StartPageCheckEligibilityActionBuilder,
                                           val sessionService: SessionCacheService,
                                           val controllerComponents: MessagesControllerComponents,
                                           whatYouWillNeedView: WhatYouWillNeedView,
                                           navigator: Navigator)
                                          (implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  extends EligibleLeppBaseController(identify, getData, checkEligibility.create(withCaching = false)) {
 
   val start: Action[AnyContent] = handle { implicit request =>
     Future.successful(Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad()))
   }
 
-  def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
+  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
     Future.successful(Ok(whatYouWillNeedView(None, navigator.nextPage(WhatYouWillNeedPage, NormalMode).url)))
   }
 }
