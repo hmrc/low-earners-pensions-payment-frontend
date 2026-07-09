@@ -19,9 +19,10 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction}
-import controllers.base.BarsLeppBaseController
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.common.BarsLeppBaseController
 import models.ResponseWrapper.ErrorWrapper
+import models.requests.DataRequest
 import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
-                                           barsLockout: BarsLockoutAction,
+                                           barsLockout: RedirectBarsLockoutAction,
                                            getData: DataRetrievalAction,
                                            checkEligibility: AcceptPaymentCheckEligibilityAction,
                                            view: CheckYourAnswersView,
@@ -67,7 +68,8 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
     bankDetails =>
       import req.leppSummary
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
-      
+      implicit val req2: DataRequest[AnyContent] = DataRequest[AnyContent](req.request, req.user, req.userAnswers)
+
       handleWithBars(bankDetails)(() => {
         val result = for {
           submissionSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppSummary, bankDetails)
