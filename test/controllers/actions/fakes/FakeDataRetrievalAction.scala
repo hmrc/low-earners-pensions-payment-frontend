@@ -20,12 +20,15 @@ import controllers.actions.DataRetrievalAction
 import models.requests.{DataRequest, IdentifierRequest}
 import models.userAnswers.UserAnswers
 
+import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeDataRetrievalAction(dataToReturn: UserAnswers) extends DataRetrievalAction {
+class FakeDataRetrievalAction(dataToReturn: UserAnswers,
+                              lockoutTimestampOpt: Option[Instant] = None) extends DataRetrievalAction {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[DataRequest[A]] =
-    Future(DataRequest(request, request.user, dataToReturn))
+  override protected def transform[A](request: IdentifierRequest[A]): Future[DataRequest[A]] = {
+    Future(DataRequest(request, request.user, dataToReturn, lockoutTimestampOpt))
+  }
 
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global

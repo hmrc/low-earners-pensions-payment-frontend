@@ -17,7 +17,8 @@
 package controllers.bars
 
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
+import controllers.common.{BarsLeppBaseController, LeppBaseController}
 import models.CorrelationId
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -27,31 +28,26 @@ import utils.CorrelationIdHandler
 import views.html.bars.BarsLockoutView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BarsLockoutController @Inject()(
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       barsLockoutView: BarsLockoutView,
-                                       barsVerifyStatusConnector: BarsVerifyStatusConnector,
-                                       correlationIdHandler: CorrelationIdHandler,
-                                       mcc:             MessagesControllerComponents
-)(implicit ec: ExecutionContext, languageUtils: LanguageUtils)
-    extends FrontendController(mcc)
-    with I18nSupport {
+class BarsLockoutController @Inject()(identify: IdentifierAction,
+                                      barsLockout: NoRedirectBarsLockoutAction,
+                                      getData: DataRetrievalAction,
+                                      checkEligibility: AcceptPaymentCheckEligibilityAction,
+                                      barsLockoutView: BarsLockoutView,
+                                      val controllerComponents: MessagesControllerComponents)
+                                     (using ExecutionContext, LanguageUtils)
+    extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request)
-    barsVerifyStatusConnector.status() map { status =>
-      status.lockoutExpiryDateTime match {
+  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+    Future.successful(
+      request.barsLockoutExpiryOpt match {
         case Some(value) =>
           Ok(barsLockoutView(value, controllers.routes.DashboardController.onPageLoad().url))
         case None =>
-          throw new RuntimeException(
-            "Unexpected condition. This controller should only be called when service is locked out"
-          )
-      }
-    }
+          Redirect(controllers.routes.ClearCacheController.onPageLoad())
+      } 
+    )
   }
 }

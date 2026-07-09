@@ -41,14 +41,14 @@ class AcceptPaymentCheckEligibilityAction @Inject()()(using ec: ExecutionContext
 
   override protected[actions] def refine[A](request: DataRequest[A]): Future[Either[Result, EligibleDataRequest[A]]] = {
     val leppSummaryOpt: Option[LeppSummary] = request.userAnswers.get[LeppSummary](DashboardPage)
-    
+
     leppSummaryOpt.fold(
       Future.successful(Left(Redirect(controllers.routes.DashboardController.onPageLoad())))
     )(leppSummary =>
       Future.successful(Right(EligibleDataRequest(request, leppSummary)))
     )
   }
-    
+
 }
 
 @Singleton
@@ -65,7 +65,7 @@ class StartPageCheckEligibilityActionBuilder @Inject()(sessionDataService: Sessi
 }
 
 @Singleton
-class StartPageCheckEligibilityAction (withCaching: Boolean) 
+class StartPageCheckEligibilityAction (withCaching: Boolean)
                                       (sessionDataService: SessionCacheService,
                                        correlationIdHandler: CorrelationIdHandler,
                                        leppRetrievalService: LeppRetrievalService)
@@ -81,13 +81,13 @@ class StartPageCheckEligibilityAction (withCaching: Boolean)
     lazy val notEligibleRedirect: Either[Result, EligibleDataRequest[A]] = Left(
       Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
     )
-    
+
     def cachingResult(userAnswers: UserAnswers): Future[Unit] = if(withCaching){
       sessionDataService.save(userAnswers)
     } else {
      Future.successful(())
     }
-    
+
     val result: ConnectorResponse[LeppSummary] = for {
       _ <- EitherT.right(Future.successful(sessionDataService.clear(request.userAnswers)))
       leppSummary <- leppRetrievalService.retrieveLeppDetails()
@@ -95,7 +95,7 @@ class StartPageCheckEligibilityAction (withCaching: Boolean)
       updatedUserAnswers <- EitherT.right(Future.fromTry(emptyUserAnswers.set(DashboardPage, leppSummary.value)))
       _ <- EitherT.right(cachingResult(updatedUserAnswers))
     } yield leppSummary
-    
+
     val requestWithCid: Request[A] = ActionUtils.requestWithCid(request.request)
     val dataRequestWithCid: DataRequest[A] = request.copy(request = requestWithCid)
 

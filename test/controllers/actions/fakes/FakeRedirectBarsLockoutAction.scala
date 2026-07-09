@@ -22,6 +22,7 @@ import models.requests.{BarsVerifiedRequest, IdentifierRequest}
 import play.api.mvc.*
 import utils.CorrelationIdHandler
 
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 

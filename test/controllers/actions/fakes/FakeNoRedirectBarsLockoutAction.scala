@@ -26,13 +26,13 @@ import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeNoRedirectBarsLockoutAction(count: Int)
+class FakeNoRedirectBarsLockoutAction(count: Int, lockoutTimestampOpt: Option[Instant])
                                      (implicit connector: BarsVerifyStatusConnector, cidHandler: CorrelationIdHandler)
   extends NoRedirectBarsLockoutAction(connector, cidHandler) {
 
   override protected[actions] def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
     if (count >= 3) {
-      Future.successful(Right(BarsVerifiedRequest(request, Some(Instant.ofEpochMilli(1000)))))
+      Future.successful(Right(BarsVerifiedRequest(request, lockoutTimestampOpt)))
     }
     else {
       Future.successful(Right(BarsVerifiedRequest(request)))

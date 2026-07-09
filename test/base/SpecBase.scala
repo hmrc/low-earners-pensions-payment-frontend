@@ -71,6 +71,7 @@ import utils.CorrelationIdHandler
 import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
+import java.time.Instant
 import scala.reflect.ClassTag
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -122,29 +123,25 @@ trait SpecBase
   given mockCidHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
   given mockSessionService: SessionCacheService = mock[SessionCacheService]
   given mockRetrievalService: LeppRetrievalService = mock[LeppRetrievalService]
-
-  val mockRedirectBarsLockoutAction: RedirectBarsLockoutAction = FakeRedirectBarsLockoutAction(1)
-  val mockNoRedirectBarsLockoutAction: NoRedirectBarsLockoutAction = FakeNoRedirectBarsLockoutAction(1)
   
-  val mockStartPageEligibilityActionBuilder: StartPageCheckEligibilityActionBuilder = FakeStartPageCheckEligibilityActionBuilder(
+  lazy val mockStartPageEligibilityActionBuilder: StartPageCheckEligibilityActionBuilder = FakeStartPageCheckEligibilityActionBuilder(
     result = Right(summaryModel)
   )
   
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
+                                   barsFailedAttemptCount: Int = 0,
+                                   barsLockoutTimestampOpt: Option[Instant] = None,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
-                                   redirectBarsLockout: RedirectBarsLockoutAction = mockRedirectBarsLockoutAction,
-                                   noRedirectBarsLockout: NoRedirectBarsLockoutAction = mockNoRedirectBarsLockoutAction,
-                                   startPageCheckEligibilityBuilder: StartPageCheckEligibilityActionBuilder = mockStartPageEligibilityActionBuilder,
-                                   servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
+                                   servicesConfig: Map[String, Any] = servicesConfig,
+                                   startPageCheckEligibilityBuilder: StartPageCheckEligibilityActionBuilder = mockStartPageEligibilityActionBuilder): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
       .overrides(
         bind[IdentifierAction].toInstance(identifierAction),
-        bind[RedirectBarsLockoutAction].toInstance(redirectBarsLockout),
-        bind[NoRedirectBarsLockoutAction].toInstance(noRedirectBarsLockout),
-        bind[BarsVerifyStatusConnector].toInstance(mockBarsConnector),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[StartPageCheckEligibilityActionBuilder].toInstance(startPageCheckEligibilityBuilder)
+        bind[RedirectBarsLockoutAction].toInstance(FakeRedirectBarsLockoutAction(barsFailedAttemptCount)),
+        bind[NoRedirectBarsLockoutAction].toInstance(FakeNoRedirectBarsLockoutAction(barsFailedAttemptCount, barsLockoutTimestampOpt)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, barsLockoutTimestampOpt)),
+        bind[StartPageCheckEligibilityActionBuilder].toInstance(mockStartPageEligibilityActionBuilder)
       )
 
   def runningApplication(block: Application => Unit): Unit =

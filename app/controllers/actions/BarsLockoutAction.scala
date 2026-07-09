@@ -32,11 +32,11 @@ import scala.concurrent.{ExecutionContext, Future}
 trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedRequest] with Logging with Results {
   val barsVerifyStatusConnector: BarsVerifyStatusConnector
   val correlationIdHandler: CorrelationIdHandler
-  
+
   def handleWithBarsStatus[A](f: BarsVerifyStatusResponse => Either[Result, BarsVerifiedRequest[A]])
                              (using cid: CorrelationId)
                              (using HeaderCarrier, ExecutionContext): Future[Either[Result, BarsVerifiedRequest[A]]] = {
-    
+
     barsVerifyStatusConnector
       .status()
       .map(status => f(status))
@@ -78,7 +78,7 @@ class NoRedirectBarsLockoutAction @Inject()(val barsVerifyStatusConnector: BarsV
 @Singleton
 class RedirectBarsLockoutAction @Inject()(val barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                           val correlationIdHandler: CorrelationIdHandler)
-                                         (implicit ec: ExecutionContext) 
+                                         (implicit ec: ExecutionContext)
   extends BarsLockoutAction {
 
   override protected[actions] def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
