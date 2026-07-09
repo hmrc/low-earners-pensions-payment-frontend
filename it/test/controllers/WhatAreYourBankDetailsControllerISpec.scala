@@ -16,7 +16,7 @@
 
 package controllers
 
-import common.IntegrationSpecBase
+import base.IntegrationSpecBase
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.*
 import play.api.Application
