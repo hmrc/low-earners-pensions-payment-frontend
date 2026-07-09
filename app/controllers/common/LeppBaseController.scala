@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.base
+package controllers.common
 
 import controllers.actions.{CheckEligibilityAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
