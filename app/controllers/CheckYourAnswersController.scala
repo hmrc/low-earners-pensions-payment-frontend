@@ -19,7 +19,7 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
 import controllers.common.BarsLeppBaseController
 import models.ResponseWrapper.ErrorWrapper
 import models.requests.DataRequest
@@ -27,7 +27,6 @@ import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
 import pages.CheckYourAnswersPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier

@@ -16,15 +16,10 @@
 
 package controllers.bars
 
-import connectors.BarsVerifyStatusConnector
 import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
-import controllers.common.{BarsLeppBaseController, LeppBaseController}
-import models.CorrelationId
-import play.api.i18n.I18nSupport
+import controllers.common.BarsLeppBaseController
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.language.LanguageUtils
-import utils.CorrelationIdHandler
 import views.html.bars.BarsLockoutView
 
 import javax.inject.{Inject, Singleton}

@@ -17,9 +17,8 @@
 package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
 import controllers.common.BarsLeppBaseController
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.bars.BarsCheckFailedView
 

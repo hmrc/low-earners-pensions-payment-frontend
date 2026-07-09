@@ -17,16 +17,14 @@
 package controllers.actions
 
 import base.SpecBase
-import cats.data.EitherT
 import connectors.BarsVerifyStatusConnector
 import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import models.requests.{AuthUser, BarsVerifiedRequest, IdentifierRequest}
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.{reset, when}
-import play.api.libs.json.JsObject
+import org.mockito.Mockito.when
 import play.api.mvc.*
-import play.api.mvc.Results.{Ok, Redirect}
-import play.api.test.Helpers.{redirectLocation, status, *}
+import play.api.mvc.Results.Redirect
+import play.api.test.Helpers.{redirectLocation, status}
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.domain.Nino
 import utils.CorrelationIdHandler

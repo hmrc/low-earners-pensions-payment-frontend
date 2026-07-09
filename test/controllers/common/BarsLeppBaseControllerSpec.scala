@@ -30,8 +30,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesControllerComponents
 import viewmodels.NormalMode
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class BarsLeppBaseControllerSpec extends SpecBase {
   private trait Test(count: Int = 0) {

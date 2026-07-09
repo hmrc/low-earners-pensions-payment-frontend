@@ -16,16 +16,11 @@
 
 package controllers
 
-import connectors.BarsVerifyStatusConnector
-import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
-import controllers.common.{BarsLeppBaseController, LeppBaseController}
-import models.CorrelationId
-import models.userAnswers.LeppSummary
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
+import controllers.common.BarsLeppBaseController
 import navigation.Navigator
 import pages.*
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 

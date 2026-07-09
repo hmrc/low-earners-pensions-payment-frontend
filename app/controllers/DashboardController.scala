@@ -16,22 +16,14 @@
 
 package controllers
 
-import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
-import connectors.BarsVerifyStatusConnector
-import controllers.actions.{DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction, StartPageCheckEligibilityAction, StartPageCheckEligibilityActionBuilder}
-import controllers.common.{BarsLeppBaseController, EligibleLeppBaseController, LeppBaseController}
-import models.ResponseWrapper.ErrorWrapper
-import models.errors.ErrorResult.notEligibleError
-import models.userAnswers.LeppSummary
-import models.{CorrelationId, ResponseWrapper}
+import controllers.actions.{DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction, StartPageCheckEligibilityActionBuilder}
+import controllers.common.BarsLeppBaseController
 import navigation.Navigator
 import pages.DashboardPage
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{LeppRetrievalService, SessionCacheService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionCacheService
 import uk.gov.hmrc.play.language.LanguageUtils
-import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.DashboardView
 

@@ -17,13 +17,8 @@
 package controllers.bars
 
 import base.SpecBase
-import controllers.actions.fakes.{FakeDataRetrievalAction, FakeNoRedirectBarsLockoutAction}
 import controllers.bars
-import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import models.userAnswers.UserAnswers
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when
-import org.mockito.stubbing.OngoingStubbing
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, Result}

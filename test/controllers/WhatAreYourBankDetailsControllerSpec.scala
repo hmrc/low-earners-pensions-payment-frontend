@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.fakes.FakeRedirectBarsLockoutAction
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.{DashboardPage, SubmissionPage, WhatAreYourBankDetailsPage}

@@ -16,19 +16,14 @@
 
 package controllers.common
 
-import controllers.actions.{CheckEligibilityAction, DataRetrievalAction, IdentifierAction}
-import controllers.routes
-import models.requests.{DataRequest, EligibleDataRequest}
-import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary}
-import pages.*
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.requests.DataRequest
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, Call, Result}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.formPages.FormPageViewModel
-import viewmodels.{CheckMode, Mode}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 abstract class LeppBaseController @Inject()(identify: IdentifierAction,
                                             getData: DataRetrievalAction)

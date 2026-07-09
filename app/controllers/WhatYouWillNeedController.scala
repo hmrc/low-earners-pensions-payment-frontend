@@ -16,11 +16,10 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction, StartPageCheckEligibilityAction, StartPageCheckEligibilityActionBuilder}
+import controllers.actions.{DataRetrievalAction, IdentifierAction, StartPageCheckEligibilityActionBuilder}
 import controllers.common.EligibleLeppBaseController
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
 import viewmodels.NormalMode

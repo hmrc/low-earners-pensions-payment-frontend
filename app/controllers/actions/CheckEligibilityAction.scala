@@ -20,16 +20,15 @@ import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.ConnectorResponse
 import models.CorrelationId
-import models.ResponseWrapper.ErrorWrapper
+import models.errors.ErrorResult.notEligibleError
 import models.requests.{DataRequest, EligibleDataRequest}
-import pages.DashboardPage
-import play.api.mvc.{ActionFilter, ActionRefiner, Headers, Request, Result, Results}
-import services.{LeppRetrievalService, SessionCacheService}
 import models.userAnswers.{LeppSummary, UserAnswers}
+import pages.DashboardPage
+import play.api.mvc.{ActionRefiner, Request, Result, Results}
+import services.{LeppRetrievalService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.{Constants, CorrelationIdHandler}
-import models.errors.ErrorResult.notEligibleError
+import utils.CorrelationIdHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 

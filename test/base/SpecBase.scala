@@ -36,7 +36,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
-import controllers.actions.fakes.{FakeDataRetrievalAction, FakeIdentifierAction, FakeNoRedirectBarsLockoutAction, FakeRedirectBarsLockoutAction, FakeStartPageCheckEligibilityActionBuilder}
+import controllers.actions.fakes.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.*
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
@@ -72,9 +72,9 @@ import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
 import java.time.Instant
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.reflect.ClassTag
 import scala.util.Random
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SpecBase
   extends AnyFreeSpec
