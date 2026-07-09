@@ -17,7 +17,8 @@
 package controllers
 
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, BarsLockoutAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
+import controllers.common.{BarsLeppBaseController, LeppBaseController}
 import models.CorrelationId
 import models.userAnswers.LeppSummary
 import navigation.Navigator
@@ -29,31 +30,29 @@ import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
+                                               barsLockout: NoRedirectBarsLockoutAction,
                                                getData: DataRetrievalAction,
-                                               barsVerifyStatusConnector: BarsVerifyStatusConnector,
-                                               correlationIdHandler: CorrelationIdHandler,
-                                               val controllerComponents: MessagesControllerComponents,
+                                               checkEligibility: AcceptPaymentCheckEligibilityAction,
+                                                val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
                                                navigator: Navigator)(implicit val ec: ExecutionContext)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling{
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) {
 
   def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(request.request)
-    barsVerifyStatusConnector.status() map { status =>
-      request.userAnswers.get(DashboardPage) match {
-        case Some(leppSummary) => Ok(paymentCalcBreakdownView(
-          paymentSummary = leppSummary,
+    Future.successful(
+      Ok(
+        paymentCalcBreakdownView(
+          paymentSummary = request.leppSummary,
           continueUrl = navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
           backUrl = Some(backLinkUrl(NormalMode, PaymentCalcBreakdownPage).url),
-          barsLockFlag = status.lockoutExpiryDateTime.nonEmpty,
+          barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
           itemId = id
-        ))
-        case None => DashboardPage.asRedirect
-      }
-    }
+        )
+      ) 
+    )
   }
 }
   
