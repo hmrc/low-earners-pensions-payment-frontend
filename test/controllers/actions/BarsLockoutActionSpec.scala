@@ -24,7 +24,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
-import play.api.test.Helpers.{redirectLocation, status}
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.domain.Nino
 import utils.CorrelationIdHandler
