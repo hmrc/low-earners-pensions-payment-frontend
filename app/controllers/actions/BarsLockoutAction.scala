@@ -41,7 +41,6 @@ trait BarsLockoutAction extends ActionRefiner[IdentifierRequest, BarsVerifiedReq
       .status()
       .map(status => f(status))
       .recover { case e =>
-        println(e)
         logger.error(
           s"[BarsLockoutActionRefiner] " +
             s"failed to retrieve BarsVerifyStatus for " +
