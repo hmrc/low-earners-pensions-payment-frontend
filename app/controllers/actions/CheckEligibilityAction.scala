@@ -29,6 +29,7 @@ import models.userAnswers.{LeppSummary, UserAnswers}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.{Constants, CorrelationIdHandler}
+import models.errors.ErrorResult.notEligibleError
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -99,7 +100,12 @@ class StartPageCheckEligibilityAction (withCaching: Boolean)
     val dataRequestWithCid: DataRequest[A] = request.copy(request = requestWithCid)
 
     result.biflatMap(
-      err => EitherT(Future.successful(notEligibleRedirect)),
+      err => EitherT(Future.successful(Left(Redirect(
+        err.value match {
+          case `notEligibleError` => controllers.auth.routes.IneligibleController.onPageLoad()
+          case _ => controllers.routes.ClearCacheController.defaultError()
+        }
+      )))),
       success =>
         if(success.value.isNonEmpty)
           EitherT(Future.successful(Right(EligibleDataRequest[A](dataRequestWithCid, success.value))))

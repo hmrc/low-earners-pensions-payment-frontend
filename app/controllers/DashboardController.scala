@@ -19,7 +19,8 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction, StartPageCheckEligibilityAction, StartPageCheckEligibilityActionBuilder}
+import controllers.common.{BarsLeppBaseController, EligibleLeppBaseController, LeppBaseController}
 import models.ResponseWrapper.ErrorWrapper
 import models.errors.ErrorResult.notEligibleError
 import models.userAnswers.LeppSummary
@@ -38,43 +39,28 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DashboardController @Inject()(identify: IdentifierAction,
+                                    barsLockout: NoRedirectBarsLockoutAction,
                                     getData: DataRetrievalAction,
-                                    barsVerifyStatusConnector: BarsVerifyStatusConnector,
-                                    correlationIdHandler: CorrelationIdHandler,
-                                    leppRetrievalService: LeppRetrievalService,
+                                    checkEligibility: StartPageCheckEligibilityActionBuilder,
                                     val sessionService: SessionCacheService,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
                                     navigator: Navigator)
                                    (implicit val ec: ExecutionContext, languageUtils: LanguageUtils)
-  extends LeppBaseController(identify, getData) with I18nSupport with SessionDataHandling {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility.create(withCaching = true)) {
 
-  def onPageLoad(): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    implicit val cid: CorrelationId = correlationIdHandler.getCorrelationId(request)
-
-    val result: EitherT[Future, ResponseWrapper.ErrorWrapper, Result] = for {
-      leppSummary <- leppRetrievalService.retrieveLeppDetails()
-      updatedAnswers <- EitherT.right(Future.fromTry(request.userAnswers.set(DashboardPage, leppSummary.value)))
-      _ <- EitherT.right(sessionService.save(updatedAnswers))
-      barsStatus <- EitherT.right(barsVerifyStatusConnector.status())
-    } yield {
-      Ok(view(
-        leppSummary = leppSummary.value,
-        backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
-        continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
-        barsLockFlag = barsStatus.lockoutExpiryDateTime.nonEmpty,
-        lockoutExpires = barsStatus.lockoutExpiryDateTime
-      ))
-    }
-
-    result.leftMap(mapErrors).merge
-  }
-
-  private def mapErrors[A](err: ErrorWrapper): Result = {
-    err.value match {
-      case `notEligibleError` => Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
-      case _ => Redirect(controllers.routes.ClearCacheController.defaultError())
-    }
+  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
+    Future.successful(
+      Ok(
+        view(
+          leppSummary = request.leppSummary,
+          backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
+          continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
+          barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
+          lockoutExpires = request.barsLockoutExpiryOpt
+        )
+      )
+    )
   }
 }
 

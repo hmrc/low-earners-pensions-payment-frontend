@@ -75,11 +75,11 @@ class StartPageCheckEligibilityActionSpec extends SpecBase with Results {
   
   "StartPageCheckEligibilityAction" - {
     "refine" - {
-      "should redirect to NotEligible page when user has no LEPP data" in new Test {
+      "should redirect to ClearCacheController when call to retrieve LEPP data fails" in new Test {
         mockLeppRetrieval(None)
         
         result mustBe a[Left[_, _]]
-        result.swap.getOrElse(ImATeapot("")) mustBe Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
+        result.swap.getOrElse(ImATeapot("")) mustBe Redirect(controllers.routes.ClearCacheController.defaultError())
       }
       
       "should redirect to NotEligible page when user has no applicable LEPP data" in new Test {
