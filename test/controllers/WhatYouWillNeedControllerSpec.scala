@@ -48,7 +48,7 @@ class WhatYouWillNeedControllerSpec extends SpecBase {
         redirectLocation(result) mustBe Some(controllers.auth.routes.IneligibleController.onPageLoad().url)
       }
     }
-    
+
     "must return OK and the correct view for a GET" in {
       val application: Application = applicationBuilder().build()
 

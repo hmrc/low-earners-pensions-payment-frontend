@@ -141,7 +141,7 @@ trait SpecBase
         bind[RedirectBarsLockoutAction].toInstance(FakeRedirectBarsLockoutAction(barsFailedAttemptCount)),
         bind[NoRedirectBarsLockoutAction].toInstance(FakeNoRedirectBarsLockoutAction(barsFailedAttemptCount, barsLockoutTimestampOpt)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, barsLockoutTimestampOpt)),
-        bind[StartPageCheckEligibilityActionBuilder].toInstance(mockStartPageEligibilityActionBuilder)
+        bind[StartPageCheckEligibilityActionBuilder].toInstance(startPageCheckEligibilityBuilder)
       )
 
   def runningApplication(block: Application => Unit): Unit =
