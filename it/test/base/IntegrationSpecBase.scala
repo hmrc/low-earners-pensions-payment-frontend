@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package common
+package base
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction}
+import controllers.actions.DataRetrievalAction
+import controllers.actions.fakes.FakeDataRetrievalAction
 import models.CorrelationId
 import models.ResponseWrapper.ErrorWrapper
 import models.errors.ErrorResult.ServiceErrorResult

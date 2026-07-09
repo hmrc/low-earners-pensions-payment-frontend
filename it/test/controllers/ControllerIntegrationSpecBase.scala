@@ -17,7 +17,7 @@
 package controllers
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import common.{AuthSupport, IntegrationSpecBase}
+import base.{AuthSupport, IntegrationSpecBase}
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.libs.json.*

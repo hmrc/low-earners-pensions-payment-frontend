@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package common
+package base
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.*
