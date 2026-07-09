@@ -36,6 +36,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
+import controllers.actions.fakes.{FakeDataRetrievalAction, FakeIdentifierAction, FakeNoRedirectBarsLockoutAction, FakeRedirectBarsLockoutAction}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.*
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
@@ -65,6 +66,7 @@ import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtr
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import utils.CorrelationIdHandler
 import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
@@ -114,18 +116,23 @@ trait SpecBase
 
   val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(nino = nino)
 
-  val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
-  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(1)
+  given mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+  given mockCidHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
+
+  val mockRedirectBarsLockoutAction: RedirectBarsLockoutAction = FakeRedirectBarsLockoutAction(1)
+  val mockNoRedirectBarsLockoutAction: NoRedirectBarsLockoutAction = FakeNoRedirectBarsLockoutAction(1)
   
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
-                                   barsLockoutAction: BarsLockoutAction = mockBarsLockoutAction,
+                                   redirectBarsLockoutAction: RedirectBarsLockoutAction = mockRedirectBarsLockoutAction,
+                                   noRedirectBarsLockoutAction: NoRedirectBarsLockoutAction = mockNoRedirectBarsLockoutAction,
                                    servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
       .overrides(
         bind[IdentifierAction].toInstance(identifierAction),
-        bind[BarsLockoutAction].toInstance(barsLockoutAction),
+        bind[RedirectBarsLockoutAction].toInstance(redirectBarsLockoutAction),
+        bind[NoRedirectBarsLockoutAction].toInstance(noRedirectBarsLockoutAction),
         bind[BarsVerifyStatusConnector].toInstance(mockBarsConnector),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )

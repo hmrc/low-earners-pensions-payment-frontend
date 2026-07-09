@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package controllers.actions.fakes
 
-import models.barsLockout.BarsVerifiedRequest
-import models.requests.IdentifierRequest
+import connectors.BarsVerifyStatusConnector
+import controllers.actions.RedirectBarsLockoutAction
+import models.requests.{BarsVerifiedRequest, IdentifierRequest}
 import play.api.mvc.*
-import play.api.mvc.Results.Redirect
+import utils.CorrelationIdHandler
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class FakeBarsLockoutAction(count: Int) extends BarsLockoutAction {
-
-  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
+class FakeRedirectBarsLockoutAction(count: Int)
+                                   (implicit connector: BarsVerifyStatusConnector, cidHandler: CorrelationIdHandler)
+  extends RedirectBarsLockoutAction(connector, cidHandler) {
+  
+  override protected[actions] def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
     if(count >= 3){
       Future.successful(Left(Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad().url)))
     }
     else{
       Future.successful(Right(BarsVerifiedRequest(request)))
     }
-      
   }
-
-  override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.global
 }
-
