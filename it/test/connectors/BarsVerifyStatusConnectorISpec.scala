@@ -16,10 +16,10 @@
 
 package connectors
 
+import base.IntegrationSpecBase
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import base.IntegrationSpecBase
 import models.CorrelationId
 import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import org.scalatest.matchers.should.Matchers.shouldBe

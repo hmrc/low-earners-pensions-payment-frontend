@@ -16,8 +16,8 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import base.{IntegrationSpecBase, WireMockMethods}
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
 import models.errors.ErrorResult
