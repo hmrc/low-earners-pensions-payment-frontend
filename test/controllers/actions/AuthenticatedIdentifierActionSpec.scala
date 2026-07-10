@@ -19,6 +19,7 @@ package controllers.actions
 import base.SpecBase
 import com.google.inject.Inject
 import config.AppConfig
+import connectors.UserAllowListConnector
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.*
@@ -38,6 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
   private val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  private val mockUserAllowListConnector: UserAllowListConnector = mock[UserAllowListConnector]
 
   def authResult(internalId: Option[String],
                  nino: Option[String],
@@ -66,7 +68,6 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
     "when the user logged in" - {
       "must return a valid IdentifierRequest" in {
         setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
-
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
         running(application) {
@@ -75,6 +76,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = mockAuthConnector,
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -85,9 +87,66 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
           status(result) mustBe OK
         }
       }
+
+      "must return a valid IdentifierRequest when added to user allow list and private beta enabled" in {
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
+        when(mockUserAllowListConnector.check(any(), any())(any())).thenReturn(Future.successful(true))
+        val servicesConfig: Map[String, Any] = Map(
+          "feature-switch.privateBetaEnabled" -> true
+        )
+        
+        val application = applicationBuilder(userAnswers = emptyUserAnswers, servicesConfig = servicesConfig).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig = application.injector.instanceOf[AppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = mockAuthConnector,
+            userAllowListConnector = mockUserAllowListConnector,
+            config = appConfig,
+            playBodyParsers = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must redirect to unauthorised page when not added to user allow list" in {
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
+        when(mockUserAllowListConnector.check(any(), any())(any())).thenReturn(Future.successful(false))
+        val servicesConfig: Map[String, Any] = Map(
+          "feature-switch.privateBetaEnabled" -> true
+        )
+        
+        val application = applicationBuilder(userAnswers = emptyUserAnswers, servicesConfig = servicesConfig).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig = application.injector.instanceOf[AppConfig]
+          
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = mockAuthConnector,
+            userAllowListConnector = mockUserAllowListConnector,
+            config = appConfig,
+            playBodyParsers = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          val expectedUrl = controllers.routes.PrivateBetaUnauthorisedController.onPageLoad().url
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe expectedUrl
+        }
+      }
+      
       "but not enrolled must return unauthorised page" in {
         setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, invalidEnrolment))
-
+        
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
         running(application) {
@@ -96,6 +155,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = mockAuthConnector,
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -113,7 +173,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
     "when the user has confidence level less than 250" - {
       "must redirect to IV uplift journey" in {
         setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200, ptaEnrolment))
-
+        
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
         running(application) {
@@ -122,6 +182,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = mockAuthConnector,
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -145,6 +206,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = new FakeFailingAuthConnector(BearerTokenExpired()),
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -168,6 +230,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = new FakeFailingAuthConnector(SessionRecordNotFound()),
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -193,6 +256,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = new FakeFailingAuthConnector(new UnsupportedAffinityGroup),
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
@@ -217,6 +281,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val authAction = new AuthenticatedIdentifierAction(
             authConnector = new FakeFailingAuthConnector(new RuntimeException()),
+            userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
           )
