@@ -20,7 +20,6 @@ import com.google.inject.{Inject, Singleton}
 import controllers.actions.*
 import controllers.common.BarsLeppBaseController
 import pages.BarsRequestErrorsPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.NormalMode
 import views.html.bars.BarsRequestErrorsView

@@ -16,6 +16,7 @@
 
 package connectors
 
+import base.{IntegrationSpecBase, WireMockMethods}
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
