@@ -21,8 +21,9 @@ import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
 import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
+import play.api.Application
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.NormalMode
@@ -31,12 +32,11 @@ import views.html.PaymentCalcBreakdownView
 import scala.concurrent.Future
 
 class PaymentCalcBreakdownControllerSpec extends SpecBase {
-  
   "Payment calculation breakdown controller" - {
     when(mockBarsConnector.status()(
-      ArgumentMatchers.any(),
-      ArgumentMatchers.any(),
-      ArgumentMatchers.any()
+      hc = ArgumentMatchers.any(),
+      ec = ArgumentMatchers.any(),
+      correlationId = ArgumentMatchers.any()
     )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
 
     val userAnswers = emptyUserAnswers.copy(
@@ -45,14 +45,14 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
       ))
     
     "must return OK and the breakdown view of available items for a GET having data in the cache" in {
-      val application = applicationBuilder(userAnswers).build()
-      val view = application.injector.instanceOf[PaymentCalcBreakdownView]
+      val application: Application = applicationBuilder(userAnswers).build()
+      val view: PaymentCalcBreakdownView = application.injector.instanceOf[PaymentCalcBreakdownView]
       
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =
           FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(None).url)
         
-        val result = route(application, request).value
+        val result: Future[Result] = route(application, request).value
         contentAsString(result) mustEqual view(
           summaryModel,
           routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
@@ -63,14 +63,13 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
     }
     
     "must return OK and the breakdown view of history item for a GET having data in the cache" in {
-
-      val application = applicationBuilder(userAnswers).build()
-      val view = application.injector.instanceOf[PaymentCalcBreakdownView]
+      val application: Application = applicationBuilder(userAnswers).build()
+      val view: PaymentCalcBreakdownView = application.injector.instanceOf[PaymentCalcBreakdownView]
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =
           FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(Some("P-25-1")).url)
 
-        val result = route(application, request).value
+        val result: Future[Result] = route(application, request).value
         contentAsString(result) mustEqual view(
           summaryModel,
           routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
@@ -83,7 +82,7 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
     }
 
     "must redirect to dashboard page when no summary data in the cache" in {
-      val application = applicationBuilder().build()
+      val application: Application = applicationBuilder().build()
       when(mockBarsConnector.status()(
         ArgumentMatchers.any(),
         ArgumentMatchers.any(),
@@ -91,10 +90,12 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
       )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
       
       running(application) {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(None).url)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
+          method = GET,
+          path = controllers.routes.PaymentCalcBreakdownController.onPageLoad(None).url
+        )
 
-        val result = route(application, request).value
+        val result: Future[Result] = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)

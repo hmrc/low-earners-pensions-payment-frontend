@@ -17,14 +17,16 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{BarsLockoutAction, FakeBarsLockoutAction}
 import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary, UserAnswers}
 import pages.{DashboardPage, WhatAreYourBankDetailsPage}
+import play.api.Application
 import play.api.libs.json.{JsBoolean, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.NormalMode
+
+import java.time.Instant
 
 class SubmitConfirmationControllerSpec extends SpecBase {
 
@@ -102,10 +104,11 @@ class SubmitConfirmationControllerSpec extends SpecBase {
     }
 
     "must redirect to BARS lockout controller when bars check limit exceeds" in {
-
-      val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(3)
-      
-      val application = applicationBuilder(userAnswers = userAnswers, barsLockoutAction = mockBarsLockoutAction).build()
+      val application: Application = applicationBuilder(
+        userAnswers = userAnswers,
+        barsFailedAttemptCount = 3,
+        barsLockoutTimestampOpt = Some(Instant.ofEpochMilli(1000))
+      ).build()
 
       running(application) {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] =

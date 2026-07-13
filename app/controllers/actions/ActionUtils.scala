@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package models.barsLockout
+package controllers.actions
 
-import models.requests.IdentifierRequest
+import models.CorrelationId
+import play.api.mvc.{Headers, Request}
+import utils.Constants
 
-class BarsVerifiedRequest[A](
-                              override val request:           IdentifierRequest[A]
-) extends IdentifierRequest[A](request, request.user)
+object ActionUtils {
+  def requestWithCid[A](request: Request[A])(using cid: CorrelationId): Request[A] = {
+    val requestHeadersWithCid: Headers = request.headers.replace(Constants.correlationIdKey -> cid.value)
+     request.withHeaders(requestHeadersWithCid)
+  }
+}

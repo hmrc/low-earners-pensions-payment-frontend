@@ -17,10 +17,10 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.common.LeppBaseController
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -30,9 +30,9 @@ class ClearCacheController @Inject()(override val messagesApi: MessagesApi,
                                      identify: IdentifierAction,
                                      getData: DataRetrievalAction,
                                      sessionCacheService: SessionCacheService)
-                                    (using ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                    (using ExecutionContext) extends LeppBaseController(identify, getData) {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = handle { implicit request =>
     sessionCacheService
       .clear(request.userAnswers)
       .map { _ =>
@@ -40,7 +40,7 @@ class ClearCacheController @Inject()(override val messagesApi: MessagesApi,
       }
   }
 
-  def defaultError(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def defaultError(): Action[AnyContent] = handle { implicit request =>
     sessionCacheService
       .clear(request.userAnswers)
       .map { _ =>

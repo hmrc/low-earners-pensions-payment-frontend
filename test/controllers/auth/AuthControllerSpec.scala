@@ -18,7 +18,8 @@ package controllers.auth
 
 import base.SpecBase
 import config.AppConfig
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, IdentifierAction}
+import controllers.actions.fakes.FakeDataRetrievalAction
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder

@@ -35,6 +35,14 @@ object MethodContext {
   given toStringImpl: Conversion[MethodContext, String] = (mc: MethodContext) => mc
 }
 
+case class LoggerWithContext(underlying: Logger, cc: ClassContext) {
+  private val logger: slf4j.Logger = underlying.logger
+  def info(msg: String)(using mc: MethodContext): Unit = logger.info(s"[$cc][$mc] - $msg")
+  def warn(msg: String)(using mc: MethodContext): Unit = logger.warn(s"[$cc][$mc] - $msg")
+  def error(msg: String)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg")
+  def error(msg: String, ex: Throwable)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg", ex)
+}
+
 trait Logging {
   private val classLoggingContext: ClassContext = ClassContext(this.getClass.getSimpleName.replace("$", ""))
   val logger: LoggerWithContext = LoggerWithContext(Logger(this.getClass), classLoggingContext)
@@ -42,12 +50,4 @@ trait Logging {
   def warnLogger(using mc: MethodContext): String => Unit = (msg: String) => logger.warn(msg)
   def errorLogger(using mc: MethodContext): (String, Option[Throwable]) => Unit = (msg: String, exOpt: Option[Throwable]) =>
     exOpt.fold(logger.warn(msg))(ex => logger.error(msg, ex))
-}
-
-case class LoggerWithContext(underlying: Logger, cc: ClassContext) {
-  private val logger: slf4j.Logger = underlying.logger
-  def info(msg: String)(using mc: MethodContext): Unit = logger.info(s"[$cc][$mc] - $msg")
-  def warn(msg: String)(using mc: MethodContext): Unit = logger.warn(s"[$cc][$mc] - $msg")
-  def error(msg: String)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg")
-  def error(msg: String, ex: Throwable)(using mc: MethodContext): Unit = logger.error(s"[$cc][$mc] - $msg", ex)
 }

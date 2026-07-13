@@ -16,7 +16,7 @@
 
 package controllers
 
-import common.IntegrationSpecBase
+import base.IntegrationSpecBase
 import config.AppConfig
 import play.api.Application
 import play.api.http.Status.SEE_OTHER

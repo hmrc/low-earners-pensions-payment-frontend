@@ -16,7 +16,7 @@
 
 package controllers.bars
 
-import common.IntegrationSpecBase
+import base.IntegrationSpecBase
 import controllers.ControllerIntegrationSpecBase
 import play.api.Application
 import play.api.libs.json.Json

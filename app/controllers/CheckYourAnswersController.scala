@@ -19,13 +19,14 @@ package controllers
 import cats.data.EitherT
 import com.google.inject.{Inject, Singleton}
 import connectors.BarsVerifyStatusConnector
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.common.BarsLeppBaseController
 import models.ResponseWrapper.ErrorWrapper
+import models.requests.DataRequest
 import models.userAnswers.BankAccountDetails
 import models.{CorrelationId, ResponseWrapper}
 import navigation.Navigator
 import pages.CheckYourAnswersPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,8 +39,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
-                                           barsLockout: BarsLockoutAction,
+                                           barsLockout: RedirectBarsLockoutAction,
                                            getData: DataRetrievalAction,
+                                           checkEligibility: AcceptPaymentCheckEligibilityAction,
                                            view: CheckYourAnswersView,
                                            correlationIdHandler: CorrelationIdHandler,
                                            barsService: BarsService,
@@ -49,10 +51,10 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            barsVerifyStatusConnector: BarsVerifyStatusConnector,
                                            val controllerComponents: MessagesControllerComponents)
                                           (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling with Logging {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) with Logging {
 
   def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit req =>
-    (_, bankDetails) =>
+    bankDetails =>
       Future.successful(Ok(
         view(
           summaryList = cyaSummaryList(bankDetails),
@@ -62,13 +64,15 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
   }
 
   def onSubmit(): Action[AnyContent] = handleWithBankDetails { implicit req =>
-    (leppData, bankDetails) =>
+    bankDetails =>
+      import req.leppSummary
       implicit val correlationId: CorrelationId = correlationIdHandler.getCorrelationId(req)
-      
+      implicit val req2: DataRequest[AnyContent] = DataRequest[AnyContent](req.request, req.user, req.userAnswers)
+
       handleWithBars(bankDetails)(() => {
         val result = for {
-          leppSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppData, bankDetails)
-          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, leppSummary.value)))
+          submissionSummary <- leppSubmissionService.acceptMultiplePayments(req.user.nino, leppSummary, bankDetails)
+          updatedAnswers <- EitherT.right(Future.fromTry(req.userAnswers.set(CheckYourAnswersPage, submissionSummary.value)))
           _ <- EitherT.right(sessionService.save(updatedAnswers))
         } yield Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode))
         

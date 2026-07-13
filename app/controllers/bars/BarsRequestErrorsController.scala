@@ -17,10 +17,9 @@
 package controllers.bars
 
 import com.google.inject.{Inject, Singleton}
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
-import controllers.{BarsLeppBaseController, SessionDataHandling}
+import controllers.actions.*
+import controllers.common.BarsLeppBaseController
 import pages.BarsRequestErrorsPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.NormalMode
 import views.html.bars.BarsRequestErrorsView
@@ -29,12 +28,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BarsRequestErrorsController @Inject()(identify: IdentifierAction,
-                                            barsLockout: BarsLockoutAction,
+                                            barsLockout: RedirectBarsLockoutAction,
                                             getData: DataRetrievalAction,
+                                            checkEligibilityAction: AcceptPaymentCheckEligibilityAction,
                                             view: BarsRequestErrorsView,
                                             val controllerComponents: MessagesControllerComponents)
                                            (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling {
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibilityAction) {
   
   def onPageLoad(): Action[AnyContent] = handleWithBankDetails { implicit request => _ =>
     Future.successful(BadRequest(view(viewModel(NormalMode, BarsRequestErrorsPage))))

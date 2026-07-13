@@ -16,11 +16,11 @@
 
 package connectors
 
+import base.{IntegrationSpecBase, WireMockMethods}
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import common.{IntegrationSpecBase, WireMockMethods}
 import models.allowList.CheckRequest
 import play.api.Application
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}

@@ -16,7 +16,7 @@
 
 package controllers
 
-import common.IntegrationSpecBase
+import base.IntegrationSpecBase
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
 import play.api.Application

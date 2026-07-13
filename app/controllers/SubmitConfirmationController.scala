@@ -16,10 +16,10 @@
 
 package controllers
 
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, RedirectBarsLockoutAction}
+import controllers.common.BarsLeppBaseController
 import models.userAnswers.LeppItem
 import pages.SubmissionPage
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
 import utils.{DateTime, DateTimeFormats}
@@ -29,28 +29,29 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmitConfirmationController @Inject()(identify: IdentifierAction,
-                                             barsLockout: BarsLockoutAction,
+                                             barsLockout: RedirectBarsLockoutAction,
                                              getData: DataRetrievalAction,
+                                             checkEligibility: AcceptPaymentCheckEligibilityAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              confirmationView: SubmitConfirmationView,
                                              dateTime: DateTime,
                                              val sessionService: SessionCacheService)
                                             (implicit val ec: ExecutionContext)
-  extends BarsLeppBaseController(identify, getData, barsLockout) with I18nSupport with SessionDataHandling:
+  extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility):
 
   private def filterForIds(items: Option[Seq[LeppItem]], ids: Seq[String]): Seq[LeppItem] = 
     items.getOrElse(Nil).filter(item => ids.contains(item.id))
   
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
-    (leppData, _, leppSubmissionSummary) =>
+    submissionSummary =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, true))
           _ <- sessionService.save(updatedAnswers)
         } yield {
-          import leppData.availableItems
+          import request.leppSummary.availableItems
           
-          val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, leppSubmissionSummary.acceptedIds)
-          val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, leppSubmissionSummary.notAcceptedIds)
+          val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.acceptedIds)
+          val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.notAcceptedIds)
           
           if (acceptedItems.nonEmpty) {
             Ok(confirmationView(

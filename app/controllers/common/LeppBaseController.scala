@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.common
 
-import controllers.actions.{BarsLockoutAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import models.requests.DataRequest
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-abstract class BarsLeppBaseController @Inject()(identify: IdentifierAction,
-                                                getData: DataRetrievalAction,
-                                                barsLockoutAction: BarsLockoutAction)
-  extends LeppBaseController(identify, getData) {
+abstract class LeppBaseController @Inject()(identify: IdentifierAction,
+                                            getData: DataRetrievalAction)
+  extends FrontendBaseController with UrlSupport with I18nSupport {
 
-  override def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
-    (identify andThen barsLockoutAction andThen getData).async(implicit req => f(req))  
+  def handle(f: DataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
+    (identify andThen getData).async(implicit req => f(req))
+
 }

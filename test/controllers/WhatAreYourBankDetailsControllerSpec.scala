@@ -17,16 +17,19 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.FakeBarsLockoutAction
 import forms.WhatAreYourBankDetailsFormProvider
 import models.userAnswers.{BankAccountDetails, LeppSummary, UserAnswers}
 import pages.{DashboardPage, SubmissionPage, WhatAreYourBankDetailsPage}
+import play.api.Application
 import play.api.data.Form
+import play.api.mvc.{AnyContentAsEmpty, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, NormalMode}
 import views.html.WhatAreYourBankDetailsView
+
+import scala.concurrent.Future
 
 class WhatAreYourBankDetailsControllerSpec extends SpecBase {
 
@@ -56,17 +59,14 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
 
   "WhatAreYourBankDetailsController" - {
-    
     "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = summaryUserAnswers).build()
+      val application: Application = applicationBuilder(userAnswers = summaryUserAnswers).build()
 
       running(application) {
-        val request = FakeRequest(GET, onPageLoad)
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, onPageLoad)
+        val result: Future[Result] = route(application, request).value
 
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
+        val view: WhatAreYourBankDetailsView = application.injector.instanceOf[WhatAreYourBankDetailsView]
         val viewModel: FormPageViewModel = getFormPageViewModel(onSubmit, backLinkUrl)
 
         status(result) mustEqual OK
@@ -75,19 +75,16 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must return OK and pre-fill the form when data is already present" in {
-
-      val application = applicationBuilder(userAnswers).build()
+      val application: Application = applicationBuilder(userAnswers).build()
 
       running(application) {
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(application, request).value
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, onPageLoad)
+        val result: Future[Result] = route(application, request).value
 
         val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
         val viewModel: FormPageViewModel = getFormPageViewModel(onSubmit, backLinkUrl)
         val expectedForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
-        val expectedViewString: String =
-          view(expectedForm, viewModel)(request, messages(application)).toString
+        val expectedViewString: String = view(expectedForm, viewModel)(request, messages(application)).toString
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual expectedViewString
@@ -95,23 +92,20 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must return OK and pre-fill the form in the edit mode" in {
+      val application: Application = applicationBuilder(userAnswers).build()
 
-      val application = applicationBuilder(userAnswers).build()
-
-      val onPageLoadEdit = routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url
-      val onSubmitEdit = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
-      val editBackLinkUrl = routes.CheckYourAnswersController.onPageLoad().url
+      val onPageLoadEdit: String = routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url
+      val onSubmitEdit: Call = routes.WhatAreYourBankDetailsController.onSubmit(CheckMode)
+      val editBackLinkUrl: String = routes.CheckYourAnswersController.onPageLoad().url
       
       running(application) {
-        val request = FakeRequest(GET, onPageLoadEdit)
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, onPageLoadEdit)
+        val result: Future[Result] = route(application, request).value
 
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[WhatAreYourBankDetailsView]
+        val view: WhatAreYourBankDetailsView = application.injector.instanceOf[WhatAreYourBankDetailsView]
         val viewModel: FormPageViewModel = getFormPageViewModel(onSubmitEdit, editBackLinkUrl)
         val expectedForm: Form[BankAccountDetails] = form.fill(bankAccountDetails)
-        val expectedViewString: String =
-          view(expectedForm, viewModel)(request, messages(application)).toString
+        val expectedViewString: String = view(expectedForm, viewModel)(request, messages(application)).toString
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual expectedViewString
@@ -119,13 +113,11 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must redirect to Dashboard page when no payment data exists" in {
-
-      val application = applicationBuilder(emptyUserAnswers).build()
+      val application: Application = applicationBuilder(emptyUserAnswers).build()
 
       running(application) {
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(application, request).value
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, onPageLoad)
+        val result: Future[Result] = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.DashboardController.onPageLoad().url
@@ -133,14 +125,12 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must redirect to clear cache controller when already submitting the request" in {
-
-      val userAnswers = emptyUserAnswers.set(page = SubmissionPage, value = true).success.value
-      val application = applicationBuilder(userAnswers).build()
+      val userAnswers: UserAnswers = summaryUserAnswers.set(page = SubmissionPage, value = true).success.value
+      val application: Application = applicationBuilder(userAnswers).build()
 
       running(application) {
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(application, request).value
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, onPageLoad)
+        val result: Future[Result] = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.ClearCacheController.onPageLoad().url
@@ -148,8 +138,10 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must redirect to BARS lockout controller when user made too many bars check attempts" in {
-      
-      val application = applicationBuilder(userAnswers, barsLockoutAction = FakeBarsLockoutAction(3)).build()
+      val application: Application = applicationBuilder(
+        userAnswers = userAnswers,
+        barsFailedAttemptCount = 3
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, onPageLoad)

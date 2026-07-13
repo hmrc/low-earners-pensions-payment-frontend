@@ -17,78 +17,204 @@
 package controllers.actions
 
 import base.SpecBase
+import connectors.BarsVerifyStatusConnector
 import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
-import models.requests.{AuthUser, IdentifierRequest}
+import models.requests.{AuthUser, BarsVerifiedRequest, IdentifierRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.libs.json.JsObject
 import play.api.mvc.*
-import play.api.mvc.Results.{Ok, Redirect}
-import play.api.test.Helpers.{redirectLocation, status, *}
+import play.api.mvc.Results.Redirect
 import play.api.test.{FakeHeaders, FakeRequest}
+import uk.gov.hmrc.domain.Nino
 import utils.CorrelationIdHandler
 
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class BarsLockoutActionSpec extends SpecBase {
+class BarsLockoutActionSpec extends SpecBase with Results {
 
   val headers: FakeHeaders = FakeHeaders(Seq("x-conversation-id" -> "X-id"))
+  
+  private object TestBarsLockoutAction extends BarsLockoutAction {
+    override val barsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+    override val correlationIdHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
 
-  "BarsLockout Action" - {
-    "must redirect to BarsLockoutController when the user lockedout" in {
-
-      when(mockBarsConnector.status()(
-        ArgumentMatchers.any(),
-        ArgumentMatchers.any(),
-        ArgumentMatchers.any()
-      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(3), Some(Instant.now()))))
-
-      val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
-
-      running(application) {
-        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser.apply("1", nino, None))
-
-        val barsAction = new BarsLockoutActionRefiner(
-          barsVerifyStatusConnector = mockBarsConnector,
-          correlationIdHandler = CorrelationIdHandler()
-        )
-
-        val result = barsAction.invokeBlock(identifierRequest,
-          block = (_: IdentifierRequest[AnyContentAsEmpty.type]) =>
-            Future.successful(Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad())))
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bars.routes.BarsLockoutController.onPageLoad().url)
-      }
+    override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, BarsVerifiedRequest[A]]] = {
+      Future.successful(Left(ImATeapot("")))
     }
 
-    "must return a Bars request when the user not lockout" in {
-
-      when(mockBarsConnector.status()(
-        ArgumentMatchers.any(),
-        ArgumentMatchers.any(),
-        ArgumentMatchers.any()
-      )).thenReturn(Future.successful(BarsVerifyStatusResponse(NumberOfBarsVerifyAttempts(1), None)))
-
-      val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
-
-      running(application) {
-
-        val identifierRequest = IdentifierRequest(FakeRequest(), AuthUser("1", nino, None))
-
-        val barsAction = new BarsLockoutActionRefiner(
-          barsVerifyStatusConnector = mockBarsConnector,
-          correlationIdHandler = CorrelationIdHandler()
+    override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  }
+  
+  "BarsLockoutAction" - {
+    "handleWithBarsStatus" - {
+      "must return InternalServerError when request to verify bars status fails" in {
+        when(
+          TestBarsLockoutAction.barsVerifyStatusConnector.status()(
+            ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()
+          )
+        ).thenReturn(
+          Future.failed(new RuntimeException(""))
         )
-
-        val result = barsAction.invokeBlock(identifierRequest,
-          block = (_: IdentifierRequest[AnyContentAsEmpty.type]) => Future.successful(Ok(JsObject.empty)))
-
-        status(result) mustBe OK
+        
+        val result: Either[Result, BarsVerifiedRequest[Nothing]] = await(
+          TestBarsLockoutAction.handleWithBarsStatus(f = _ => Left(ImATeapot("")))
+        )
+        
+        result mustBe a[Left[_, _]]
+        val expectedResult: Result = InternalServerError
+        result.swap.getOrElse(NotFound("")) mustBe expectedResult
       }
 
+      "must return expected result when request to verify bars status succeeds" in {
+        when(
+          TestBarsLockoutAction.barsVerifyStatusConnector.status()(
+            ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()
+          )
+        ).thenReturn(
+          Future.successful(BarsVerifyStatusResponse(
+            attempts = NumberOfBarsVerifyAttempts.zero,
+            lockoutExpiryDateTime = None
+          ))
+        )
+
+        val result: Either[Result, BarsVerifiedRequest[Nothing]] = await(
+          TestBarsLockoutAction.handleWithBarsStatus(f = _ => Left(ImATeapot("")))
+        )
+
+        result mustBe a[Left[_, _]]
+        val expectedResult: Result = ImATeapot("")
+        result.swap.getOrElse(NotFound("")) mustBe expectedResult
+      }
+    }
+  }
+  
+  "NoRedirectBarsLockoutAction" - {
+    trait Test {
+      val barsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+      val correlationIdHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
+      
+      when(correlationIdHandler.getCorrelationId(ArgumentMatchers.any())).thenReturn(testCorrelationId)
+      
+      val idRequest: IdentifierRequest[AnyContentAsEmpty.type] = IdentifierRequest(
+        request = FakeRequest(),
+        user = AuthUser(userId = "id", nino = Nino("AA123456C"), itmpNameOpt = None)
+      )
+      
+      val action: NoRedirectBarsLockoutAction = new NoRedirectBarsLockoutAction(
+        barsVerifyStatusConnector,
+        correlationIdHandler
+      )
+    }
+    
+    "should return lockout data when a user has BARS lockout" in new Test {
+      when(
+        barsVerifyStatusConnector.status()(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()
+        )
+      ).thenReturn(
+        Future.successful(BarsVerifyStatusResponse(
+          attempts = NumberOfBarsVerifyAttempts(2),
+          lockoutExpiryDateTime = Some(Instant.ofEpochMilli(1000))
+        ))
+      )
+      
+      lazy val result: Either[Result, BarsVerifiedRequest[AnyContentAsEmpty.type]] = await(
+        action.refine(idRequest)
+      )
+      
+      val dummyRequest: BarsVerifiedRequest[AnyContentAsEmpty.type] = BarsVerifiedRequest(idRequest, None)
+      
+      result mustBe a[Right[_, _]]
+      result.getOrElse(dummyRequest).barsLockoutExpiryOpt mustBe Some(Instant.ofEpochMilli(1000))
+    }
+    
+    "should return no lockout data for a user who isn't locked out from BARS" in new Test {
+      when(
+        barsVerifyStatusConnector.status()(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()
+        )
+      ).thenReturn(
+        Future.successful(BarsVerifyStatusResponse(
+          attempts = NumberOfBarsVerifyAttempts.zero,
+          lockoutExpiryDateTime = None
+        ))
+      )
+
+      lazy val result: Either[Result, BarsVerifiedRequest[AnyContentAsEmpty.type]] = await(
+        action.refine(idRequest)
+      )
+
+      val dummyRequest: BarsVerifiedRequest[AnyContentAsEmpty.type] = BarsVerifiedRequest(idRequest, None)
+
+      result mustBe a[Right[_, _]]
+      result.getOrElse(dummyRequest).barsLockoutExpiryOpt mustBe None
+    }
+  }
+
+  "RedirectBarsLockoutAction" - {
+    trait Test {
+      val barsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+      val correlationIdHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
+
+      when(correlationIdHandler.getCorrelationId(ArgumentMatchers.any())).thenReturn(testCorrelationId)
+
+      val idRequest: IdentifierRequest[AnyContentAsEmpty.type] = IdentifierRequest(
+        request = FakeRequest(),
+        user = AuthUser(userId = "id", nino = Nino("AA123456C"), itmpNameOpt = None)
+      )
+
+      val action: RedirectBarsLockoutAction = new RedirectBarsLockoutAction(
+        barsVerifyStatusConnector,
+        correlationIdHandler
+      )
+    }
+    
+    "refine" - {
+      "must redirect to BarsLockoutController when the user locked out" in new Test {
+        when(
+          barsVerifyStatusConnector.status()(
+            hc = ArgumentMatchers.any(), 
+            ec = ArgumentMatchers.any(), 
+            correlationId = ArgumentMatchers.any()
+          )
+        ).thenReturn(
+          Future.successful(
+            BarsVerifyStatusResponse(
+              attempts = NumberOfBarsVerifyAttempts(3),
+              lockoutExpiryDateTime = Some(Instant.now())
+            )
+          )
+        )
+        
+        val result: Either[Result, BarsVerifiedRequest[AnyContentAsEmpty.type]] = await(action.refine(idRequest))
+        result mustBe a[Left[_, _]]
+        result.swap.getOrElse(InternalServerError("")) mustBe Redirect(controllers.bars.routes.BarsLockoutController.onPageLoad())
+      }
+
+      "must return a Bars request when the user not lockout" in new Test {
+        when(
+          barsVerifyStatusConnector.status()(
+            hc = ArgumentMatchers.any(), 
+            ec = ArgumentMatchers.any(), 
+            correlationId = ArgumentMatchers.any()
+          )
+        ).thenReturn(
+          Future.successful(
+            BarsVerifyStatusResponse(
+              attempts = NumberOfBarsVerifyAttempts(1),
+              lockoutExpiryDateTime = None
+            )
+          )
+        )
+
+        val dummyRequest: BarsVerifiedRequest[AnyContentAsEmpty.type] = BarsVerifiedRequest(idRequest, None)
+        
+        val result: Either[Result, BarsVerifiedRequest[AnyContentAsEmpty.type]] = await(action.refine(idRequest))
+        result mustBe a[Right[_, _]]
+        result.getOrElse(dummyRequest).barsLockoutExpiryOpt mustBe None
+      } 
     }
   }
 }

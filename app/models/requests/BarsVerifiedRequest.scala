@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,8 @@
 
 package models.requests
 
-import models.userAnswers.UserAnswers
-import play.api.mvc.{Request, WrappedRequest}
-
 import java.time.Instant
 
-case class DataRequest[A](request: Request[A],
-                          user: AuthUser,
-                          userAnswers: UserAnswers,
-                          barsLockoutExpiryOpt: Option[Instant] = None) extends WrappedRequest[A](request)
-
+class BarsVerifiedRequest[A](override val request: IdentifierRequest[A],
+                             val barsLockoutExpiryOpt: Option[Instant] = None)
+  extends IdentifierRequest[A](request, request.user)

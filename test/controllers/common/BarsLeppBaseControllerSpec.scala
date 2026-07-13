@@ -14,74 +14,60 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.common
 
 import base.SpecBase
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
-import models.userAnswers.{BankAccountDetails, LeppSummary, SubmissionSummary, UserAnswers}
+import controllers.actions.*
+import controllers.actions.fakes.{FakeDataRetrievalAction, FakeIdentifierAction, FakeRedirectBarsLockoutAction}
+import controllers.bars
+import models.userAnswers.{BankAccountDetails, SubmissionSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import pages.*
-import play.api.libs.json.{JsBoolean, JsObject, JsString, Json}
+import play.api.libs.json.{JsBoolean, JsObject, Json}
 import play.api.mvc.Results.ImATeapot
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{DefaultActionBuilder, MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesControllerComponents
-import services.SessionCacheService
-import viewmodels.{CheckMode, Mode, NormalMode}
+import viewmodels.NormalMode
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class LeppBaseControllerSpec extends SpecBase {
-  private trait Test {
+class BarsLeppBaseControllerSpec extends SpecBase {
+  private trait Test(count: Int = 0) {
     val userAnswers: UserAnswers = UserAnswers("1")
     val mockAuth: IdentifierAction = FakeIdentifierAction(nino = nino)
-    val mockSessionService: SessionCacheService = mock[SessionCacheService]
+    private val mockBarsLockoutAction: FakeRedirectBarsLockoutAction = FakeRedirectBarsLockoutAction(count)
     private val mockCc: MessagesControllerComponents = stubMessagesControllerComponents()
     private lazy val mockData: DataRetrievalAction = FakeDataRetrievalAction(userAnswers)
+    private lazy val mockEligibilityAction: CheckEligibilityAction = new AcceptPaymentCheckEligibilityAction()
+
+    val defaultActionBuilder: DefaultActionBuilder = app.injector.instanceOf[DefaultActionBuilder]
     
     class DummyController(identifierAction: IdentifierAction,
+                          barsLockoutAction: BarsLockoutAction,
                           data: DataRetrievalAction,
+                          checkEligibility: CheckEligibilityAction,
                           val controllerComponents: MessagesControllerComponents = mockCc)
-      extends LeppBaseController(identifierAction, data) with SessionDataHandling {
-
-      override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-    }
+      extends BarsLeppBaseController(identifierAction, barsLockoutAction, data, checkEligibility)
     
-    lazy val controller: DummyController = new DummyController(mockAuth, mockData)
+    lazy val controller: DummyController = new DummyController(
+      mockAuth,
+      mockBarsLockoutAction,
+      mockData,
+      mockEligibilityAction
+    )
   }
   
-  "LeppBaseController" - {
-    "submitUrl" - {
-      def testSubmitUrl(mode: Mode, page: Page, link: String): Unit =
-        s"should return correct submit link for page: $page, and mode: $mode" in new Test {
-          controller.submitUrl(mode, page).url mustBe link
-        }
-
-      Seq(
-        (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/bank-details"),
-        (CheckMode,  WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/change-bank-details"),
-        (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/check-your-answers")
-      ).foreach(testSubmitUrl)
-    }
-    
-    "backLinkUrl" - {
-      def testBackLink(mode: Mode, page: Page, link: String): Unit =
-        s"should return correct back link for page: ${page.toString}, and mode: $mode" in new Test {
-        controller.backLinkUrl(mode, page).url mustBe link
-      }
-
-      Seq(
-        (NormalMode, DashboardPage, "/accept-your-low-earners-pension-payment/start"),
-        (NormalMode, PaymentCalcBreakdownPage, "/accept-your-low-earners-pension-payment/payments"),
-        (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/payment-breakdown"),
-        (CheckMode,  WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/check-your-answers"),
-        (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/bank-details")
-      ).foreach(testBackLink)
-    }
-    
+  "BarsLeppBaseController" - {
     "handle" - {
-      "should invoke block when authorisation succeeds" in new Test {
+      "should invoke bars refiner when authorisation succeeds" in new Test(1) {
+        override val userAnswers: UserAnswers = emptyUserAnswers.copy(
+          data = Json.obj(
+            "leppSummary" -> Json.toJson(summaryModel)
+          )
+        )
+          
         val result: Future[Result] = controller.handle(
           _ => Future.successful(ImATeapot("Teapot time"))
         )(FakeRequest())
@@ -90,7 +76,7 @@ class LeppBaseControllerSpec extends SpecBase {
         contentAsString(result) mustBe "Teapot time"
       }
 
-      "should not invoke block when authorisation fails" in new Test {
+      "should not bars refiner when authorisation fails" in new Test(1) {
         override val mockAuth = FakeIdentifierAction(true, nino)
         
         val result: Future[Result] = controller.handle(
@@ -100,107 +86,17 @@ class LeppBaseControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some("some-url")
       }
-    }
-  }
-  
-  "SessionDataHandling" - {
-    "handleWithSubmissionCheck" - {
-      "should redirect to clear cache controller when data has already submitted" in new Test {
-        when(
-          mockSessionService.save(userAnswers = ArgumentMatchers.any())(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any()
-          )
-        ).thenReturn(Future.successful(()))
-        
-        override val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = JsObject(Seq("isSubmitted" -> JsBoolean(true)))
-        )
-        
-        lazy val result: Future[Result] = controller.handleWithSubmissionCheck(
-          req => Future.successful(ImATeapot(req.userAnswers.data))
-        )(FakeRequest())
-        
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
-      }
 
-      "should not wipe user answers when data has not been submitted" in new Test {
-        when(
-          mockSessionService.save(
-            ArgumentMatchers.any()
-          )(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )
-        ).thenReturn(
-          Future.successful(())
-        )
-
-        override val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = JsObject(Seq("otherData" -> JsString("value")))
-        )
-
-        lazy val result: Future[Result] = controller.handleWithSubmissionCheck(
-          req => Future.successful(ImATeapot(req.userAnswers.data))
-        )(FakeRequest())
-
-        status(result) mustBe IM_A_TEAPOT
-        contentAsJson(result) mustBe Json.parse("""{"otherData": "value"}""")
-      }
-    }
-    
-    "handleWithLeppData" - {
-      "should redirect to dashboard page when claims data isn't cached" in new Test {
-        val result: Future[Result] = controller.handleWithLeppData(
-          _ => _ => Future.successful(ImATeapot(""))
+      "should redirect to BarsLockout when authorisation succeed but exceeds BARS limit" in new Test(3) {
+        val result: Future[Result] = controller.handle(
+          _ => Future.successful(ImATeapot("Teapot time"))
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
-      }
-
-      "should evaluate block when LEPP data is cached" in new Test {
-        override val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = Json.obj("leppSummary" -> Json.toJson(summaryModel))
-        )
-
-        val result: Future[Result] = controller.handleWithLeppData(
-          _ => _ => Future.successful(ImATeapot("teapot time"))
-        )(FakeRequest())
-
-        status(result) mustBe IM_A_TEAPOT
-        contentAsString(result) mustBe "teapot time"
-      }
-
-      "should clear user answers and redirect to dashboard page when data has already been submitted" in new Test {
-        override val userAnswers: UserAnswers = UserAnswers(
-          id = "1",
-          data = JsObject(Seq(
-            "isSubmitted" -> JsBoolean(true),
-            "leppSummary" -> Json.toJson(summaryModel)
-          ))
-        )
-
-        when(
-          mockSessionService.save(userAnswers = ArgumentMatchers.any())(
-            hc = ArgumentMatchers.any(),
-            ec = ArgumentMatchers.any()
-          )
-        ).thenReturn(Future.successful(()))
-        
-        val result: Future[Result] = controller.handleWithLeppData(
-          req => _ => Future.successful(ImATeapot("teapot time"))
-        )(FakeRequest())
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(bars.routes.BarsLockoutController.onPageLoad().url)
       }
     }
-    
+
     "handleWithBankDetails" - {
       "should redirect to dashboard page when claims data isn't cached" in new Test {
         val result: Future[Result] = controller.handleWithBankDetails(
@@ -208,7 +104,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
@@ -222,7 +118,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
+        redirectLocation(result) mustBe Some(controllers.routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
       }
 
       "should evaluate block when all data is cached" in new Test {
@@ -241,7 +137,7 @@ class LeppBaseControllerSpec extends SpecBase {
           )
         )
 
-        val result: Future[Result] = controller.handleWithLeppData(
+        val result: Future[Result] = controller.handleWithBankDetails(
           _ => _ => Future.successful(ImATeapot("teapot time"))
         )(FakeRequest())
 
@@ -270,10 +166,10 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.ClearCacheController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(controllers.routes.ClearCacheController.onPageLoad().url)
       }
     }
-    
+
     "handleForConfirmationPage" - {
       "should redirect to dashboard page when claims data isn't cached" in new Test {
         val result: Future[Result] = controller.handleForConfirmationPage(
@@ -281,7 +177,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DashboardController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
       }
 
       "should redirect to bank details page when bank details aren't cached" in new Test {
@@ -295,7 +191,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
+        redirectLocation(result) mustBe Some(controllers.routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
       }
 
       "should redirect to CYA page when data hasn't been submitted" in new Test {
@@ -319,7 +215,7 @@ class LeppBaseControllerSpec extends SpecBase {
         )(FakeRequest())
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(controllers.routes.CheckYourAnswersController.onPageLoad().url)
       }
 
       "should evaluate block when all data is cached" in new Test {

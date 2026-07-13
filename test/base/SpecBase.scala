@@ -36,6 +36,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import connectors.BarsVerifyStatusConnector
 import controllers.actions.*
+import controllers.actions.fakes.*
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.backend.*
 import models.backend.accept.{AcceptLeppPaymentRequest, AcceptLeppPaymentRequestBody, AcceptLeppPaymentResponse}
@@ -62,12 +63,16 @@ import play.api.libs.json.*
 import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, ResultExtractors}
+import services.{LeppRetrievalService, SessionCacheService}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
+import utils.CorrelationIdHandler
 import viewmodels.formPages.FormPageViewModel
 
 import java.net.URLEncoder
+import java.time.Instant
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.reflect.ClassTag
 import scala.util.Random
 
@@ -114,20 +119,29 @@ trait SpecBase
 
   val fakeIdentifierAction: FakeIdentifierAction = new FakeIdentifierAction(nino = nino)
 
-  val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
-  val mockBarsLockoutAction: BarsLockoutAction = FakeBarsLockoutAction(1)
+  given mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
+  given mockCidHandler: CorrelationIdHandler = mock[CorrelationIdHandler]
+  given mockSessionService: SessionCacheService = mock[SessionCacheService]
+  given mockRetrievalService: LeppRetrievalService = mock[LeppRetrievalService]
+  
+  lazy val mockStartPageEligibilityActionBuilder: StartPageCheckEligibilityActionBuilder = FakeStartPageCheckEligibilityActionBuilder(
+    result = Right(summaryModel)
+  )
   
   protected def applicationBuilder(userAnswers: UserAnswers = emptyUserAnswers,
+                                   barsFailedAttemptCount: Int = 0,
+                                   barsLockoutTimestampOpt: Option[Instant] = None,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
-                                   barsLockoutAction: BarsLockoutAction = mockBarsLockoutAction,
-                                   servicesConfig: Map[String, Any] = servicesConfig): GuiceApplicationBuilder =
+                                   servicesConfig: Map[String, Any] = servicesConfig,
+                                   startPageCheckEligibilityBuilder: StartPageCheckEligibilityActionBuilder = mockStartPageEligibilityActionBuilder): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
       .overrides(
         bind[IdentifierAction].toInstance(identifierAction),
-        bind[BarsLockoutAction].toInstance(barsLockoutAction),
-        bind[BarsVerifyStatusConnector].toInstance(mockBarsConnector),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[RedirectBarsLockoutAction].toInstance(FakeRedirectBarsLockoutAction(barsFailedAttemptCount)),
+        bind[NoRedirectBarsLockoutAction].toInstance(FakeNoRedirectBarsLockoutAction(barsFailedAttemptCount, barsLockoutTimestampOpt)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, barsLockoutTimestampOpt)),
+        bind[StartPageCheckEligibilityActionBuilder].toInstance(startPageCheckEligibilityBuilder)
       )
 
   def runningApplication(block: Application => Unit): Unit =

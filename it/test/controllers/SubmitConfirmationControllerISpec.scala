@@ -16,7 +16,7 @@
 
 package controllers
 
-import common.IntegrationSpecBase
+import base.IntegrationSpecBase
 import models.CorrelationId
 import models.userAnswers.LeppItemStatus.Available
 import models.userAnswers.{LeppItem, SubmissionSummary, UserAnswers}

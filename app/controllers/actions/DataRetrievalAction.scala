@@ -16,23 +16,29 @@
 
 package controllers.actions
 
-import models.requests.{DataRequest, IdentifierRequest}
+import models.requests.{BarsVerifiedRequest, DataRequest, IdentifierRequest}
 import models.userAnswers.UserAnswers
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
 
+import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRetrievalActionImpl @Inject()(
-                                         val sessionRepository: SessionRepository
-                                       )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction:
+class DataRetrievalActionImpl @Inject()(val sessionRepository: SessionRepository)
+                                       (using val executionContext: ExecutionContext) extends DataRetrievalAction:
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[DataRequest[A]] =
-    sessionRepository.get(request.user.userId).map {
-      case Some(value) => DataRequest(request, request.user, value)
-      case None => DataRequest(request, request.user, UserAnswers(request.user.userId))
+  override protected def transform[A](request: IdentifierRequest[A]): Future[DataRequest[A]] = {
+    val barsExpiryOpt: Option[Instant] = request match {
+      case barsReq: BarsVerifiedRequest[_] => barsReq.barsLockoutExpiryOpt
+      case _ => None
     }
+    
+    sessionRepository.get(request.user.userId).map {
+      case Some(value) => DataRequest(request, request.user, value, barsExpiryOpt)
+      case None => DataRequest(request, request.user, UserAnswers(request.user.userId), barsExpiryOpt)
+    }
+  }
 
 trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, DataRequest]
 

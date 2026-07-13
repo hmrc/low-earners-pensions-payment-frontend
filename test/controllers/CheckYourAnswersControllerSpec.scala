@@ -19,7 +19,8 @@ package controllers
 import base.SpecBase
 import cats.data.EitherT
 import connectors.{BarsVerifyStatusConnector, ConnectorResponse}
-import controllers.actions.{FakeBarsLockoutAction, FakeDataRetrievalAction, FakeIdentifierAction}
+import controllers.actions.fakes.{FakeDataRetrievalAction, FakeIdentifierAction}
+import controllers.actions.{AcceptPaymentCheckEligibilityAction, RedirectBarsLockoutAction}
 import models.ResponseWrapper.{ErrorWrapper, SuccessWrapper}
 import models.bars.BarsResponse
 import models.barsLockout.{BarsVerifyStatusResponse, NumberOfBarsVerifyAttempts}
@@ -46,14 +47,15 @@ import scala.concurrent.Future
 class CheckYourAnswersControllerSpec extends SpecBase {
   "CheckYourAnswerController" - {
     
-    trait Test(barsVerifyCount: Int = 1) {
+    trait Test {
       val mockBarsService: BarsService = mock[BarsService]
       val mockBarsConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
       
       val controller: CheckYourAnswersController = new CheckYourAnswersController(
         identify = FakeIdentifierAction(nino = nino),
-        barsLockout = FakeBarsLockoutAction(barsVerifyCount),
+        barsLockout = mock[RedirectBarsLockoutAction],
         getData = FakeDataRetrievalAction(emptyUserAnswers),
+        checkEligibility = mock[AcceptPaymentCheckEligibilityAction],
         view = mock[CheckYourAnswersView],
         correlationIdHandler = mock[CorrelationIdHandler],
         barsService = mockBarsService,
