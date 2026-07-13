@@ -74,9 +74,9 @@ class StartPageCheckEligibilityAction (withCaching: Boolean)
   override protected def executionContext: ExecutionContext = ec
 
   override protected[actions] def refine[A](request: DataRequest[A]): Future[Either[Result, EligibleDataRequest[A]]] = {
-    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     given cid: CorrelationId = correlationIdHandler.getCorrelationId(request)
-
+    
     lazy val notEligibleRedirect: Either[Result, EligibleDataRequest[A]] = Left(
       Redirect(controllers.auth.routes.IneligibleController.onPageLoad())
     )
