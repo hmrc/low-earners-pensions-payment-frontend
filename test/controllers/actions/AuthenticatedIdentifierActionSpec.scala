@@ -136,7 +136,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
-          val expectedUrl = controllers.routes.PrivateBetaUnauthorisedController.onPageLoad().url
+          val expectedUrl = controllers.auth.routes.PrivateBetaUnauthorisedController.onPageLoad().url
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe expectedUrl

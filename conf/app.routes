@@ -50,4 +50,4 @@ GET    /clear-cache                             controllers.ClearCacheController
 GET    /clear-cache-error                       controllers.ClearCacheController.defaultError()
 
 # Private Beta
-GET    /private-beta-unauthorised               controllers.PrivateBetaUnauthorisedController.onPageLoad()
+GET    /private-beta-unauthorised               controllers.auth.PrivateBetaUnauthorisedController.onPageLoad()

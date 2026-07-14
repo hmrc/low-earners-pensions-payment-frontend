@@ -19,7 +19,6 @@ package controllers.actions
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import config.AppConfig
 import connectors.UserAllowListConnector
-import controllers.routes
 import models.requests.{AuthUser, IdentifierRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
@@ -82,7 +81,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     if (config.privateBetaEnabled) {
       userAllowListConnector.check("nino", request.user.nino.value) flatMap {
         case true => block(request)
-        case false => Future.successful(Redirect(routes.PrivateBetaUnauthorisedController.onPageLoad()))
+        case false => Future.successful(Redirect(controllers.auth.routes.PrivateBetaUnauthorisedController.onPageLoad()))
       }
     } else {
       block(request)
