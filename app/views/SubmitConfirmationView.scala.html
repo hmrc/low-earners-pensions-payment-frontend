@@ -52,17 +52,17 @@
                                 Seq("taxYear", "availableUntil", "amount")),
             tableRef = "confirmation_table_available_payments"
         ))
-
-        @insetText(
-            InsetTextViewModel("confirmation.part.confirmation.details")
-        )
     } else {
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">
                 @messages("confirmation.heading")
             </h1>
         </div>
-        <p class="govuk-body">@messages("confirmation.details")</p>
+        @if(acceptedItems.length == 1){
+            <p class="govuk-body">@messages("confirmation.details")</p>
+        } else {
+            <p class="govuk-body">@messages("confirmation.part.confirmation.details")</p>
+        }
     }
 
     @table(TableViewModel(
