@@ -33,7 +33,7 @@ trait AuthSupport extends WireMockMethods {
       |   {
       |      "identifiers": [],
       |      "state": "Activated",
-      |      "enrolment": "HMRC-PI"
+      |      "enrolment": "HMRC-PT"
       |   }
       | ],
       | "retrieve": [
@@ -51,7 +51,7 @@ trait AuthSupport extends WireMockMethods {
     """
       |{
       | "state": "Activated",
-      | "key": "HMRC-PI"
+      | "key": "HMRC-PT"
       |}
     """.stripMargin
   )
