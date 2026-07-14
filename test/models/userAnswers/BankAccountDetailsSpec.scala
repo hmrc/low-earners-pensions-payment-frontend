@@ -32,7 +32,12 @@ class BankAccountDetailsSpec extends SpecBase {
       """.stripMargin
     )
 
-    val model: BankAccountDetails = BankAccountDetails("name", "number", "sortcode", Some("rollNumber"))
+    val model: BankAccountDetails = BankAccountDetails(
+      accountName = "name",
+      sortCode = "sortcode",
+      accountNumber = "number",
+      rollNumber = Some("rollNumber")
+    )
 
     "reads" - {
       "should return a JsSuccess for valid JSON" in {

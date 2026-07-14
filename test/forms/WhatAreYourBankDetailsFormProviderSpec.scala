@@ -58,8 +58,8 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
     "bind" - {
       Seq(
         (s"$prefix.accountName", 1, 18, Seq("!!!!!"), Seq("Mr Taxwell Payer", "Aa'&,/\\ -"), "^[A-Za-z'&,\\\\=()\\/ -]+$"),
-        (s"$prefix.accountNumber", 6, 8, Seq("abcdefgj"), Seq("123456", "1234567", "12345678"), "^[0-9]{6,8}$"),
-        (s"$prefix.sortCode", 6, 6, Seq("ABCDEF"), Seq("11-22-33", "112233"), "^[0-9]{6}$")
+        (s"$prefix.sortCode", 6, 6, Seq("ABCDEF"), Seq("11-22-33", "112233"), "^[0-9]{6}$"),
+        (s"$prefix.accountNumber", 6, 8, Seq("abcdefgj"), Seq("123456", "1234567", "12345678"), "^[0-9]{6,8}$")
       ).foreach(handleForMandatoryField(form))
 
       handleForOptionalField(form)(
@@ -69,10 +69,15 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
       "should strip any leading, trailing, or excess whitespace from fields" in {
         form.bind(Map(
           s"$prefix.accountName" -> " name    nameson   ",
-          s"$prefix.accountNumber" -> "  12345678  ",
           s"$prefix.sortCode" -> "  112233  ",
+          s"$prefix.accountNumber" -> "  12345678  ",
           s"$prefix.rollNumber" -> "      "
-        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", None)
+        )).get mustBe BankAccountDetails(
+          accountName = "name nameson",
+          sortCode = "112233",
+          accountNumber = "12345678",
+          rollNumber = None
+        )
       }
 
       "should strip dashes from sort code field" in {
@@ -81,7 +86,12 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
           s"$prefix.accountNumber" -> "12345678",
           s"$prefix.sortCode" -> "11-22-33",
           s"$prefix.rollNumber" -> "ABC/DEF"
-        )).get mustBe BankAccountDetails("name nameson", "12345678", "112233", Some("ABCDEF"))
+        )).get mustBe BankAccountDetails(
+          accountName = "name nameson",
+          sortCode = "112233",
+          accountNumber = "12345678",
+          rollNumber = Some("ABCDEF")
+        )
       }
     }
   }
