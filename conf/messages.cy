@@ -134,11 +134,10 @@ bars.lockout.p2 = Gallwch chi roi cynnig arall arni ar ôl {0} i gadarnhau manyl
 bars.lockout.go-to-dashboard = Dychwelyd i''ch taliadau
 
 # Not eligible page
-ineligible.title = Ni allwch ddefnyddio''r gwasanaeth hwn
-ineligible.heading = Ni allwch ddefnyddio''r gwasanaeth hwn
-ineligible.guidance.preform = Os ydych chi''n credu bod hyn yn anghywir, efallai y byddwch chi
-ineligible.guidance.formLink = cysylltwch â ni (yn agor tab newydd).
-ineligible.guidance.postform = . Byddwn yn ymateb i chi o fewn 5 diwrnod gwaith.
+ineligible.title = Ni allwch ddefnyddio'r gwasanaeth hwn
+ineligible.heading = Ni allwch ddefnyddio'r gwasanaeth hwn
+ineligible.body = Nid ydych chi'n gymwys i gael y taliad pensiwn i'r sawl sy'n ennill incwm isel.
+ineligible.link = Dychwelyd i'ch cyfrif treth personol
 
 # Something went wrong page
 somethingWentWrong.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth

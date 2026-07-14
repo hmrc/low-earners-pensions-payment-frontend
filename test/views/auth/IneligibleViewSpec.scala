@@ -30,9 +30,8 @@ class IneligibleViewSpec extends SpecBase {
   "view" - {
     "display correct error information" in new Setup {
       view.getElementsByTag("h1").text() mustBe messages(app)("ineligible.heading")
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.guidance.preform"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.guidance.formLink"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.guidance.postform"))
+      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.body"))
+      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.link"))
     }
   }
 
