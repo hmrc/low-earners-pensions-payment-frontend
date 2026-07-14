@@ -89,6 +89,7 @@ bankDetails.rollNumber.formError.format = The building society roll number must 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.bankDetails = Your bank details
+checkYourAnswers.rollNumber = Building society roll number
 checkYourAnswers.changeAccountName = change-account-name
 checkYourAnswers.changeAccountNumber = change-account-number
 checkYourAnswers.changeSortCode = change-sort-code
