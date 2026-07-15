@@ -31,6 +31,30 @@ import views.html.SubmitConfirmationView
 
 class SubmitConfirmationViewSpec extends SpecBase {
 
+  val acceptedItem = LeppItem(
+    id = "A-25-1",
+    taxYear = 2025,
+    contributions = 1000,
+    taxRate = 20,
+    entitlement = 200,
+    status = Available,
+    claimDate = None
+  )
+  
+  val acceptedItems: Seq[LeppItem] = Seq(acceptedItem)
+  
+  val notAcceptedItems: Seq[LeppItem] = Seq(
+    LeppItem(
+      id = "A-26-1",
+      taxYear = 2026,
+      contributions = 1000,
+      taxRate = 20,
+      entitlement = 200,
+      status = Available,
+      claimDate = None
+    )
+  )
+  
   "view" - {
 
     "with correct LEPP gov banner" in new Setup {
@@ -39,7 +63,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
         "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
-    "display correct guidance and text" in new Setup {
+    "display correct guidance and text" in new Setup(acceptedItems = acceptedItems) {
       view.getElementsByTag("h1").text() mustBe messages(app)("confirmation.heading")
 
       view.text.contains(messages(app)("confirmation.details"))
@@ -51,36 +75,18 @@ class SubmitConfirmationViewSpec extends SpecBase {
     }
 
     "display correct accepted payments" in new Setup(
-      acceptedItems = Seq(
-        LeppItem(
-          id = "A-25-1",
-          taxYear = 2025,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      ),
-      notAcceptedItems = Seq(
-        LeppItem(
-          id = "A-26-1",
-          taxYear = 2026,
-          contributions = 1000,
-          taxRate = 20,
-          entitlement = 200,
-          status = Available,
-          claimDate = None
-        )
-      )
+      acceptedItems = acceptedItems :+ acceptedItem.copy(id = "A-25-2"),
+      notAcceptedItems = notAcceptedItems
     ) {
       
       val taxYear: Int = summaryModel.availableItems.get.head.taxYear
       val entitlement: BigDecimal = summaryModel.availableItems.get.head.entitlement
+      view.text.contains(messages(app)("confirmation.part.confirmation.details"))
       view.getElementById("confirmation_table_accepted_payments_header_taxYear").text() mustBe messages(app)("confirmation.table.header.taxYear")
       view.getElementById("confirmation_table_accepted_payments_header_amount").text() mustBe messages(app)("confirmation.table.header.amount")
       view.getElementById(s"taxYear_$taxYear").text() mustBe messages(app)("common.taxYearDates", s"$taxYear", s"${taxYear + 1}")
       view.getElementById(s"entitlement_$taxYear").text() mustBe CurrencyFormats.format(entitlement)
+      
     }
   }
 
@@ -88,7 +94,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
-
+    
     val view: Document = Jsoup.parse(
       app.injector.instanceOf[SubmitConfirmationView].apply(acceptedItems, notAcceptedItems, "").body
     )
