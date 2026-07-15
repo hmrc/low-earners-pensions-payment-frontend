@@ -1,5 +1,6 @@
 service.name = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
-service.text = Dyma eich gwasanaeth newydd
+outage-page.serviceDisplayName = Derbyn eich taliad pensiwn i'r sawl sy'n ennill incwm isel
+
 
 # What you will need page
 whatYouWillNeed.title = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel

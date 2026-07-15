@@ -1,5 +1,5 @@
 service.name = Accept your low earner''s pension payment
-service.text = This is your new service
+outage-page.serviceDisplayName = Accept your low earner's pension payment
 
 # What you will need page
 whatYouWillNeed.title = Accept your low earner''s pension payment
