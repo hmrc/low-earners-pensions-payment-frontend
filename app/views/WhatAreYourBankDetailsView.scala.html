@@ -35,18 +35,16 @@
 @(form: Form[BankAccountDetails], viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, s"${messages("bankDetails.title")}"), backLinkUrl = viewModel.backLinkUrl) {
-
-   @heading("bankDetails.heading", headerSize = "l")
-
-   @insetText(
-        InsetTextViewModel("bankDetails.securityInset")
-   )
-
-   @formHelper(action = viewModel.onSubmit, Symbol("autoComplete") -> "off") {
-
+    @formHelper(action = viewModel.onSubmit, Symbol("autoComplete") -> "off") {
         @if(form.hasErrors) {
-           @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+
+        @heading("bankDetails.heading", headerSize = "l")
+
+        @insetText(
+            InsetTextViewModel("bankDetails.securityInset")
+        )
 
         @govukInput(
             InputViewModel(
@@ -99,5 +97,5 @@
         @govukButton(
             ButtonViewModel(viewModel.buttonText.toMessage)
         )
-   }
+    }
 }
