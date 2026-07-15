@@ -24,14 +24,12 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(
-pageTitle = titleNoForm(messages("ineligible.title")),
-timeout   = false,
-showSignOut  = true
+    pageTitle = titleNoForm(messages("ineligible.title")),
+    timeout   = false,
+    showSignOut  = true
 ) {
+    <h1 class="govuk-heading-xl">@messages("ineligible.heading")</h1>
 
-<h1 class="govuk-heading-xl">@messages("ineligible.heading")</h1>
-
-<p class="govuk-body">@messages("ineligible.guidance.preform")
- <a class="govuk-link" href="@appConfig.contactFrontendUrl">@messages("ineligible.guidance.formLink")</a>
- @messages("ineligible.guidance.postform")</p>
+    <p class="govuk-body">@messages("ineligible.body")</p>
+    <a class="govuk-link" href="@appConfig.ptaUrl">@messages("ineligible.link")</a>
 }

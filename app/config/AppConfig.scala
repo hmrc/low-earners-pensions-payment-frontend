@@ -41,6 +41,7 @@ class AppConfig @Inject()(config: Configuration):
   val loginUrl: String = loadConfig("urls.login")
   val loginContinueUrl: String = loadConfig("urls.loginContinue")
   lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback")
+  val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   //IV uplift config
   val confidenceLevelMinimum: ConfidenceLevel =

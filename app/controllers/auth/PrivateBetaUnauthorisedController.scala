@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.auth
 
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.auth.UnauthorisedView
+import views.html.auth.IneligibleView
 
 import javax.inject.Inject
 
 class PrivateBetaUnauthorisedController @Inject()(val controllerComponents: MessagesControllerComponents,
-                                       view: UnauthorisedView)
+                                       view: IneligibleView)
   extends FrontendBaseController with I18nSupport:
 
   def onPageLoad(): Action[AnyContent] = Action:

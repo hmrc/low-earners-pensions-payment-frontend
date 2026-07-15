@@ -137,9 +137,8 @@ bars.lockout.go-to-dashboard = Return to your payments
 # Not eligible page
 ineligible.title = You cannot use this service
 ineligible.heading = You cannot use this service
-ineligible.guidance.preform = If you believe this is wrong you may
-ineligible.guidance.formLink = contact us (opens in a new link)
-ineligible.guidance.postform = . We will respond to you within 5 working days.
+ineligible.body = You are not eligible for the low earner's pension payment.
+ineligible.link = Return to your personal tax account
 
 # Something went wrong page
 somethingWentWrong.title = Sorry, there is a problem with the service
