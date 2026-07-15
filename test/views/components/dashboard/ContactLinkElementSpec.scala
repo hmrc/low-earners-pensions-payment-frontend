@@ -32,7 +32,7 @@ class ContactLinkElementSpec extends SpecBase {
       val element: Document = view()
       element.html() must include("For more information,")
       val expectedContactLink: String = app.injector.instanceOf[AppConfig].contactUrl
-      element.html() must include(s"""<a class="govuk-link govuk-link--no-visited-state" href="$expectedContactLink">contact us (opens in new tab).</a>""")
+      element.html() must include(s"""<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="$expectedContactLink">contact us (opens in new tab).</a>""")
     }
   }
   trait Setup {

@@ -29,7 +29,7 @@ class LinkElementSpec extends SpecBase {
   "link_element" - {
     "should return the expected HTML element" in new Setup {
       val element: Document = view("/", "common.signOut")
-      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" href="/">""")
+      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/">""")
       element.html() must include("Sign out")
     }
   }
