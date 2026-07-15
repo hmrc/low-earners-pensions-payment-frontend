@@ -71,7 +71,7 @@ object CheckYourAnswersSummary {
                            (implicit messages: Messages): Option[SummaryListRow] =
     bankAccountDetails.rollNumber.map(rollNumber =>
       SummaryListRow(
-        key = Key(content = Text(messages("bankDetails.rollNumber"))),
+        key = Key(content = Text(messages("checkYourAnswers.rollNumber"))),
         value = Value(content = Text(rollNumber)),
         actions = Some(
           Actions(

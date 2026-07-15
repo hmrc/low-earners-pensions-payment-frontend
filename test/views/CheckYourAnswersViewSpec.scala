@@ -43,7 +43,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
       view.html must include(msg("bankDetails.accountName"))
       view.html must include(msg("bankDetails.accountNumber"))
       view.html must include(msg("bankDetails.sortCode"))
-      view.html must include(msg("bankDetails.rollNumber"))
+      view.html must include(msg("checkYourAnswers.rollNumber"))
     }
 
     "not display roll number row when user has not submitted a value" in new Setup {

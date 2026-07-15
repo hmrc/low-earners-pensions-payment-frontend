@@ -89,6 +89,7 @@ bankDetails.rollNumber.formError.format = Mae''n rhaid i rif rôl y gymdeithas a
 checkYourAnswers.title = Gwiriwch eich atebion
 checkYourAnswers.heading = Gwiriwch eich atebion
 checkYourAnswers.bankDetails = Eich manylion banc
+checkYourAnswers.rollNumber = Rhif y gymdeithas adeiladu
 checkYourAnswers.changeAccountName = newid-enw-y-cyfrif
 checkYourAnswers.changeAccountNumber = newid-rhif-cyfrif
 checkYourAnswers.changeSortCode = newid-cod-didoli
