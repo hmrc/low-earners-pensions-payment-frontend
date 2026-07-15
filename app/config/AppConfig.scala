@@ -94,7 +94,7 @@ class AppConfig @Inject()(config: Configuration):
 
   //Feedback banner config
   val feedbackBannerEnabled: Boolean = config.get[Boolean]("contact-frontend.bannerEnabled")
-  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"
+  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=$appName"
 
   val contactUrl: String = config.get[String]("urls.contactUrl")
   
