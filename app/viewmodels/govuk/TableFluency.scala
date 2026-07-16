@@ -23,12 +23,18 @@ trait TableFluency {
     def apply(caption: String,
               rows: Seq[Seq[TableRow]],
               columnHeaders: Seq[HeadCell],
-              tableRef: String): Table = Table(
-      rows = rows,
-      head = Some(columnHeaders),
-      caption = Some(caption),
-      captionClasses = "govuk-table__caption--m",
-      attributes = Map("id" -> s"$tableRef")
-    )
+              tableRef: String,
+              captionIsHidden: Boolean = true): Table = {
+      val baseCaptionClasses: String = "govuk-table__caption--m"
+      val captionClasses: String = if(captionIsHidden) s"$baseCaptionClasses govuk-visually-hidden" else baseCaptionClasses
+      
+      Table(
+        rows = rows,
+        head = Some(columnHeaders),
+        caption = Some(caption),
+        captionClasses = captionClasses,
+        attributes = Map("id" -> s"$tableRef")
+      )
+    }
   }
 }

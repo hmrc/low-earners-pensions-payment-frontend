@@ -23,7 +23,7 @@
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
- heading: h1,
+ subHeading: h2,
  statusElement: status_element,
  contactLinkElement: contact_link_element,
  availableSummarySection: available_summary_section,
@@ -43,6 +43,8 @@
   @insetText(InsetTextViewModel(html = suspendedInsetContent))
  }
 
+ @subHeading(msgKey = messages("dashboard.availablePayments.heading"))
+
  @table(TableViewModel(
   caption = messages("dashboard.availablePayments.heading"),
   rows = DashboardUtils.tableRows(tableRef, leppSummary.availablePaymentItems, statusElement),
@@ -53,6 +55,6 @@
  @availableSummarySection(leppSummary.totalEntitlementString, continueUrl, barsLockFlag, hasAvailableItems)
 
 } else {
- @heading(msgKey = messages("dashboard.availablePayments.heading"), headerSize = "m")
+ @subHeading(msgKey = messages("dashboard.availablePayments.heading"))
  <p class = "govuk-body">@messages("dashboard.availablePayments.noneAvailable")</p>
 }
