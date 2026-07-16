@@ -44,7 +44,7 @@ abstract class BarsLeppBaseController @Inject()(identify: IdentifierAction,
   }
 
   def handleForConfirmationPage(f: BlockFor[SubmissionSummary]): Action[AnyContent] =
-    handleWithSubmissionCheck { implicit req =>
+    handle { implicit req =>
       import req.userAnswers
       val bankDetailsOpt: Option[BankAccountDetails] = userAnswers.get(WhatAreYourBankDetailsPage)
       val cyaSubmissionOpt: Option[SubmissionSummary] = userAnswers.get(CheckYourAnswersPage)
