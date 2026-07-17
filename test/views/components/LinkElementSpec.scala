@@ -28,9 +28,12 @@ import views.html.components.link_element
 class LinkElementSpec extends SpecBase {
   "link_element" - {
     "should return the expected HTML element" in new Setup {
-      val element: Document = view("/", "common.signOut")
-      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/">""")
+      val element: Document = view("/", "common.signOut", "")
+      element.html() must include("""<a class="govuk-link govuk-link--no-visited-state" target="" href="/">""")
       element.html() must include("Sign out")
+
+      val element1: Document = view("/", "common.signOut", "_blank")
+      element1.html() must include("""<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/">""")
     }
   }
   trait Setup {
@@ -38,8 +41,8 @@ class LinkElementSpec extends SpecBase {
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    def view(href: String, messageKey: String): Document = Jsoup.parse(
-      app.injector.instanceOf[link_element].apply(href, messageKey).body
+    def view(href: String, messageKey: String, target: String): Document = Jsoup.parse(
+      app.injector.instanceOf[link_element].apply(href, messageKey, target).body
     )
   }
 }
