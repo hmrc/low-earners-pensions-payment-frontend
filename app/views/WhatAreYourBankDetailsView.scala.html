@@ -55,7 +55,6 @@
             )
             .withHint(HintViewModel(Text(messages("bankDetails.accountName.hint"))))
             .withAutocomplete("name")
-            .withInputMode("latin-name")
         )
 
         @govukInput(
@@ -80,6 +79,7 @@
             .withWidth(Fixed10)
             .withHint(HintViewModel(Text(messages("bankDetails.accountNumber.hint"))))
             .withCssClass("govuk-input--extra-letter-spacing")
+            .withInputMode("numeric")
         )
 
         @govukInput(
