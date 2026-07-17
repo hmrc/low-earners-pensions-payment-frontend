@@ -33,14 +33,16 @@ class AppConfig @Inject()(config: Configuration):
   //Application config
   val host: String = loadConfig("host")
   val appName: String = loadConfig("appName")
+  
+  private val serviceNavigationString: String = "useServiceNavigation"
 
   // Feedback config
-  val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback")
+  val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback") + s"?$serviceNavigationString"
 
   //URLs
-  val loginUrl: String = loadConfig("urls.login")
+  val loginUrl: String = loadConfig("urls.login") //TODO
   val loginContinueUrl: String = loadConfig("urls.loginContinue")
-  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback")
+  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback") //TODO
   val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   //IV uplift config
@@ -49,7 +51,7 @@ class AppConfig @Inject()(config: Configuration):
       .fromInt(config.get[Int]("confidenceLevelMinimum"))
       .getOrElse(L250)
 
-  private lazy val ivUpliftBaseUrl: String = loadConfig("urls.ivUpliftBaseUrl")
+  private lazy val ivUpliftBaseUrl: String = loadConfig("urls.ivUpliftBaseUrl") //TODO
   private val ivOrigin = "low-earners-pensions-payment"
   private val ivSuccessUrl: String = loadConfig("urls.ivUpliftCallbackUrl")
   private val ivFailureUrl: String = loadConfig("urls.ivUpliftFailureUrl")
@@ -94,7 +96,7 @@ class AppConfig @Inject()(config: Configuration):
 
   //Feedback banner config
   val feedbackBannerEnabled: Boolean = config.get[Boolean]("contact-frontend.bannerEnabled")
-  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=$appName"
+  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"//TODO
 
   val contactUrl: String = config.get[String]("urls.contactUrl")
   

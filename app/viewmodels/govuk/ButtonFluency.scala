@@ -24,7 +24,7 @@ trait ButtonFluency {
   object ButtonViewModel {
     def apply(content: Content): Button =
       Button(
-        element = Some("button"),
+        name = Some("button"),
         content = content
       )
 
@@ -35,7 +35,7 @@ trait ButtonFluency {
   implicit class FluentButton(button: Button) {
     def asLink(href: String, isSubmit: Boolean = false): Button =
       button.copy(
-        element = Some("a"),
+        name = Some("a"),
         href = Some(href),
         attributes = Map(
           "id" -> "submit",
