@@ -23,7 +23,7 @@
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
- heading: h1,
+ subHeading: h2,
  statusElement: status_element,
  linkElement: link_element,
  contactLinkElement: contact_link_element
@@ -45,6 +45,8 @@
   @insetText(InsetTextViewModel(cancelledInsetContent))
  }
 
+ @subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
+
  @table(TableViewModel(
   caption = messages("dashboard.paymentHistory.heading"),
   rows =  DashboardUtils.tableRows(tableRef, leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
@@ -56,6 +58,6 @@
   @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
  }
 } else {
- @heading(msgKey = messages("dashboard.paymentHistory.heading"), headerSize = "m")
- <p class = "govuk-body">@messages("dashboard.paymentHistory.noneAvailable")</p>
+ @subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
+ <p class="govuk-body">@messages("dashboard.paymentHistory.noneAvailable")</p>
 }
