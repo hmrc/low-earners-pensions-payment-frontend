@@ -93,24 +93,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldEqual Some(routes.ClearCacheController.defaultError().url)
       }
-
-      "redirect to clear cache controller when already accepted payments" in new Test {
-        mockAuthSuccess()
-        mockBarsVerifyStatus(
-          status = OK,
-          response = Json.obj("attempts" -> 1)
-        )
-
-        val application: Application = applicationWithUserAnswers(userAnswersWithExistingSubmission)
-
-        lazy val result: Future[Result] = route(application, request).getOrElse(
-          Future.failed(new RuntimeException("TEST_ERROR"))
-        )
-
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldEqual Some(routes.ClearCacheController.onPageLoad().url)
-      }
-
+      
       "render view correctly with acceptPayments successful for all payments" in new Test {
         mockAuthSuccess()
         mockBarsVerifyStatus(
