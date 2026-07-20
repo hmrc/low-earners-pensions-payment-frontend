@@ -17,6 +17,7 @@
 package views.components.dashboard
 
 import base.SpecBase
+import models.userAnswers.LeppSummary
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -29,8 +30,8 @@ class AvailableSummarySectionSpec extends SpecBase {
 
   "available_summary_section" - {
     "should produce expected HTML element if not locked" in new Setup() {
-      val summaryView: Document = view("£100.11", "/href", false, true)
-      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£100.11</strong>""")
+      val summaryView: Document = view(summaryModel, "/href", false, true)
+      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
       summaryView.html must include("To accept these payments, you need to provide us with your bank details.")
       summaryView.html must include("""<a href="/href"""")
       summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
@@ -38,14 +39,14 @@ class AvailableSummarySectionSpec extends SpecBase {
     }
 
     "should produce expected HTML element when there are no available payments" in new Setup() {
-      val summaryView: Document = view("£100.11", "/href", false, false)
-      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£100.11</strong>""")
+      val summaryView: Document = view(summaryModel, "/href", false, false)
+      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
       summaryView.html mustNot include("To accept these payments, you need to provide us with your bank details.")
       summaryView.html mustNot include("""<a href="/href"""")
     }
 
     "display 'view payments' button when locked out" in new Setup() {
-      val summaryView: Document = view("£100.11", "/href", true, true)
+      val summaryView: Document = view(summaryModel, "/href", true, true)
       summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
         messages(app)("dashboard.availablePayments.button.viewPayments")
     }
@@ -56,8 +57,8 @@ class AvailableSummarySectionSpec extends SpecBase {
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    def view(entitlement: String, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean): Document = Jsoup.parse(
-      app.injector.instanceOf[available_summary_section].apply(entitlement, continueUrl, barsLockFlag, hasAvailableItems).body
+    def view(leppSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean): Document = Jsoup.parse(
+      app.injector.instanceOf[available_summary_section].apply(leppSummary, continueUrl, barsLockFlag, hasAvailableItems).body
     )
   }
 }
