@@ -29,21 +29,20 @@ import javax.inject.{Inject, Singleton}
 class AppConfig @Inject()(config: Configuration):
   private def loadConfig(key: String): String = config.get[String](key)
   private val servicesConfig = ServicesConfig(config)
-
+  
   //Application config
   val host: String = loadConfig("host")
   val appName: String = loadConfig("appName")
-  
-  private val serviceNavigationString: String = "useServiceNavigation"
+  val serviceNavigationString: String = "useServiceNavigation"
+
+  //Authorisation config
+  val loginUrl: String = loadConfig("urls.login")
+  val loginContinueUrl: String = loadConfig("urls.loginContinue")
+  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback") + s"?$serviceNavigationString"
+  val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   // Feedback config
   val exitSurveyUrl: String = loadConfig("urls.signOutWithFeedback") + s"?$serviceNavigationString"
-
-  //URLs
-  val loginUrl: String = loadConfig("urls.login") //TODO
-  val loginContinueUrl: String = loadConfig("urls.loginContinue")
-  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback") //TODO
-  val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   //IV uplift config
   val confidenceLevelMinimum: ConfidenceLevel =
@@ -63,7 +62,7 @@ class AppConfig @Inject()(config: Configuration):
       s"&completionURL=$ivSuccessUrl" +
       s"&failureURL=$ivFailureUrl"
 
-  //Timeout config
+  //Session timeout config
   val timeout: Int = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
@@ -71,19 +70,6 @@ class AppConfig @Inject()(config: Configuration):
   val sessionDataTtl: Long = config.get[Int]("mongodb.sessionDataTtl")
   val encryptionKey: String = config.get[String]("mongodb.encryption.key")
   val useEncryption: Boolean = config.get[Boolean]("mongodb.encryption.enabled")
-  
-  //BARS config
-  private val barsBaseUrl: String = servicesConfig.baseUrl("bars")
-  private val barsEnv: String = config.get("microservice.services.bars.env")
-  def barsUrl: String = barsBaseUrl + (if (barsEnv == "local") "" else "/bank-account-reputation")
-  val barsUserAgent: String = loadConfig("microservice.services.bars.userAgent")
-
-  //BARS config
-  private val backendUrl: String = servicesConfig.baseUrl("lepp-backend")
-  val getPaymentsUrl = s"$backendUrl/${loadConfig("urls.getPaymentsUrl")}"
-  val acceptPaymentUrl = s"$backendUrl/${loadConfig("urls.acceptPaymentUrl")}"
-  val verifyStatus = s"$backendUrl/${loadConfig("urls.verifyStatus")}"
-  val updateStatus = s"$backendUrl/${loadConfig("urls.verifyUpdate")}"
 
   //Language config
   def languageMap: Map[String, Lang] =
@@ -93,16 +79,31 @@ class AppConfig @Inject()(config: Configuration):
 
   val welshLanguageSupportEnabled: Boolean =
     config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+  
+  //BARS submission config
+  private val barsBaseUrl: String = servicesConfig.baseUrl("bars")
+  private val barsEnv: String = config.get("microservice.services.bars.env")
+  def barsUrl: String = barsBaseUrl + (if (barsEnv == "local") "" else "/bank-account-reputation")
+  val barsUserAgent: String = loadConfig("microservice.services.bars.userAgent")
+
+  //LEPP backend config
+  private val backendUrl: String = servicesConfig.baseUrl("lepp-backend")
+  val verifyStatus = s"$backendUrl/${loadConfig("urls.verifyStatus")}"
+  val updateStatus = s"$backendUrl/${loadConfig("urls.verifyUpdate")}"
+  
+  val getPaymentsUrl = s"$backendUrl/${loadConfig("urls.getPaymentsUrl")}"
+  val acceptPaymentUrl = s"$backendUrl/${loadConfig("urls.acceptPaymentUrl")}"
 
   //Feedback banner config
   val feedbackBannerEnabled: Boolean = config.get[Boolean]("contact-frontend.bannerEnabled")
-  val contactFrontendUrl: String = s"${loadConfig("urls.betaFeedbackUrl")}/?service=low-earners-pensions-payment"//TODO
+  val contactFrontendUrl: String =
+    s"${loadConfig("urls.betaFeedbackUrl")}/" +
+      s"?service=low-earners-pensions-payment&" +
+      serviceNavigationString
 
   val contactUrl: String = config.get[String]("urls.contactUrl")
-  
-  // Private Beta
-  val privateBetaEnabled: Boolean = config.get[Boolean]("feature-switch.privateBetaEnabled")
 
-  // User allow list
+  //Private Beta config
+  val privateBetaEnabled: Boolean = config.get[Boolean]("feature-switch.privateBetaEnabled")
   val userAllowListService: Service = config.get[Service]("microservice.services.user-allow-list")
   val internalAuthToken: String = config.get[String]("internal-auth.token")
