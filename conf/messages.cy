@@ -197,6 +197,7 @@ site.print = Argraffwch y dudalen hon
 site.acceptAndSubmit = Cyflwyno
 site.govuk = GOV.UK
 error.title.prefix = Gwall:
+error.prefix = Gwall
 submitted.on = Cyflwynwyd ar
 
 # Months
