@@ -19,12 +19,20 @@
 
 @this()
 
-@(entitlement: String, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean)(implicit messages: Messages)
+@(leppSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean)(implicit messages: Messages)
 
 <p class = "govuk-body">
- @messages("dashboard.availablePayments.totalAvailableText.start")
- <strong class="govuk-!-font-weight-bold">@entitlement</strong>
- @messages("dashboard.availablePayments.totalAvailableText.end")
+ @if(leppSummary.availableItems.getOrElse(Nil).length == 1) {
+  @messages("dashboard.availablePayments.totalAvailableText.single.start")
+ } else {
+  @messages("dashboard.availablePayments.totalAvailableText.multiple.start")
+ }
+ <strong class="govuk-!-font-weight-bold">@leppSummary.totalEntitlementString</strong>
+ @if(leppSummary.availableItems.getOrElse(Nil).length == 1) {
+  @messages("dashboard.availablePayments.totalAvailableText.single.end")
+ } else {
+  @messages("dashboard.availablePayments.totalAvailableText.multiple.end")
+ }
 </p>
 
 @if(hasAvailableItems){
