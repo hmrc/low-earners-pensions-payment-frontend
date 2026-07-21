@@ -23,7 +23,7 @@ import controllers.bars
 import models.userAnswers.{BankAccountDetails, SubmissionSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.libs.json.{JsBoolean, JsObject, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{DefaultActionBuilder, MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
@@ -149,7 +149,7 @@ class BarsLeppBaseControllerSpec extends SpecBase {
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
           data = JsObject(Seq(
-            "isSubmitted" -> JsBoolean(true),
+            "Submitted" -> JsString("Submission_Date"),
             "leppSummary" -> Json.toJson(summaryModel)
           ))
         )

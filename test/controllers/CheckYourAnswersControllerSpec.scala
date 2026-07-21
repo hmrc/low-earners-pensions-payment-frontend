@@ -125,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val userAnswers: UserAnswers =
           emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
             .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
-            .set(page = SubmissionPage, value = true).success.value
+            .set(page = SubmissionPage, value = "submissionDate").success.value
 
         val application: Application = applicationBuilder(userAnswers = userAnswers).build()
 

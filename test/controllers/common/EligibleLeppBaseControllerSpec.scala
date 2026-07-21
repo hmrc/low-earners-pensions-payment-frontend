@@ -22,7 +22,7 @@ import controllers.actions.{CheckEligibilityAction, DataRetrievalAction, Identif
 import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.libs.json.{JsBoolean, JsObject, JsString, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
@@ -73,7 +73,7 @@ class EligibleLeppBaseControllerSpec extends SpecBase {
 
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
-          data = JsObject(Seq("isSubmitted" -> JsBoolean(true)))
+          data = JsObject(Seq("Submitted" -> JsString("Submitted_Date")))
         )
 
         lazy val result: Future[Result] = controller.handleWithSubmissionCheck(

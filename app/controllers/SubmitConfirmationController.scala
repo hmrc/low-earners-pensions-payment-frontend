@@ -44,21 +44,28 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
   
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
     submissionSummary =>
+      val submissionDate = request.userAnswers.get(SubmissionPage) match {
+        case Some(date) => date
+        case _ => DateTimeFormats.getCurrentDateTimestamp(dateTime.now())
+      }
+      
+      import request.leppSummary.availableItems
+      val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.acceptedIds)
+      val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.notAcceptedIds)
+      
+      if (acceptedItems.nonEmpty) {
         for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, true))
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmissionPage, submissionDate))
           _ <- sessionService.save(updatedAnswers)
-        } yield {
-          import request.leppSummary.availableItems
-          
-          val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.acceptedIds)
-          val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.notAcceptedIds)
-          
-          if (acceptedItems.nonEmpty) {
-            Ok(confirmationView(
-              acceptedItems = acceptedItems,
-              notAcceptedItems = notAcceptedItems,
-              formattedTimestamp = DateTimeFormats.getCurrentDateTimestamp(dateTime.now()))
-            )
-          } else Redirect(routes.ClearCacheController.defaultError())
-        }
-  }
+        } yield
+          Ok(confirmationView(
+            acceptedItems = acceptedItems,
+            notAcceptedItems = notAcceptedItems,
+            formattedTimestamp = submissionDate
+          ))
+      } else
+        Future.successful(Redirect(routes.ClearCacheController.defaultError()))
+  
+}
+  
+    

@@ -40,7 +40,7 @@ abstract class EligibleLeppBaseController @Inject()(identify: IdentifierAction,
   protected[controllers] def handleWithSubmissionCheck(f: EligibleDataRequest[AnyContent] => Future[Result]): Action[AnyContent] =
     handle { implicit req =>
       req.userAnswers.get(SubmissionPage) match {
-        case Some(true) => Future.successful(Redirect(routes.ClearCacheController.onPageLoad()))
+        case Some(_) => Future.successful(Redirect(routes.ClearCacheController.onPageLoad()))
         case _ => f(req)
       }
     }

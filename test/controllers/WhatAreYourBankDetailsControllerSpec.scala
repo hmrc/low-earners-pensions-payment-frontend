@@ -125,7 +125,7 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must redirect to clear cache controller when already submitting the request" in {
-      val userAnswers: UserAnswers = summaryUserAnswers.set(page = SubmissionPage, value = true).success.value
+      val userAnswers: UserAnswers = summaryUserAnswers.set(page = SubmissionPage, value = "submissionDate").success.value
       val application: Application = applicationBuilder(userAnswers).build()
 
       running(application) {

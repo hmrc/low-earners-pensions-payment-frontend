@@ -72,7 +72,8 @@
     ))
 
     @heading2("confirmation.what-next.heading")
-    <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">@messages("confirmation.what-next.opt1")</a>
-
+    <p>
+        <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">@messages("confirmation.what-next.opt1")</a>
+    </p>
     @resultsFooter(formattedTimestamp)
 }
