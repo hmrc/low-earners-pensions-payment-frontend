@@ -50,7 +50,7 @@ class AppConfig @Inject()(config: Configuration):
       .fromInt(config.get[Int]("confidenceLevelMinimum"))
       .getOrElse(L250)
 
-  private lazy val ivUpliftBaseUrl: String = loadConfig("urls.ivUpliftBaseUrl") //TODO
+  private lazy val ivUpliftBaseUrl: String = loadConfig("urls.ivUpliftBaseUrl")
   private val ivOrigin = "low-earners-pensions-payment"
   private val ivSuccessUrl: String = loadConfig("urls.ivUpliftCallbackUrl")
   private val ivFailureUrl: String = loadConfig("urls.ivUpliftFailureUrl")
