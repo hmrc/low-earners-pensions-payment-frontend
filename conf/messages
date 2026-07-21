@@ -198,6 +198,7 @@ site.print = Print this page
 site.acceptAndSubmit = Submit
 site.govuk = GOV.UK
 error.title.prefix = Error:
+error.prefix = Error
 submitted.on = Submitted on
 
 # Months
