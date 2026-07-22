@@ -16,6 +16,8 @@
 
 @import views.html.components._
 @import viewmodels.formPages._
+@import viewmodels.checkYourAnswers.CheckYourAnswersUtils._
+@import models.userAnswers.BankAccountDetails
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
@@ -28,16 +30,17 @@
     form: FormWithCSRF
 )
 
-@(summaryList: Seq[SummaryListRow], viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
+@(bankDetails: BankAccountDetails, viewModel: FormPageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), backLinkUrl = viewModel.backLinkUrl) {
 
     @heading(s"${messages("checkYourAnswers.heading")}", headerSize = "l")
 
-    @heading2(s"${messages("checkYourAnswers.bankDetails")}", headerSize = "m")
-
     @govukSummaryList(
-        SummaryList(summaryList).withCssClass("govuk-!-margin-bottom-9")
+        SummaryList(
+            rows = cyaSummaryListRows(bankDetails),
+            card = Some(cyaSummaryCard())
+        ).withCssClass("govuk-!-margin-bottom-9")
     )
 
     @form(action = viewModel.onSubmit) {
