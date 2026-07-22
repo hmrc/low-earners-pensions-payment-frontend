@@ -96,7 +96,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[SubmitConfirmationView].apply(acceptedItems, notAcceptedItems, "").body
+      app.injector.instanceOf[SubmitConfirmationView].apply(acceptedItems, notAcceptedItems, "2026-07-22T18:35:24.00Z").body
     )
   }
 

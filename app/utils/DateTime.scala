@@ -26,7 +26,7 @@ class DateTime {
 
 object DateTimeFormats {
 
-  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' h:mma")
+  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
 
   def getCurrentDateTimestamp(time: ZonedDateTime, formatter: DateTimeFormatter = dateTimeFormatter): String =
     formatter

@@ -17,6 +17,7 @@
 @import views.html.components._
 @import viewmodels.confirmation.ConfirmationUtils
 @import models.userAnswers.LeppItem
+@import utils.Formatters
 
 @this(
     table: GovukTable,
@@ -32,8 +33,11 @@
     formattedTimestamp: String
 )(
     implicit request: Request[_],
-    messages: Messages
+    messages: Messages,
+    requestHeader: RequestHeader
 )
+
+@submittedDate = @{ Formatters.submissionDate(formattedTimestamp, messages)(requestHeader) }
 
 @layout(
     pageTitle = titleNoForm(messages("confirmation.title")),
@@ -75,5 +79,5 @@
     <p>
         <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">@messages("confirmation.what-next.opt1")</a>
     </p>
-    @resultsFooter(formattedTimestamp)
+    @resultsFooter(submittedDate)
 }

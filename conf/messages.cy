@@ -113,8 +113,9 @@ confirmation.table.availableUntil = 5 Ebrill {0}
 confirmation.table.header.taxYear = Blwyddyn dreth
 confirmation.table.header.amount = Swm
 confirmation.table.header.availableUntil = Ar gael tan
-confirmation.details = Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân, i''r cyfrif banc a ddarparwyd gennych, o fewn 7 diwrnod gwaith.
+confirmation.details = Byddwn yn anfon y taliad hwn i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
 confirmation.multiple.details= Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
+confirmation.sub.time = am
 
 # Bars request errors page
 barsRequestErrors.title = Ni allwn wirio manylion eich cyfrif banc

@@ -42,4 +42,18 @@ object Formatters {
     s"$timeString ${messages("between.time.and.date")} $dateString"
   }
 
+  def submissionDate(dt: String, messages: Messages)(implicit requestHeader: RequestHeader
+  ): String = {
+    val zonedDateTime = Instant.parse(dt).atZone(ZoneId.of("Europe/London"))
+    val date = zonedDateTime.toLocalDate
+    val time = zonedDateTime.toLocalTime
+
+    val dateString = s"${date.getDayOfMonth.toString} ${messages(date.getMonth.toString)} ${date.getYear.toString}"
+    val timeString = DateTimeFormatter
+      .ofPattern("HH:mm")
+      .format(time)
+
+    s"$dateString ${messages("confirmation.sub.time")} $timeString"
+  }
+
 }
