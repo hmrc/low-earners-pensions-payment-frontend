@@ -20,12 +20,14 @@ dashboard.heading = Eich taliadau pensiwn i''r sawl sy''n ennill incwm isel
 dashboard.moreInformation = I gael rhagor o wybodaeth,
 dashboard.availablePayments.heading = Taliadau sydd ar gael
 dashboard.availablePayments.noneAvailable = Nid oes gennych unrhyw daliadau ar gael.
-dashboard.availablePayments.totalAvailableText.start = Mae gennych gyfanswm o
-dashboard.availablePayments.totalAvailableText.end = mewn taliadau ar gael i’w derbyn.
+dashboard.availablePayments.totalAvailableText.multiple.start = Mae gennych gyfanswm o
+dashboard.availablePayments.totalAvailableText.single.start = Mae taliad o
+dashboard.availablePayments.totalAvailableText.multiple.end = mewn taliadau ar gael i''w derbyn.
+dashboard.availablePayments.totalAvailableText.single.end = ar gael i chi ei dderbyn.
 dashboard.availablePayments.acceptText = I dderbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
 dashboard.availablePayments.button.acceptPayments = Derbyn taliadau
 dashboard.availablePayments.button.viewPayments = Gweld taliadau
-dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi’u gohirio.
+dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi''u gohirio.
 dashboard.paymentHistory.heading = Hanes taliadau
 dashboard.paymentHistory.paidInset = Bydd taliadau gyda''r statws ''Wedi talu'' yn y cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
 dashboard.paymentHistory.noneAvailable = Nid oes gennych unrhyw daliadau blaenorol.
@@ -197,6 +199,7 @@ site.print = Argraffwch y dudalen hon
 site.acceptAndSubmit = Cyflwyno
 site.govuk = GOV.UK
 error.title.prefix = Gwall:
+error.prefix = Gwall
 submitted.on = Cyflwynwyd ar
 
 # Months
