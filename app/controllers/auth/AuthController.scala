@@ -37,6 +37,7 @@ class AuthController @Inject()(val controllerComponents: MessagesControllerCompo
             url = config.signOutUrl,
             queryStringParams = Map(
               "continue" -> Seq(config.host + controllers.auth.routes.SessionTimeoutController.onPageLoad().url),
-              "origin" -> Seq(config.appName)
+              "origin" -> Seq(config.appName),
+              config.serviceNavigationString -> Nil
             )
           ).withNewSession
