@@ -24,9 +24,9 @@
     heading: h1
 )
 
-@(lockoutExpires: Instant, returnUrl: String)(implicit messages: Messages, languageUtils: LanguageUtils, requestHeader: RequestHeader)
+@(lockoutExpires: Instant, returnUrl: String)(implicit messages: Messages, requestHeader: RequestHeader)
 
-@expiryTimeString = @{ Formatters.fullDateTime(Some(lockoutExpires), messages, languageUtils)(requestHeader) }
+@expiryTimeString = @{ Formatters.fullDateTime(Some(lockoutExpires), messages) }
 
 @layout(
     pageTitle = titleNoForm(messages("bars.lockout.title")),

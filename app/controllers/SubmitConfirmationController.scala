@@ -20,11 +20,13 @@ import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAc
 import controllers.common.BarsLeppBaseController
 import models.userAnswers.LeppItem
 import pages.SubmissionPage
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
-import utils.{DateTime, DateTimeFormats}
+import utils.DateTime
 import views.html.SubmitConfirmationView
 
+import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,12 +45,13 @@ class SubmitConfirmationController @Inject()(identify: IdentifierAction,
     items.getOrElse(Nil).filter(item => ids.contains(item.id))
   
   def onPageLoad(): Action[AnyContent] = handleForConfirmationPage { implicit request =>
+    implicit val messages: Messages = controllerComponents.messagesApi.preferred(request)
     submissionSummary =>
       val submissionDate = request.userAnswers.get(SubmissionPage) match {
         case Some(date) => date
-        case _ => DateTimeFormats.getCurrentDateTimestamp(dateTime.now())
+        case _ => dateTime.now()
       }
-      
+
       import request.leppSummary.availableItems
       val acceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.acceptedIds)
       val notAcceptedItems: Seq[LeppItem] = filterForIds(availableItems, submissionSummary.notAcceptedIds)

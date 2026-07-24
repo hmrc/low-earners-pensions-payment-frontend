@@ -16,21 +16,8 @@
 
 package utils
 
-import java.time.format.DateTimeFormatter
-import java.time.{ZoneId, ZonedDateTime}
-import java.util.Locale
+import java.time.Instant
 
 class DateTime {
-  def now(zoneId: ZoneId = ZoneId.of("Europe/London")): ZonedDateTime = ZonedDateTime.now(zoneId)
-}
-
-object DateTimeFormats {
-
-  private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
-
-  def getCurrentDateTimestamp(time: ZonedDateTime, formatter: DateTimeFormatter = dateTimeFormatter): String =
-    formatter
-      .withLocale(Locale.UK)
-      .format(time)
-
+  def now(): Instant = Instant.now()
 }

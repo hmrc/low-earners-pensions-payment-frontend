@@ -40,7 +40,7 @@ import play.api.{Application, inject}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import utils.DateTime
 
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.{Instant, ZonedDateTime}
 import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
@@ -65,7 +65,7 @@ class IntegrationSpecBase extends AnyWordSpec
   implicit val testCorrelationId: CorrelationId = CorrelationId("TEST-ID")
   
   class FakeDateTime extends DateTime {
-    override def now(zoneId: ZoneId): ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(10000L), zoneId)
+    override def now(): Instant = Instant.ofEpochMilli(10000L)
   }
   
   val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]

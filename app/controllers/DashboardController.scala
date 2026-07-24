@@ -23,7 +23,6 @@ import navigation.Navigator
 import pages.DashboardPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
-import uk.gov.hmrc.play.language.LanguageUtils
 import viewmodels.NormalMode
 import views.html.DashboardView
 
@@ -38,7 +37,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
                                     navigator: Navigator)
-                                   (implicit val ec: ExecutionContext, languageUtils: LanguageUtils)
+                                   (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility.create(withCaching = true)) {
 
   def onPageLoad(): Action[AnyContent] = handle { implicit request =>

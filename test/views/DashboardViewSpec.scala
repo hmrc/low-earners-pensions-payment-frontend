@@ -20,10 +20,9 @@ import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.i18n.{DefaultLangs, Messages, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.language.LanguageUtils
 import utils.Formatters
 import views.html.DashboardView
 
@@ -45,7 +44,7 @@ class DashboardViewSpec extends SpecBase {
 
     "display correct guidance and text if locked" in new Setup {
       val instant: Instant = Instant.now()
-      val time: String = Formatters.fullDateTime(Some(instant), msg, languageUtils)
+      val time: String = Formatters.fullDateTime(Some(instant), msg)
       val html: String = view(true, Some(instant)).html
       html must include("Important")
       html must include(time)
@@ -58,7 +57,6 @@ class DashboardViewSpec extends SpecBase {
     implicit val msg: Messages = messages(app)
     implicit val msgApi: MessagesApi = messageApi(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
-    implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
 
     def view(barsLock: Boolean = false, expiry: Option[Instant] = None): Document = Jsoup.parse(
       app.injector.instanceOf[DashboardView].apply(summaryModel, None, "some-url", barsLock, expiry).body

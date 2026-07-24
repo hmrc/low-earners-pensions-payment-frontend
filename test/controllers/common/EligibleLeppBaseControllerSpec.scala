@@ -22,12 +22,13 @@ import controllers.actions.{CheckEligibilityAction, DataRetrievalAction, Identif
 import models.userAnswers.{LeppSummary, UserAnswers}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.mvc.Results.ImATeapot
 import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesControllerComponents
 
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -70,10 +71,10 @@ class EligibleLeppBaseControllerSpec extends SpecBase {
             ec = ArgumentMatchers.any()
           )
         ).thenReturn(Future.successful(()))
-
+        
         override val userAnswers: UserAnswers = UserAnswers(
           id = "1",
-          data = JsObject(Seq("Submitted" -> JsString("Submitted_Date")))
+          data = JsObject(Seq("submittedDate" -> Json.toJson(Instant.now())))
         )
 
         lazy val result: Future[Result] = controller.handleWithSubmissionCheck(

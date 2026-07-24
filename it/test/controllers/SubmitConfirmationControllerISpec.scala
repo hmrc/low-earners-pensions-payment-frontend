@@ -29,6 +29,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import views.html.SubmitConfirmationView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
@@ -124,7 +125,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         contentAsString(result) shouldEqual view(
           acceptedItems = Seq(item1, item2),
           notAcceptedItems = Nil,
-          formattedTimestamp = "1970-01-01T00:00:00.00Z"
+          formattedTimestamp = Instant.parse("1970-01-01T00:00:00.00Z")
         ).toString
       }
 
@@ -158,7 +159,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(Seq(item1), Seq(item2), "1970-01-01T00:00:00.00Z").toString
+        contentAsString(result) shouldEqual view(Seq(item1), Seq(item2), Instant.parse("1970-01-01T00:00:00.00Z")).toString
       }
     }
   }

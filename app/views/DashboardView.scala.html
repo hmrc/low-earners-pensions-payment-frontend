@@ -14,13 +14,11 @@
  * limitations under the License.
  *@
 
-@import play.api.mvc.RequestHeader
 @import models.userAnswers.LeppSummary
 @import views.html.components._
 @import views.html.components.dashboard._
 @import viewmodels.govuk._
 @import viewmodels.formPages.FormPageViewModel
-@import uk.gov.hmrc.play.language.LanguageUtils
 @import java.time.Instant
 @import utils.Formatters
 
@@ -32,9 +30,9 @@
     paymentHistorySection: payment_history_section
 )
 
-@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String, barsLockFlag: Boolean, lockoutExpires: Option[Instant] = None)(implicit request: Request[_], messages: Messages, languageUtils: LanguageUtils, requestHeader: RequestHeader)
+@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String, barsLockFlag: Boolean, lockoutExpires: Option[Instant] = None)(implicit request: Request[_], messages: Messages)
 
-@expiryTimeString = @{ Formatters.fullDateTime(lockoutExpires, messages, languageUtils)(requestHeader) }
+@expiryTimeString = @{ Formatters.fullDateTime(lockoutExpires, messages) }
 
 @bannerHtml = {
     <p class="govuk-notification-banner__heading">@{Html(messages("dashboard.lockout.message", expiryTimeString))}

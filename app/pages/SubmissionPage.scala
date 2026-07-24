@@ -21,8 +21,10 @@ import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import viewmodels.Mode
 
-case object SubmissionPage extends QuestionPage[String] {
+import java.time.Instant
+
+case object SubmissionPage extends QuestionPage[Instant] {
   override def route(mode: Mode): Call = routes.SubmitConfirmationController.onPageLoad()
   override def path: JsPath = JsPath \ toString
-  override def toString: String = "Submitted"
+  override def toString: String = "submittedDate"
 }

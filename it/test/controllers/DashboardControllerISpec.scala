@@ -20,13 +20,12 @@ import base.IntegrationSpecBase
 import models.userAnswers.LeppItemStatus.Paid
 import models.userAnswers.{LeppItem, LeppSummary}
 import play.api.Application
-import play.api.i18n.{DefaultLangs, Messages, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.language.LanguageUtils
 import views.html.DashboardView
 
 import java.time.{Instant, LocalDate}
@@ -207,8 +206,6 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
         lazy val application: Application = fakeApplication()
         implicit val msgApi: MessagesApi = application.injector.instanceOf[MessagesApi]
         implicit val messages: Messages = msgApi.preferred(request)
-
-        implicit val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
 
         val backLink: String = routes.WhatYouWillNeedController.onPageLoad().url
         val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad(None).url
