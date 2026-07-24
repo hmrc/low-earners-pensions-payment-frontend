@@ -114,6 +114,7 @@ confirmation.table.header.amount = Amount
 confirmation.table.header.availableUntil = Available until
 confirmation.details = We''ll send this payment to the bank account you provided within 7 working days.
 confirmation.multiple.details= The following payments were processed successfully. We''ll send them separately to the bank account you provided within 7 working days.
+confirmation.sub.time = at
 
 # Bars request errors page
 barsRequestErrors.title = We could not verify your bank account details

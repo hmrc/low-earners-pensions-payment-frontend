@@ -18,17 +18,13 @@ package utils
 
 import cats.syntax.eq.*
 import play.api.i18n.Messages
-import play.api.mvc.RequestHeader
-import uk.gov.hmrc.play.language.LanguageUtils
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 
 object Formatters {
 
-  def fullDateTime(dt: Option[Instant], messages: Messages, languageUtils: LanguageUtils)(implicit
-    requestHeader: RequestHeader
-  ): String = {
+  def fullDateTime(dt: Option[Instant], messages: Messages): String = {
     val zonedDateTime = dt.getOrElse(Instant.now()).atZone(ZoneId.of("Europe/London"))
     val date          = zonedDateTime.toLocalDate
     val time          = zonedDateTime.toLocalTime
@@ -40,6 +36,19 @@ object Formatters {
       .format(time)
     
     s"$timeString ${messages("between.time.and.date")} $dateString"
+  }
+
+  def submissionDate(dt: Instant, messages: Messages): String = {
+    val zonedDateTime = dt.atZone(ZoneId.of("Europe/London"))
+    val date = zonedDateTime.toLocalDate
+    val time = zonedDateTime.toLocalTime
+
+    val dateString = s"${date.getDayOfMonth.toString} ${messages(date.getMonth.toString)} ${date.getYear.toString}"
+    val timeString = DateTimeFormatter
+      .ofPattern("HH:mm")
+      .format(time)
+
+    s"$dateString ${messages("confirmation.sub.time")} $timeString"
   }
 
 }

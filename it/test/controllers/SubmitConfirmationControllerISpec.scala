@@ -29,6 +29,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import views.html.SubmitConfirmationView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
@@ -48,7 +49,7 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
       )
     )
 
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
       method = "GET",
       path = "/accept-your-low-earners-pension-payment/bank-details-received"
     ).withSession(SessionKeys.authToken -> "auth token")
@@ -118,14 +119,14 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         )
 
         val view: SubmitConfirmationView = application.injector.instanceOf[SubmitConfirmationView]
-        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+        implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
         contentAsString(result) shouldEqual view(
           acceptedItems = Seq(item1, item2),
           notAcceptedItems = Nil,
-          formattedTimestamp = "01 January 1970 at 1:00am"
-        )(request, messages).toString
+          formattedTimestamp = Instant.parse("1970-01-01T00:00:00.00Z")
+        ).toString
       }
 
       "render view correctly with acceptPayments partly successful" in new Test {
@@ -155,10 +156,10 @@ class SubmitConfirmationControllerISpec extends ControllerIntegrationSpecBase {
         )
 
         val view: SubmitConfirmationView = application.injector.instanceOf[SubmitConfirmationView]
-        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+        implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
         status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(Seq(item1), Seq(item2), "01 January 1970 at 1:00am")(request, messages).toString
+        contentAsString(result) shouldEqual view(Seq(item1), Seq(item2), Instant.parse("1970-01-01T00:00:00.00Z")).toString
       }
     }
   }

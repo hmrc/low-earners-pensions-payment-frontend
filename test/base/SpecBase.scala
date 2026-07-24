@@ -158,7 +158,8 @@ trait SpecBase
   
   implicit val testCorrelationId: CorrelationId = CorrelationId("some-id")
   implicit val dummyHeaderCarrier: HeaderCarrier = HeaderCarrier()
-
+  implicit val instantNumberWrites: Writes[Instant] = (t: Instant) => JsNumber(BigDecimal valueOf t.toEpochMilli)
+  
   val dummyErrorWrapper: ErrorWrapper = ErrorWrapper(
     value = ServiceErrorResult(IM_A_TEAPOT, "FOOBAR"),
     correlationId = testCorrelationId

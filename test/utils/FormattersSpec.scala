@@ -18,10 +18,9 @@ package utils
 
 import base.SpecBase
 import play.api.Application
-import play.api.i18n.{DefaultLangs, Messages, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.language.LanguageUtils
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, ZoneId, ZonedDateTime}
@@ -32,7 +31,6 @@ class FormattersSpec extends SpecBase {
   implicit val msgApi: MessagesApi = messageApi(application)
   val msgs: Messages = messages(application)
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val languageUtils: LanguageUtils = new LanguageUtils(new DefaultLangs(), app.configuration)
   val instant: Instant = Instant.now()
 
   val zonedDateTime: ZonedDateTime = instant.atZone(ZoneId.of("Europe/London"))
@@ -52,7 +50,16 @@ class FormattersSpec extends SpecBase {
       "should return a date formatted string" in {
         val str = s"$time on $day $dayOfMonth $month $year"
 
-        val  result = Formatters.fullDateTime(Some(instant), msgs, languageUtils)
+        val  result = Formatters.fullDateTime(Some(instant), msgs)
+        result mustBe str
+      }
+    }
+    
+    "submissionDate" - {
+      "should return a date formatted string" in {
+        val str = s"$dayOfMonth $month $year at $time"
+
+        val result = Formatters.submissionDate(instant, msgs)
         result mustBe str
       }
     }

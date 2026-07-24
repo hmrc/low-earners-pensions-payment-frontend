@@ -28,7 +28,7 @@ import play.api.test.Helpers.*
 import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, NormalMode}
 import views.html.WhatAreYourBankDetailsView
-
+import java.time.Instant
 import scala.concurrent.Future
 
 class WhatAreYourBankDetailsControllerSpec extends SpecBase {
@@ -125,7 +125,7 @@ class WhatAreYourBankDetailsControllerSpec extends SpecBase {
     }
 
     "must redirect to clear cache controller when already submitting the request" in {
-      val userAnswers: UserAnswers = summaryUserAnswers.set(page = SubmissionPage, value = true).success.value
+      val userAnswers: UserAnswers = summaryUserAnswers.set(page = SubmissionPage, value = Instant.now()).success.value
       val application: Application = applicationBuilder(userAnswers).build()
 
       running(application) {

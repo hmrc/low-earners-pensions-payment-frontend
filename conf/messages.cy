@@ -24,7 +24,7 @@ dashboard.availablePayments.totalAvailableText.multiple.start = Mae gennych gyfa
 dashboard.availablePayments.totalAvailableText.single.start = Mae taliad o
 dashboard.availablePayments.totalAvailableText.multiple.end = mewn taliadau ar gael i''w derbyn.
 dashboard.availablePayments.totalAvailableText.single.end = ar gael i chi ei dderbyn.
-dashboard.availablePayments.acceptText = I dderbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
+dashboard.availablePayments.acceptText = I dderbyn y taliad hwn, mae angen i chi ddarparu eich manylion banc i ni.
 dashboard.availablePayments.button.acceptPayments = Derbyn taliadau
 dashboard.availablePayments.button.viewPayments = Gweld taliadau
 dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi''u gohirio.
@@ -113,8 +113,9 @@ confirmation.table.availableUntil = 5 Ebrill {0}
 confirmation.table.header.taxYear = Blwyddyn dreth
 confirmation.table.header.amount = Swm
 confirmation.table.header.availableUntil = Ar gael tan
-confirmation.details = Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân, i''r cyfrif banc a ddarparwyd gennych, o fewn 7 diwrnod gwaith.
+confirmation.details = Byddwn yn anfon y taliad hwn i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
 confirmation.multiple.details= Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
+confirmation.sub.time = am
 
 # Bars request errors page
 barsRequestErrors.title = Ni allwn wirio manylion eich cyfrif banc

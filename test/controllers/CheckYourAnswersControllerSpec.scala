@@ -40,7 +40,7 @@ import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import utils.CorrelationIdHandler
 import viewmodels.NormalMode
 import views.html.CheckYourAnswersView
-
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -125,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val userAnswers: UserAnswers =
           emptyUserAnswers.set(page = DashboardPage, value = summaryModel).success.value
             .set(page = WhatAreYourBankDetailsPage, value = bankAccountDetails).success.value
-            .set(page = SubmissionPage, value = true).success.value
+            .set(page = SubmissionPage, value = Instant.now()).success.value
 
         val application: Application = applicationBuilder(userAnswers = userAnswers).build()
 
