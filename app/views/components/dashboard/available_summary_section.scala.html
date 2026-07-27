@@ -30,14 +30,14 @@
  <strong class="govuk-!-font-weight-bold">@leppSummary.totalEntitlementString</strong>
  @if(leppSummary.availableItems.getOrElse(Nil).length == 1) {
   @messages("dashboard.availablePayments.totalAvailableText.single.end")
+  <p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.single.acceptText")</p>
  } else {
   @messages("dashboard.availablePayments.totalAvailableText.multiple.end")
+  <p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.multiple.acceptText")</p>
  }
 </p>
 
 @if(hasAvailableItems){
-
-<p class = "govuk-body govuk-!-margin-bottom-6">@messages("dashboard.availablePayments.acceptText")</p>
 
 <a href="@continueUrl"
    role="button"
