@@ -17,7 +17,8 @@
 package views.components.dashboard
 
 import base.SpecBase
-import models.userAnswers.LeppSummary
+import models.userAnswers.LeppItemStatus.Available
+import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -32,12 +33,28 @@ class AvailableSummarySectionSpec extends SpecBase {
     "should produce expected HTML element if not locked" in new Setup() {
       val summaryView: Document = view(summaryModel, "/href", false, true)
       summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
-      summaryView.html must include("To accept these payments, you need to provide us with your bank details.")
+      summaryView.html must include("To accept this payment, you need to provide us with your bank details.")
       summaryView.html must include("""<a href="/href"""")
       summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
         messages(app)("dashboard.availablePayments.button.acceptPayments")
     }
 
+    "should produce expected HTML element when there are multiple available payments" in new Setup() {
+      val availableItems: Seq[LeppItem] = summaryModel.availableItems.get :+
+        LeppItem(
+        id = "A-25-2",
+        taxYear = 2025,
+        contributions = 1000,
+        taxRate = 20,
+        entitlement = 200,
+        status = Available,
+        claimDate = None
+      )
+      val summaryView: Document = view(summaryModel.copy(availableItems = Some(availableItems)), "/href", false, true)
+      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£400</strong>""")
+      summaryView.html must include("To accept these payments, you need to provide us with your bank details.")
+    }
+    
     "should produce expected HTML element when there are no available payments" in new Setup() {
       val summaryView: Document = view(summaryModel, "/href", false, false)
       summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
@@ -56,7 +73,7 @@ class AvailableSummarySectionSpec extends SpecBase {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
-
+    
     def view(leppSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean): Document = Jsoup.parse(
       app.injector.instanceOf[available_summary_section].apply(leppSummary, continueUrl, barsLockFlag, hasAvailableItems).body
     )
