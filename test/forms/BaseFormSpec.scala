@@ -47,19 +47,25 @@ class BaseFormSpec extends FormSpecBase {
   }
 
   "BaseForm" - {
-    "stripWhitespace" - {
-      "should remove any trailing, and leading whitespace and reduce duplicated whitespace" in new TestFormProvider {
-        stripWhitespace("       word     another-word     ") mustBe "word another-word"
+    "stripExcessWhitespace" - {
+      "should remove any trailing, and leading whitespace and remove duplicated whitespace characters" in new TestFormProvider {
+        stripExcessWhitespace("       word     another-word     ") mustBe "word another-word"
       }
     }
 
-    "stripOptionalWhitespace" - {
-      "should remove any trailing, and leading whitespace and reduce duplicated whitespace" in new TestFormProvider {
-        stripOptionalWhitespace(Some("       word     another-word     ")) mustBe Some("word another-word")
+    "stripAllWhitespace" - {
+      "should all whitespace" in new TestFormProvider {
+        stripAllWhitespace("       word     another-word     ") mustBe "wordanother-word"
+      }
+    }
+
+    "stripAllWhitespaceOpt" - {
+      "should all whitespace when optional string is defined" in new TestFormProvider {
+        stripAllWhitespaceOpt(Some("       word     another-word     ")) mustBe Some("wordanother-word")
       }
 
-      "should do nothing for an None value" in new TestFormProvider {
-        stripOptionalWhitespace(None) mustBe None
+      "should return None for an undefined optional string" in new TestFormProvider {
+        stripAllWhitespaceOpt(None) mustBe None
       }
     }
 

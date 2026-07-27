@@ -21,17 +21,18 @@ import play.api.data.Mapping
 import play.api.data.validation.Constraint
 
 trait BaseForm extends Mappings {
-  private[forms] def stripWhitespace(str: String): String = str.strip().replaceAll(" {2,}", " ")
+  private[forms] def stripAllWhitespace(str: String): String = str.strip().replaceAll(" +", "")
+  private[forms] def stripAllWhitespaceOpt(strOpt: Option[String]) = strOpt.map(stripAllWhitespace)
 
-  private[forms] def stripOptionalWhitespace(strOpt: Option[String]) = strOpt.map(stripWhitespace)
-
+  private[forms] def stripExcessWhitespace(str: String): String = str.strip().replaceAll(" {2,}", " ")
+  
   private type MappingFor[A] = (String, Mapping[A])
 
   def mandatoryTextField(fieldName: String,
                          minAcceptedLength: Int,
                          maxAcceptedLength: Int,
                          regex: String,
-                         bindMap: String => String = stripWhitespace,
+                         bindMap: String => String = stripAllWhitespace,
                          unbindMap: String => String = identity[String]): MappingFor[String] =
     fieldName -> text(s"$fieldName.formError.required")
       .transform(bindMap, unbindMap)
@@ -54,7 +55,7 @@ trait BaseForm extends Mappings {
                         minAcceptedLength: Int,
                         maxAcceptedLength: Int,
                         regex: String,
-                        bindMap: Option[String] => Option[String] = stripOptionalWhitespace,
+                        bindMap: Option[String] => Option[String] = stripAllWhitespaceOpt,
                         unbindMap: Option[String] => Option[String] = identity[Option[String]]): MappingFor[Option[String]] =
     fieldName -> textOpt()
       .transform(bindMap, unbindMap)
