@@ -39,6 +39,8 @@
 
 @submittedDate = @{ Formatters.submissionDate(formattedTimestamp, messages) }
 
+@tableRef = @{"confirmation_table_accepted_payments"}
+
 @layout(
     pageTitle = titleNoForm(messages("confirmation.title")),
     showBackLink = false
@@ -68,11 +70,11 @@
         }
     }
 
-    @table(TableViewModel(
-        caption = "",
-        rows = ConfirmationUtils.acceptedTableRows("confirmation_table_accepted_payments", acceptedItems),
-        columnHeaders = ConfirmationUtils.tableHeaders("confirmation_table_accepted_payments", Seq("taxYear", "amount")),
-        tableRef = "confirmation_table_accepted_payments"
+    @table(Table(
+        attributes = Map("id" -> tableRef),
+        rows = ConfirmationUtils.acceptedTableRows(tableRef, acceptedItems),
+        head = Some(ConfirmationUtils.tableHeaders(tableRef, Seq("taxYear", "amount"))),
+        firstCellIsHeader = true
     ))
 
     @heading2("confirmation.what-next.heading")

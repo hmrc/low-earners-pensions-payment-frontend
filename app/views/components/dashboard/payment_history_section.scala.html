@@ -47,11 +47,12 @@
 
  @subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
 
- @table(TableViewModel(
-  caption = messages("dashboard.paymentHistory.heading"),
-  rows =  DashboardUtils.tableRows(tableRef, leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
-  columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action")),
-  tableRef = tableRef
+ @table(Table(
+  attributes = Map("id" -> tableRef),
+  caption = Some(messages("dashboard.paymentHistory.heading")),
+  rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
+  head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
+  firstCellIsHeader = true
  ))
 
  @if(leppSummary.paidItems.nonEmpty) {

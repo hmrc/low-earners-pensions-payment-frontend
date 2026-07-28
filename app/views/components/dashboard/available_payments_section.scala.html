@@ -45,11 +45,12 @@
 
  @subHeading(msgKey = messages("dashboard.availablePayments.heading"))
 
- @table(TableViewModel(
-  caption = messages("dashboard.availablePayments.heading"),
-  rows = DashboardUtils.tableRows(tableRef, leppSummary.availablePaymentItems, statusElement),
-  columnHeaders = DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status")),
-  tableRef = tableRef
+ @table(Table(
+  attributes = Map("id" -> tableRef),
+  caption = Some(messages("dashboard.availablePayments.heading")),
+  rows = DashboardUtils.tableRows(leppSummary.availablePaymentItems, statusElement),
+  head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status"))),
+  firstCellIsHeader = true
  ))
 
  @availableSummarySection(leppSummary, continueUrl, barsLockFlag, hasAvailableItems)
