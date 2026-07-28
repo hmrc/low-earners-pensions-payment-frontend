@@ -27,19 +27,19 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
     
     val prefix: String = "bankDetails"
 
-    "stripSortCode" - {
-      "should remove any trailing whitespace, leading whitespace, and single dashes from sort-code" in {
-        formProvider.stripSortCode("     11-22-33    ") mustBe "112233"
+    "accountNameBindMap" - {
+      "should bind account name correctly" in {
+        formProvider.accountNameBindMap("taxwell paYer") mustBe "Taxwell Payer"
+      }
+    }
+
+    "sortCodeBindMap" - {
+      "should bind sort code correctly" in {
+        formProvider.sortCodeBindMap("     11-22-33    ") mustBe "112233"
       }
 
       "should not remove double dashes" in {
-        formProvider.stripSortCode("     11--22--33    ") mustBe "11--22--33"
-      }
-    }
-    
-    "stripRollNumberOpt" - {
-      "should remove any listed characters" in {
-        formProvider.stripRollNumberOpt(Some(" 123-abc./ ")) mustBe Some("123abc")
+        formProvider.sortCodeBindMap("     11--22--33    ") mustBe "11--22--33"
       }
     }
 
@@ -48,10 +48,10 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
         formatSortCode("112233") mustBe "11-22-33"
       }
     }
-
-    "formatAccountNumber" - {
-      "should format correctly" in {
-        formProvider.formatAccountName("taxwell paYer") mustBe "Taxwell Payer"
+    
+    "rollNumberBindMap" - {
+      "should remove any listed characters" in {
+        formProvider.rollNumberBindMap(Some(" 123-abc./ ")) mustBe Some("123abc")
       }
     }
 
@@ -66,28 +66,28 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
         s"$prefix.rollNumber", 1, 18, Seq("!!!"), Seq("ABCDEF"), "^[A-Z0-9- /.]{1,18}$"
       )
 
-      "should strip any leading, trailing, or excess whitespace from fields" in {
+      "should bind fields as expected with stripped whitespace" in {
         form.bind(Map(
           s"$prefix.accountName" -> " name    nameson   ",
           s"$prefix.sortCode" -> "  112233  ",
           s"$prefix.accountNumber" -> "  12345678  ",
           s"$prefix.rollNumber" -> "      "
         )).get mustBe BankAccountDetails(
-          accountName = "name nameson",
+          accountName = "Name Nameson",
           sortCode = "112233",
           accountNumber = "12345678",
           rollNumber = None
         )
       }
 
-      "should strip dashes from sort code field" in {
+      "should bind fields as expected with sort code dashes removed" in {
         form.bind(Map(
           s"$prefix.accountName" -> "name    nameson",
           s"$prefix.accountNumber" -> "12345678",
           s"$prefix.sortCode" -> "11-22-33",
           s"$prefix.rollNumber" -> "ABC/DEF"
         )).get mustBe BankAccountDetails(
-          accountName = "name nameson",
+          accountName = "Name Nameson",
           sortCode = "112233",
           accountNumber = "12345678",
           rollNumber = Some("ABCDEF")
