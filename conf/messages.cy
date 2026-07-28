@@ -116,17 +116,20 @@ checkYourAnswers.hiddenText.rollNumber = rhif-rôl-newid
 # Confirmation page
 confirmation.title = Rydym wedi cael eich manylion banc
 confirmation.heading = Rydym wedi cael eich manylion banc
+confirmation.keep-a-copy.heading = Keep a copy for your records
+confirmation.keep-a-copy.linkText = Argraffwch y dudalen hon
 confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
-confirmation.what-next.opt1 = Bwrw golwg dros eich taliadau
-confirmation.failure.items.p1 = I''w derbyn eto, ewch yn ôl i''ch taliadau a dewiswch ''Derbyn''.
-confirmation.failure.sub.heading = Ni ellid prosesu rhai o''ch taliadau
+confirmation.what-next.linkText = Bwrw golwg dros eich taliadau
+confirmation.failure.items.p1 = I''w derbyn eto, edrychwch ar eich taliadau a dewiswch ''Derbyn’'.
+confirmation.failure.sub.heading = Methodd rhai o'ch taliadau â phrosesu oherwydd gwall system
+confirmation.table.caption.success = Taliadau llwyddiannus
+confirmation.table.caption.failed = Aliadau aflwyddiannus
 confirmation.table.availableUntil = 5 Ebrill {0}
 confirmation.table.header.taxYear = Blwyddyn dreth
 confirmation.table.header.amount = Swm
 confirmation.table.header.availableUntil = Ar gael tan
 confirmation.details = Byddwn yn anfon y taliad hwn i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
-confirmation.multiple.details= Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
-confirmation.sub.time = am
+confirmation.multiple.details= Byddwn yn anfon y taliadau ar wahân, i’r cyfrif banc a ddarparwyd gennych, o fewn 7 diwrnod gwaith.
 
 # Bars request errors page
 barsRequestErrors.title = Ni allwn wirio manylion eich cyfrif banc
