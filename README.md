@@ -1,7 +1,9 @@
 
 # low-earners-pensions-payment-frontend
 
-This is a placeholder README.md for a new repository
+The frontend service for the low-earners-pensions-payment (LEPP) project.
+
+LEPP ensures that PAYE individuals who earn up to or below the tax-free limit, and contribute to a NPA pension scheme, are able to view their entitlement, provide their bank details and view the status of their payment in order to receive tax-relief top-up payments easily and smoothly to ensure all paying into either a RAS or NPA pension receive the same tax relief.
 
 ### License
 
