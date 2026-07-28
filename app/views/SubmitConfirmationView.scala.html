@@ -64,11 +64,22 @@
             firstCellIsHeader = true
         ))
 
-        <p class="govuk-body">@messages("confirmation.failure.items.p1")</p>
+        @if(notAcceptedItems.length == 1) {
+            <p class="govuk-body">@messages("confirmation.failure.tryAgain.single")</p>
+        } else {
+            <p class="govuk-body">@messages("confirmation.failure.tryAgain.multiple")</p>
+        }
+
     } else {
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("confirmation.heading")</h1>
         </div>
+
+        @if(acceptedItems.length == 1){
+            <p class="govuk-body">@messages("confirmation.fullSuccess.single.details")</p>
+        } else {
+            <p class="govuk-body">@messages("confirmation.fullSuccess.multiple.details")</p>
+        }
     }
 }
 
@@ -78,7 +89,7 @@
 ) {
     @startSection
 
-    @if(notAcceptedItems.nonEmpty){
+    @if(notAcceptedItems.isEmpty){
         @successTable
     } else {
         @heading2("confirmation.table.caption.success")
