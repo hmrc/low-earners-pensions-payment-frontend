@@ -26,8 +26,8 @@ object BreakdownUtils {
 
   def paymentSummaryList(paymentSummary: LeppSummary, itemId: Option[String])(implicit messages: Messages): Seq[SummaryList] =
     itemId match {
-      case None => paymentSummary.availableItems.getOrElse(Nil).map(availableSummaryList)
-      case Some(value) => paymentSummary.paymentHistoryItems.filter(item => item.id == value).map(historySummaryList)
+      case None => paymentSummary.availableItems.getOrElse(Nil).map(breakdownSummaryList)
+      case Some(value) => paymentSummary.paymentHistoryItems.filter(item => item.id == value).map(breakdownSummaryList)
     }
 
   private[paymentBreakdown] def underPaymentSummaryListRows(item: LeppItem, originalAmount: BigDecimal)(implicit messages: Messages): Seq[SummaryListRow] =
@@ -43,7 +43,7 @@ object BreakdownUtils {
         Key(HtmlContent(messages("breakdown.underpayment.l3"))),
         Value(HtmlContent(item.formattedEntitlement), classes = "right-align")))
 
-  private[paymentBreakdown] def availableSummaryList(item: LeppItem)(implicit messages: Messages) = {
+  private[paymentBreakdown] def breakdownSummaryList(item: LeppItem)(implicit messages: Messages) = {
     val summaryListRows = item.originalAmount match {
       case Some(value) =>
         commonSummaryListRows(item) ++ underPaymentSummaryListRows(item, value)
@@ -68,11 +68,7 @@ object BreakdownUtils {
       Seq(SummaryListRow(
         Key(HtmlContent(messages("breakdown.l3"))),
         Value(HtmlContent(item.formattedEntitlement), classes = "right-align")))
-
-
-  private[paymentBreakdown] def historySummaryList(item: LeppItem)(implicit messages: Messages) =
-    generateSummaryList(item, paymentSummaryListRows(item))
-
+  
   private[paymentBreakdown] def generateSummaryList(item: LeppItem, summaryListRows: Seq[SummaryListRow])(implicit messages: Messages) =
     SummaryList(
       rows = summaryListRows,

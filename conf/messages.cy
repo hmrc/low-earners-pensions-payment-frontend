@@ -51,8 +51,18 @@ dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc or
 
 # Calculation Breakdown page
 breakdown.title = Dadansoddiad eich taliad
-breakdown.heading = Rydych yn gymwys i gael cyfanswm o {0}
-breakdown.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
+breakdown.single.past.heading = Roeddech yn gymwys i gael taliad o {0}
+breakdown.single.past.p1 = Roedd y taliad hwn yn ddyledus i chi oherwydd na wnaethoch dderbyn rhyddhad treth ar rai neu bob un o''ch cyfraniadau pensiwn o gyflog net.
+breakdown.single.past.underpayment.heading = Roeddech yn gymwys i gael taliad ychwanegol o {0}
+breakdown.single.past.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
+breakdown.single.past.underpayment.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+breakdown.single.underpayment.heading = Rydych chi''n gymwys i gael taliad ychwanegol o {0}
+breakdown.single.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
+breakdown.single.underpayment.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+breakdown.multiple.heading = Rydych yn gymwys i gael cyfanswm o {0}
+breakdown.single.heading = Rydych chi''n gymwys i gael taliad o {0}
+breakdown.multiple.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
+breakdown.single.p1 = Mae''r taliad hwn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar rai neu''r cyfan o''ch cyfraniadau pensiwn cyflog net.
 breakdown.u1 = Ar gyfer blwyddyn dreth 6 Ebrill {0} i 5 Ebrill {1}
 breakdown.l1 = Eich cyfraniadau pensiwn cyflog net
 breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
