@@ -32,7 +32,6 @@ import services.{BarsService, LeppSubmissionService, SessionCacheService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{CorrelationIdHandler, Logging, MethodContext}
 import viewmodels.NormalMode
-import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
 import views.html.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,7 +56,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
     bankDetails =>
       Future.successful(Ok(
         view(
-          summaryList = cyaSummaryList(bankDetails),
+          bankDetails = bankDetails,
           viewModel = viewModel(NormalMode, CheckYourAnswersPage)
         )
       ))

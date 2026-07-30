@@ -30,7 +30,7 @@ import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.SessionKeys
 import viewmodels.NormalMode
-import viewmodels.checkYourAnswers.CheckYourAnswersSummary.cyaSummaryList
+import viewmodels.checkYourAnswers.CheckYourAnswersUtils.cyaSummaryListRows
 import viewmodels.formPages.FormPageViewModel
 import views.html.CheckYourAnswersView
 
@@ -61,14 +61,13 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
         val view = application.injector.instanceOf[CheckYourAnswersView]
         implicit val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
 
-        val rows: Seq[SummaryListRow] = cyaSummaryList(bankAccountDetails)
         val viewModel: FormPageViewModel = FormPageViewModel(
           onSubmit = routes.CheckYourAnswersController.onSubmit(),
           backLinkUrl = Some(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
         )
 
         status(result) shouldBe OK
-        contentAsString(result) shouldEqual view(rows, viewModel)(request, messages).toString
+        contentAsString(result) shouldEqual view(bankAccountDetails, viewModel)(request, messages).toString
       }
     }
 

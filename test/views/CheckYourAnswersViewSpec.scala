@@ -21,14 +21,13 @@ import controllers.routes
 import models.*
 import models.userAnswers.BankAccountDetails
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.NormalMode
-import viewmodels.checkYourAnswers.CheckYourAnswersSummary.*
+import viewmodels.{CheckMode, NormalMode}
 import viewmodels.formPages.FormPageViewModel
 import views.html.CheckYourAnswersView
 
@@ -63,6 +62,15 @@ class CheckYourAnswersViewSpec extends SpecBase {
       view.html must include(msg("bankDetails.sortCode"))
       view.html must not include msg("bankDetails.rollNumber")
     }
+    
+    "should include summary card" in new Setup {
+      val summaryCardElement: Elements = view.getElementsByClass("govuk-summary-card")
+      summaryCardElement.html() must include(msg("checkYourAnswers.bankDetails"))
+      
+      val cardActionElement: Element = view.getElementById("bankDetails_changeAction")
+      cardActionElement.html() must include(msg("checkYourAnswers.bankDetails"))
+      cardActionElement.attributes().toString must include(routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url)
+    }
   }
 
   trait Setup {
@@ -76,9 +84,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
       sortCode = "11-22-33",
       rollNumber = Some("12345/678")
     )
-
-    lazy val summaryList: Seq[SummaryListRow] = cyaSummaryList(accountDetails)
-
+    
     val backLinkUrl: String = routes.WhatAreYourBankDetailsController.onSubmit(NormalMode).url
 
     val viewModel: FormPageViewModel = FormPageViewModel(
@@ -87,7 +93,7 @@ class CheckYourAnswersViewSpec extends SpecBase {
     )
 
     lazy val view: Document = Jsoup.parse(
-      app.injector.instanceOf[CheckYourAnswersView].apply(summaryList, viewModel).body
+      app.injector.instanceOf[CheckYourAnswersView].apply(accountDetails, viewModel).body
     )
   }
 }
