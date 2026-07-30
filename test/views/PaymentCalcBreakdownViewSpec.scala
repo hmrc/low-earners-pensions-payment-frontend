@@ -46,6 +46,11 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid)))
   )
   
+  val multipleSummary = LeppSummary(
+    1,
+    Some(Seq(leppItem, leppItem.copy(id = "id-2")))
+  )
+  
   "view" - {
     "with correct LEPP gov banner" in new Setup {
       view.getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
@@ -53,14 +58,20 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
         "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
-    "display correct guidance and text" in new Setup {
-      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.heading", summary.totalEntitlementString)
+    "display correct guidance and text for a single payment" in new Setup {
+      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.single.underpayment.heading", summary.totalEntitlementString)
 
-      view.html.contains(messages(app)("breakdown.p1"))
+      view.html.contains(messages(app)("breakdown.single.underpayment.p1"))
       view.text.contains(messages(app)("breakdown.u1"))
       view.text.contains(messages(app)("breakdown.l1"))
       view.text.contains(messages(app)("breakdown.l2"))
       view.text.contains(messages(app)("breakdown.l3"))
+    }
+
+    "display correct guidance and text for a multiple payment" in new Setup(multipleSummary) {
+      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.multiple.heading", multipleSummary.totalEntitlementString)
+
+      view.html.contains(messages(app)("breakdown.multiple.p1"))
     }
 
     "display continue link when not locked out" in new Setup {
@@ -68,11 +79,11 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
         messages(app)("site.continue")
     }
 
-    "display back to dashboard link when locked out" in new Setup(true) {
+    "display back to dashboard link when locked out" in new Setup(summary, true) {
       view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
     }
 
-    "display specific history item details" in new Setup(false, Some("P-id-1")) {
+    "display specific history item details" in new Setup(summary, false, Some("P-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
 
       val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
@@ -81,12 +92,12 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
           element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your net pay pension contributions"
           element.getElementsByClass("govuk-summary-list__value").first().text() mustBe "£1000"
 
-          element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Your payment"
+          element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Additional amount due"
           element.getElementsByClass("govuk-summary-list__value").last().text() mustBe "£200"
       )
     }
 
-    "display available items details" in new Setup(false) {
+    "display available items details" in new Setup(summary, false) {
       view.getElementById("id-1").getElementsByClass("govuk-summary-card__title").text() mustBe "For the tax year 6 April 2025 to 5 April 2026"
       
       val elements: Elements = view.getElementById("id-1").getElementsByClass("govuk-summary-card__content")
@@ -101,7 +112,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     }
   }
 
-  trait Setup(barsLock: Boolean = false, id: Option[String] = None) {
+  trait Setup(summary: LeppSummary = summary, barsLock: Boolean = false, id: Option[String] = None) {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")

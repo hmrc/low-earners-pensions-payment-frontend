@@ -42,9 +42,38 @@
     pageTitle = titleNoForm(messages("breakdown.title")),
     backLinkUrl = backUrl
 ) {
-    @heading(messages("breakdown.heading", paymentSummary.totalEntitlementString), headerSize = "l")
+    @itemId match {
+        case Some(value) => {
+            @if(paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined){
+                @heading(messages("breakdown.single.past.underpayment.heading", paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement), headerSize = "l")
 
-    <p class="govuk-body">@messages("breakdown.p1")</p>
+                <p class="govuk-body">@messages("breakdown.single.past.underpayment.p1")</p>
+                <p class="govuk-body">@messages("breakdown.single.past.underpayment.p2")</p>
+            } else {
+                @heading(messages("breakdown.single.past.heading", paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement), headerSize = "l")
+
+                <p class="govuk-body">@messages("breakdown.single.past.p1")</p>
+            }
+        }
+        case None => {
+            @if(paymentSummary.availableItems.getOrElse(Nil).length == 1) {
+                @if(paymentSummary.availableItems.get.head.originalAmount.isDefined) {
+                    @heading(messages("breakdown.single.underpayment.heading", paymentSummary.totalEntitlementString), headerSize = "l")
+
+                    <p class="govuk-body">@messages("breakdown.single.underpayment.p1")</p>
+                    <p class="govuk-body">@messages("breakdown.single.underpayment.p2")</p>
+                } else {
+                    @heading(messages("breakdown.single.heading", paymentSummary.totalEntitlementString), headerSize = "l")
+
+                    <p class="govuk-body">@messages("breakdown.single.p1")</p>
+                }
+            } else {
+                @heading(messages("breakdown.multiple.heading", paymentSummary.totalEntitlementString), headerSize = "l")
+
+                <p class="govuk-body">@messages("breakdown.multiple.p1")</p>
+            }
+        }
+    }
 
     @for(summaryList <- paymentSummaryList(paymentSummary, itemId)){
         @govukSummaryList(summaryList)

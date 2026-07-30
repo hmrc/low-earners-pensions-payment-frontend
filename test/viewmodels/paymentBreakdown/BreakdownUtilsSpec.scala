@@ -111,19 +111,9 @@ class BreakdownUtilsSpec extends SpecBase {
       }
     }
 
-    "historySummaryList" - {
-      "should return the expected SummaryList" in new Test {
-        val summaryList: SummaryList = BreakdownUtils.historySummaryList(historyLeppItem)
-        val summaryListRows: Seq[SummaryListRow] = summaryList.rows
-        normalPaymentAssertions(summaryListRows)
-        summaryListCardAssertions(summaryList)
-        summaryList.card.get.attributes.get("id") mustBe Some(historyLeppItem.id)
-      }
-    }
-
     "availableSummaryList" - {
       "should return the expected SummaryList for a normal payment" in new Test {
-        val summaryList: SummaryList = BreakdownUtils.availableSummaryList(leppItem)
+        val summaryList: SummaryList = BreakdownUtils.breakdownSummaryList(leppItem)
         val summaryListRows: Seq[SummaryListRow] = summaryList.rows
         normalPaymentAssertions(summaryListRows)
         summaryListCardAssertions(summaryList)
@@ -133,7 +123,7 @@ class BreakdownUtilsSpec extends SpecBase {
       "should return the expected SummaryList for a under payment" in new Test {
         val originalAmount = 100
         val underPaymentItem: LeppItem = leppItem.copy(originalAmount = Some(originalAmount))
-        val summaryList: SummaryList = BreakdownUtils.availableSummaryList(underPaymentItem)
+        val summaryList: SummaryList = BreakdownUtils.breakdownSummaryList(underPaymentItem)
         val summaryListRows: Seq[SummaryListRow] = summaryList.rows
         commonAssertions(summaryListRows)
         summaryListRows(2).key.content.asHtml.toString mustBe

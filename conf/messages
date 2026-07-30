@@ -50,8 +50,18 @@ dashboard.lockout.message = You''ve tried to enter your bank account details too
 
 # Calculation Breakdown page
 breakdown.title = Your payment breakdown
-breakdown.heading = You''re eligible for a total of {0}
-breakdown.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
+breakdown.single.past.heading = You were eligible for a {0} payment
+breakdown.single.past.p1 = This payment was due to you because you did not get tax relief on some or all of your net pay pension contributions.
+breakdown.single.past.underpayment.heading = You were eligible for an additional {0} payment
+breakdown.single.past.underpayment.p1 = You were not paid enough in your previous payment for this tax year and we''ve recalculated the amount.
+breakdown.single.past.underpayment.p2 = This is because we''ve received new information about how much you''ve earned.
+breakdown.single.underpayment.heading = You''re eligible for an additional {0} payment
+breakdown.single.underpayment.p1 = You were not paid enough in your previous payment for this tax year and we''ve recalculated the amount.
+breakdown.single.underpayment.p2 = This is because we''ve received new information about how much you''ve earned.
+breakdown.multiple.heading = You''re eligible for a total of {0}
+breakdown.single.heading = You''re eligible for a {0} payment
+breakdown.multiple.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
+breakdown.single.p1 = This payment is due to you because you did not get tax relief on some or all of your net pay pension contributions.
 breakdown.u1 = For the tax year 6 April {0} to 5 April {1}
 breakdown.l1 = Your net pay pension contributions
 breakdown.l2 = Your relevant basic tax rate
