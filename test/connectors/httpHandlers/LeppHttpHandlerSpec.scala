@@ -136,7 +136,7 @@ class LeppHttpHandlerSpec extends SpecBase {
             |         },
             |         "lowEarnersDataDetails": {
             |           "calculationSequenceNumber": 123,
-            |           "basicRatePercentage": 10.56,
+            |           "basicRatePercentage": 0.23,
             |           "dataSourceMaster": "CESA",
             |           "netPayContributionsTotal": 10.56,
             |           "responseTimestamp": "2023-06-27 09:12:28",

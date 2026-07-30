@@ -120,7 +120,7 @@ class LeppRetrievalServiceSpec extends SpecBase {
               id = "P-11-1",
               taxYear = 11,
               contributions = 10.56,
-              taxRate = 10.56,
+              taxRate = 0.23,
               entitlement = 10.56,
               status = Paid,
               claimDate = Some(LocalDate.of(2023, 6, 27)),

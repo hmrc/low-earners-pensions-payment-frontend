@@ -34,7 +34,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         id = "A-25-1",
         taxYear = 2025,
         contributions = 1000,
-        taxRate = 20,
+        taxRate = 0.2,
         entitlement = 200,
         status = Available,
         claimDate = None
@@ -43,7 +43,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         id = "A-26-1",
         taxYear = 2026,
         contributions = 1000,
-        taxRate = 20,
+        taxRate = 0.2,
         entitlement = 200,
         status = Available,
         claimDate = None
@@ -54,7 +54,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         id = "P-25-1",
         taxYear = 2025,
         contributions = 1000,
-        taxRate = 20,
+        taxRate = 0.2,
         entitlement = 200,
         status = Paid,
         claimDate = None
@@ -65,7 +65,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         id = "S-25-1",
         taxYear = 2025,
         contributions = 1000,
-        taxRate = 20,
+        taxRate = 0.2,
         entitlement = 200,
         status = Suspended,
         claimDate = None
@@ -76,7 +76,7 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
         id = "C-25-1",
         taxYear = 2025,
         contributions = 1000,
-        taxRate = 20,
+        taxRate = 0.2,
         entitlement = 200,
         status = Cancelled,
         claimDate = None

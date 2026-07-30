@@ -34,7 +34,7 @@ class LeppSummarySpec extends SpecBase {
           id = "A-25-1",
           taxYear = 2025,
           contributions = 1000,
-          taxRate = 20,
+          taxRate = 0.2,
           entitlement = 200,
           status = Available,
           claimDate = None,
@@ -46,7 +46,7 @@ class LeppSummarySpec extends SpecBase {
           id = "P-25-1",
           taxYear = 2025,
           contributions = 1000,
-          taxRate = 20,
+          taxRate = 0.2,
           entitlement = 200,
           status = Paid,
           claimDate = None
@@ -57,7 +57,7 @@ class LeppSummarySpec extends SpecBase {
           id = "S-25-1",
           taxYear = 2025,
           contributions = 1000,
-          taxRate = 20,
+          taxRate = 0.2,
           entitlement = 200,
           status = Suspended,
           claimDate = None
@@ -68,7 +68,7 @@ class LeppSummarySpec extends SpecBase {
           id = "C-25-1",
           taxYear = 2025,
           contributions = 1000,
-          taxRate = 20,
+          taxRate = 0.2,
           entitlement = 200,
           status = Cancelled,
           claimDate = None
@@ -85,7 +85,7 @@ class LeppSummarySpec extends SpecBase {
         |     "id": "A-25-1",
         |     "taxYear": 2025,
         |     "contributions": 1000.00,
-        |     "taxRate": 20.00,
+        |     "taxRate": 0.2,
         |     "entitlement": 200.00,
         |     "status": "Available"
         |   }
@@ -95,7 +95,7 @@ class LeppSummarySpec extends SpecBase {
         |     "id": "S-25-1",
         |     "taxYear": 2025,
         |     "contributions": 1000.00,
-        |     "taxRate": 20.00,
+        |     "taxRate": 0.2,
         |     "entitlement": 200.00,
         |     "status": "Suspended"
         |   }
@@ -105,7 +105,7 @@ class LeppSummarySpec extends SpecBase {
         |     "id": "P-25-1",
         |     "taxYear": 2025,
         |     "contributions": 1000.00,
-        |     "taxRate": 20.00,
+        |     "taxRate": 0.2,
         |     "entitlement": 200.00,
         |     "status": "Paid"
         |   }
@@ -115,7 +115,7 @@ class LeppSummarySpec extends SpecBase {
         |     "id": "C-25-1",
         |     "taxYear": 2025,
         |     "contributions": 1000.00,
-        |     "taxRate": 20.00,
+        |     "taxRate": 0.2,
         |     "entitlement": 200.00,
         |     "status": "Cancelled"
         |   }
@@ -294,7 +294,7 @@ class LeppSummarySpec extends SpecBase {
       }
       
       "not include empty sequences" in {
-        val leppItem = LeppItem("P-11-1", 11, 10.56, 10.56, 10.56, Paid, Some(LocalDate.of(2023, 6, 27)), Some(10.56))
+        val leppItem = LeppItem("P-11-1", 11, 10.56, 0.23, 10.56, Paid, Some(LocalDate.of(2023, 6, 27)), Some(10.56))
 
         LeppSummary(retrieveResponse) mustBe LeppSummary(
           currentLock = 123,
@@ -326,7 +326,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -337,7 +337,7 @@ class LeppSummarySpec extends SpecBase {
               id = "S-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Suspended,
               claimDate = None
@@ -348,7 +348,7 @@ class LeppSummarySpec extends SpecBase {
               id = "C-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Cancelled,
               claimDate = None
@@ -367,7 +367,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -376,7 +376,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -387,7 +387,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -398,7 +398,7 @@ class LeppSummarySpec extends SpecBase {
               id = "S-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Suspended,
               claimDate = None
@@ -409,7 +409,7 @@ class LeppSummarySpec extends SpecBase {
               id = "C-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Cancelled,
               claimDate = None
@@ -430,7 +430,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -439,7 +439,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -450,7 +450,7 @@ class LeppSummarySpec extends SpecBase {
               id = "P-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = None
@@ -461,7 +461,7 @@ class LeppSummarySpec extends SpecBase {
               id = "S-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Suspended,
               claimDate = None
@@ -472,7 +472,7 @@ class LeppSummarySpec extends SpecBase {
               id = "C-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Cancelled,
               claimDate = None
@@ -498,7 +498,7 @@ class LeppSummarySpec extends SpecBase {
               id = "C-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Cancelled,
               claimDate = None
@@ -533,7 +533,7 @@ class LeppSummarySpec extends SpecBase {
               id = "C-25-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Suspended,
               claimDate = None
