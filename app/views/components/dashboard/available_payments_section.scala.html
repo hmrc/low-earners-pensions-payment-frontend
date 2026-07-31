@@ -50,7 +50,8 @@
   caption = Some(messages("dashboard.availablePayments.heading")),
   rows = DashboardUtils.tableRows(leppSummary.availablePaymentItems, statusElement),
   head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status"))),
-  firstCellIsHeader = true
+  firstCellIsHeader = true,
+  captionClasses = "govuk-visually-hidden"
  ))
 
  @availableSummarySection(leppSummary, continueUrl, barsLockFlag, hasAvailableItems)
