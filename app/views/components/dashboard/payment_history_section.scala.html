@@ -52,7 +52,8 @@
   caption = Some(messages("dashboard.paymentHistory.heading")),
   rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
   head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
-  firstCellIsHeader = true
+  firstCellIsHeader = true,
+  captionClasses = "govuk-visually-hidden"
  ))
 
  @if(leppSummary.paidItems.nonEmpty) {
