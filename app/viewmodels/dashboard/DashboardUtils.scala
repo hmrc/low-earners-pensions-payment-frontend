@@ -33,8 +33,7 @@ object DashboardUtils {
     ) 
   })
   
-  def tableRows(tableRef: String,
-                items: Seq[LeppItem],
+  def tableRows(items: Seq[LeppItem],
                 statusElementBuilder: status_element,
                 linkElementBuilderOpt: Option[link_element] = None,
                 isHistoric: Boolean = false)

@@ -85,6 +85,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
       val entitlement: BigDecimal = summaryModel.availableItems.get.head.entitlement
       view.text.contains(messages(app)("confirmation.multiple.details"))
       view.getElementById("confirmation_table_accepted_payments_header_taxYear").text() mustBe messages(app)("confirmation.table.header.taxYear")
+      view.getElementById("confirmation_table_accepted_payments_header_taxYear").hasClass("govuk-table__header") mustBe true
       view.getElementById("confirmation_table_accepted_payments_header_amount").text() mustBe messages(app)("confirmation.table.header.amount")
       view.getElementById(s"taxYear_$taxYear").text() mustBe messages(app)("common.taxYearDates", s"$taxYear", s"${taxYear + 1}")
       view.getElementById(s"entitlement_$taxYear").text() mustBe CurrencyFormats.format(entitlement)

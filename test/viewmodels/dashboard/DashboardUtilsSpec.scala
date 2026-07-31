@@ -58,7 +58,6 @@ class DashboardUtilsSpec extends SpecBase {
     "tableRows" - {
       "should use claim date field when data is historic" in new Test {
         val rows: Seq[Seq[TableRow]] = DashboardUtils.tableRows(
-          tableRef = "ref",
           items = Seq(leppItem),
           statusElementBuilder = statusElement,
           linkElementBuilderOpt = None,
@@ -75,7 +74,6 @@ class DashboardUtilsSpec extends SpecBase {
 
       "should default claim date field when it does not exist for historic item" in new Test {
         val rows: Seq[Seq[TableRow]] = DashboardUtils.tableRows(
-          tableRef = "ref",
           items = Seq(leppItem.copy(claimDate = None)),
           statusElementBuilder = statusElement,
           linkElementBuilderOpt = None,
@@ -92,7 +90,6 @@ class DashboardUtilsSpec extends SpecBase {
       
       "should return available until date field when data is not historic" in new Test {
         val rows: Seq[Seq[TableRow]] = DashboardUtils.tableRows(
-          tableRef = "ref",
           items = Seq(leppItem.copy(claimDate = None)),
           statusElementBuilder = statusElement,
           linkElementBuilderOpt = None
@@ -108,7 +105,6 @@ class DashboardUtilsSpec extends SpecBase {
       
       "should include link field when linkElementBuilder is defined" in new Test {
         val rows: Seq[Seq[TableRow]] = DashboardUtils.tableRows(
-          tableRef = "ref",
           items = Seq(leppItem),
           statusElementBuilder = statusElement,
           linkElementBuilderOpt = Some(linkElement)
