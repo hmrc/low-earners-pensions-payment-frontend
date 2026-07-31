@@ -27,7 +27,7 @@
 @(backLinkUrl: Option[String], continueUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("whatYouWillNeed.title")),
+    pageTitle = baseTitle(),
     backLinkUrl = backLinkUrl
 ) {
 
