@@ -16,6 +16,8 @@
 
 @this()
 
-@(href: String, msgKey: String, target: String)(implicit messages: Messages)
+@(href: String, msgKey: String, target: String, hiddenText: Option[String] = None)(implicit messages: Messages)
 
-<a class="govuk-link govuk-link--no-visited-state" target="@target" href="@href">@messages(msgKey)</a>
+<a class="govuk-link govuk-link--no-visited-state"
+   target="@target"
+   href="@href">@messages(msgKey)@hiddenText.map{ text => <span class="govuk-visually-hidden">@text</span> }</a>

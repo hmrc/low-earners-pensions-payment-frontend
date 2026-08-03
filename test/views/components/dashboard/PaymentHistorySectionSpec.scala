@@ -40,17 +40,21 @@ class PaymentHistorySectionSpec extends SpecBase {
 
       result.select("tbody tr").size() mustBe summaryModel.paymentHistoryItems.size
 
-      result.select("tbody > tr:nth-of-type(1) > th").text() mustBe "6 April 2025 to 5 April 2026"
-      result.select("tbody > tr:nth-of-type(1) > td:nth-of-type(1)").text() mustBe "£200"
-      result.select("tbody > tr:nth-of-type(1) > td:nth-of-type(2)").text() mustBe "N/A"
-      result.select("tbody > tr:nth-of-type(1) > td:nth-of-type(3)").text() mustBe "Cancelled"
-      result.select("tbody > tr:nth-of-type(1) > td:nth-of-type(4)").text() mustBe "Check calculation"
+      val row1 = "tbody > tr:nth-of-type(1)"
+      result.select(s"$row1 > th").text() mustBe "6 April 2025 to 5 April 2026"
+      result.select(s"$row1 > td:nth-of-type(1)").text() mustBe "£200"
+      result.select(s"$row1 > td:nth-of-type(2)").text() mustBe "N/A"
+      result.select(s"$row1 > td:nth-of-type(3)").text() mustBe "Cancelled"
+      result.select(s"$row1 > td:nth-of-type(4)").text() mustBe "Check calculation 6 April 2025 to 5 April 2026"
+      result.select(s"$row1 > td:nth-of-type(4) .govuk-visually-hidden").text() mustBe "6 April 2025 to 5 April 2026"
 
-      result.select("tbody > tr:nth-of-type(2) > th").text() mustBe "6 April 2025 to 5 April 2026"
-      result.select("tbody > tr:nth-of-type(2) > td:nth-of-type(1)").text() mustBe "£200"
-      result.select("tbody > tr:nth-of-type(2) > td:nth-of-type(2)").text() mustBe "N/A"
-      result.select("tbody > tr:nth-of-type(2) > td:nth-of-type(3)").text() mustBe "Paid"
-      result.select("tbody > tr:nth-of-type(2) > td:nth-of-type(4)").text() mustBe "Check calculation"
+      val row2 = "tbody > tr:nth-of-type(2)"
+      result.select(s"$row2 > th").text() mustBe "6 April 2025 to 5 April 2026"
+      result.select(s"$row2 > td:nth-of-type(1)").text() mustBe "£200"
+      result.select(s"$row2 > td:nth-of-type(2)").text() mustBe "N/A"
+      result.select(s"$row2 > td:nth-of-type(3)").text() mustBe "Paid"
+      result.select(s"$row2 > td:nth-of-type(4)").text() mustBe "Check calculation 6 April 2025 to 5 April 2026"
+      result.select(s"$row2 > td:nth-of-type(4) .govuk-visually-hidden").text() mustBe "6 April 2025 to 5 April 2026"
     }
   }
 
