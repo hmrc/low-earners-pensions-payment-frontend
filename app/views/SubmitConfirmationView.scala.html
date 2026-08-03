@@ -39,7 +39,8 @@
 
 @submittedDate = @{ Formatters.submissionDate(formattedTimestamp, messages) }
 
-@tableRef = @{"confirmation_table_accepted_payments"}
+@tableRefAccepted = @{"confirmation_table_accepted_payments"}
+@tableRefAvailable = @{"confirmation_table_available_payments"}
 
 @layout(
     pageTitle = titleNoForm(messages("confirmation.title")),
@@ -50,12 +51,11 @@
         @heading("confirmation.failure.sub.heading", headerSize = "l")
         <p class="govuk-body">@messages("confirmation.failure.items.p1")</p>
 
-        @table(TableViewModel(
-            caption = "",
-            rows = ConfirmationUtils.availableTableRows("confirmation_table_available_payments", notAcceptedItems),
-            columnHeaders = ConfirmationUtils.tableHeaders("confirmation_table_available_payments",
-                                Seq("taxYear", "availableUntil", "amount")),
-            tableRef = "confirmation_table_available_payments"
+        @table(Table(
+            attributes = Map("id" -> tableRefAvailable),
+            rows = ConfirmationUtils.availableTableRows(tableRefAvailable, notAcceptedItems),
+            head = Some(ConfirmationUtils.tableHeaders(tableRefAvailable, Seq("taxYear", "availableUntil", "amount"))),
+            firstCellIsHeader = true
         ))
     } else {
         <div class="govuk-panel govuk-panel--confirmation">
@@ -71,9 +71,9 @@
     }
 
     @table(Table(
-        attributes = Map("id" -> tableRef),
-        rows = ConfirmationUtils.acceptedTableRows(tableRef, acceptedItems),
-        head = Some(ConfirmationUtils.tableHeaders(tableRef, Seq("taxYear", "amount"))),
+        attributes = Map("id" -> tableRefAccepted),
+        rows = ConfirmationUtils.acceptedTableRows(tableRefAccepted, acceptedItems),
+        head = Some(ConfirmationUtils.tableHeaders(tableRefAccepted, Seq("taxYear", "amount"))),
         firstCellIsHeader = true
     ))
 
