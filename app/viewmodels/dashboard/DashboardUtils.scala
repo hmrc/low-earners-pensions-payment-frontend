@@ -60,7 +60,8 @@ object DashboardUtils {
         linkElementBuilder(
           href = s"${controllers.routes.PaymentCalcBreakdownController.onPageLoad(Some(item.id))}",
           msgKey = "dashboard.table.link.checkCalculation",
-          target = ""
+          target = "",
+          hiddenText = Some(messages("common.taxYearDates", s"${item.taxYear}", s"${item.taxYear + 1}"))
         )
       )
 
