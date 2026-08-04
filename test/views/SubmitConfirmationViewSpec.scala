@@ -26,7 +26,6 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import utils.CurrencyFormats
 import views.html.SubmitConfirmationView
 
 import java.time.Instant
@@ -42,54 +41,147 @@ class SubmitConfirmationViewSpec extends SpecBase {
     status = Available,
     claimDate = None
   )
-  
-  val acceptedItems: Seq[LeppItem] = Seq(acceptedItem)
-  
-  val notAcceptedItems: Seq[LeppItem] = Seq(
-    LeppItem(
-      id = "A-26-1",
-      taxYear = 2026,
-      contributions = 1000,
-      taxRate = 0.2,
-      entitlement = 200,
-      status = Available,
-      claimDate = None
-    )
+
+  val acceptedItem2: LeppItem = acceptedItem.copy(id = "A-24-1", taxYear = 2024, entitlement = 201)
+
+  val notAcceptedItem = LeppItem(
+    id = "A-26-1",
+    taxYear = 2026,
+    contributions = 1000,
+    taxRate = 20,
+    entitlement = 300,
+    status = Available,
+    claimDate = None
   )
-  
+
+  val notAcceptedItem2: LeppItem = notAcceptedItem.copy(id = "A-27-1", taxYear = 2027, entitlement = 301)
+
+  val successTableId = "confirmation_table_accepted_payments"
+  val failureTableId = "confirmation_table_available_payments"
+
   "view" - {
 
-    "with correct LEPP gov banner" in new Setup {
+    "should render the correct LEPP gov banner" in new Setup {
       view.getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
       view.getElementsByClass("govuk-link hmrc-sign-out-nav__link").attr("href") mustBe
         "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
-    "display correct guidance and text" in new Setup(acceptedItems = acceptedItems) {
-      view.getElementsByTag("h1").text() mustBe messages(app)("confirmation.heading")
+    "should display the correct content when" - {
 
-      view.text.contains(messages(app)("confirmation.details"))
-      view.text.contains(messages(app)("confirmation.what-next.opt1"))
-      view.text.contains(messages(app)("confirmation.what-next.opt2.sec1"))
-      view.text.contains(messages(app)("confirmation.what-next.opt2.sec2"))
+      "there is one successful payment" in new Setup(Seq(acceptedItem)) {
 
-      view.text.contains(messages(app)("submitted.on"))
-    }
+        view.select("h1").text() mustBe "We've received your bank details"
 
-    "display correct accepted payments" in new Setup(
-      acceptedItems = acceptedItems :+ acceptedItem.copy(id = "A-25-2"),
-      notAcceptedItems = notAcceptedItems
-    ) {
-      
-      val taxYear: Int = summaryModel.availableItems.get.head.taxYear
-      val entitlement: BigDecimal = summaryModel.availableItems.get.head.entitlement
-      view.text.contains(messages(app)("confirmation.multiple.details"))
-      view.getElementById("confirmation_table_accepted_payments_header_taxYear").text() mustBe messages(app)("confirmation.table.header.taxYear")
-      view.getElementById("confirmation_table_accepted_payments_header_taxYear").hasClass("govuk-table__header") mustBe true
-      view.getElementById("confirmation_table_accepted_payments_header_amount").text() mustBe messages(app)("confirmation.table.header.amount")
-      view.getElementById(s"taxYear_$taxYear").text() mustBe messages(app)("common.taxYearDates", s"$taxYear", s"${taxYear + 1}")
-      view.getElementById(s"entitlement_$taxYear").text() mustBe CurrencyFormats.format(entitlement)
-      
+        view.text.contains("We'll send this payment to the bank account you provided within 7 working days.")
+
+        view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${successTableId}_header_amount").text() mustBe "Amount"
+        val taxYear: Int = acceptedItem.taxYear
+        view.getElementById(s"taxYear_$taxYear").text() mustBe "6 April 2025 to 5 April 2026"
+        view.getElementById(s"entitlement_$taxYear").text() mustBe "£200"
+
+        view.text.contains("Submitted on")
+
+        view.text.contains("Keep a copy for your records")
+        view.text.contains("Print this page")
+        view.text.contains("What you can do next")
+        view.text.contains("View your payments")
+      }
+
+      "when there are multiple successful payments" in new Setup(Seq(acceptedItem, acceptedItem2)) {
+
+        view.select("h1").text() mustBe "We've received your bank details"
+
+        view.text.contains("The following payments were processed successfully. " +
+          "We'll send them separately to the bank account you provided within 7 working days.")
+
+        view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${successTableId}_header_amount").text() mustBe "Amount"
+        val taxYear1: Int = acceptedItem.taxYear
+        view.getElementById(s"taxYear_$taxYear1").text() mustBe "6 April 2025 to 5 April 2026"
+        view.getElementById(s"entitlement_$taxYear1").text() mustBe "£200"
+        val taxYear2: Int = acceptedItem2.taxYear
+        view.getElementById(s"taxYear_$taxYear2").text() mustBe "6 April 2024 to 5 April 2025"
+        view.getElementById(s"entitlement_$taxYear2").text() mustBe "£201"
+
+        view.text.contains("Submitted on")
+
+        view.text.contains("Keep a copy for your records")
+        view.text.contains("Print this page")
+        view.text.contains("What you can do next")
+        view.text.contains("View your payments")
+      }
+
+      "when there is one successful payment and one failed payment" in new Setup(Seq(acceptedItem),
+                                                                                 Seq(notAcceptedItem)) {
+
+        view.select("h1").text() mustBe "Some of your payments failed to process due to a system error"
+
+        view.text.contains("Failed payments")
+        view.getElementById(s"${failureTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${failureTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${failureTableId}_header_amount").text() mustBe "Amount"
+        val failedTaxYear: Int = notAcceptedItem.taxYear
+        view.getElementById(s"taxYear_$failedTaxYear").text() mustBe "6 April 2026 to 5 April 2027"
+        view.getElementById(s"entitlement_$failedTaxYear").text() mustBe "£300"
+
+        view.text.contains("Successful payments")
+        view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${successTableId}_header_amount").text() mustBe "Amount"
+        val successTaxYear: Int = acceptedItem.taxYear
+        view.getElementById(s"taxYear_$successTaxYear").text() mustBe "6 April 2025 to 5 April 2026"
+        view.getElementById(s"entitlement_$successTaxYear").text() mustBe "£200"
+
+        view.text.contains("Submitted on")
+
+        view.text.contains("We'll send the payment to the bank account you provided within 7 working days.")
+
+        view.text.contains("Keep a copy for your records")
+        view.text.contains("Print this page")
+        view.text.contains("What you can do next")
+        view.text.contains("View your payments")
+      }
+
+      "when there are multiple successful and failed payments" in new Setup(Seq(acceptedItem, acceptedItem2),
+                                                                            Seq(notAcceptedItem, notAcceptedItem2)) {
+
+        view.select("h1").text() mustBe "Some of your payments failed to process due to a system error"
+
+        view.text.contains("Failed payments")
+        view.getElementById(s"${failureTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${failureTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${failureTableId}_header_amount").text() mustBe "Amount"
+        val failedTaxYear1: Int = notAcceptedItem.taxYear
+        view.getElementById(s"taxYear_$failedTaxYear1").text() mustBe "6 April 2026 to 5 April 2027"
+        view.getElementById(s"entitlement_$failedTaxYear1").text() mustBe "£300"
+        val failedTaxYear2: Int = notAcceptedItem2.taxYear
+        view.getElementById(s"taxYear_$failedTaxYear2").text() mustBe "6 April 2027 to 5 April 2028"
+        view.getElementById(s"entitlement_$failedTaxYear2").text() mustBe "£301"
+
+        view.text.contains("Successful payments")
+        view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
+        view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
+        view.getElementById(s"${successTableId}_header_amount").text() mustBe "Amount"
+        val successTaxYear1: Int = acceptedItem.taxYear
+        view.getElementById(s"taxYear_$successTaxYear1").text() mustBe "6 April 2025 to 5 April 2026"
+        view.getElementById(s"entitlement_$successTaxYear1").text() mustBe "£200"
+        val successTaxYear2: Int = acceptedItem2.taxYear
+        view.getElementById(s"taxYear_$successTaxYear2").text() mustBe "6 April 2024 to 5 April 2025"
+        view.getElementById(s"entitlement_$successTaxYear2").text() mustBe "£201"
+
+        view.text.contains("Submitted on")
+
+        view.text.contains("We'll send the payments separately to the bank account you provided within 7 working days.")
+
+        view.text.contains("Keep a copy for your records")
+        view.text.contains("Print this page")
+        view.text.contains("What you can do next")
+        view.text.contains("View your payments")
+      }
     }
   }
 

@@ -44,6 +44,7 @@
     table(Table(
         attributes = Map("id" -> tableRefAccepted),
         caption = Some(messages("confirmation.table.caption.success")),
+        captionClasses = "govuk-visually-hidden",
         rows = ConfirmationUtils.acceptedTableRows(tableRefAccepted, acceptedItems),
         head = Some(ConfirmationUtils.tableHeaders(tableRefAccepted, Seq("taxYear", "amount"))),
         firstCellIsHeader = true
@@ -59,6 +60,7 @@
         @table(Table(
             attributes = Map("id" -> tableRefAvailable),
             caption = Some(messages("confirmation.table.caption.failed")),
+            captionClasses = "govuk-visually-hidden",
             rows = ConfirmationUtils.availableTableRows(tableRefAvailable, notAcceptedItems),
             head = Some(ConfirmationUtils.tableHeaders(tableRefAvailable, Seq("taxYear", "availableUntil", "amount"))),
             firstCellIsHeader = true
@@ -89,22 +91,24 @@
 ) {
     @startSection
 
-    @if(notAcceptedItems.isEmpty){
-        @successTable
-    } else {
+    @if(notAcceptedItems.nonEmpty){
         @heading2("confirmation.table.caption.success")
         @successTable
+    } else {
+        @successTable
+    }
 
+    <p class="govuk-body">
+        @messages("submitted.on") @submittedDate
+    </p>
+
+    @if(notAcceptedItems.nonEmpty) {
         @if(acceptedItems.length == 1) {
             <p class="govuk-body">@messages("confirmation.partialSuccess.single.details")</p>
         } else {
             <p class="govuk-body">@messages("confirmation.partialSuccess.multiple.details")</p>
         }
     }
-
-    <p class="govuk-body">
-        @messages("submitted.on") @submittedDate
-    </p>
 
     @heading2("confirmation.keep-a-copy.heading")
     <p class="govuk-body">
