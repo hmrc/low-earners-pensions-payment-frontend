@@ -103,14 +103,6 @@ checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.bankDetails = Your bank details
 checkYourAnswers.rollNumber = Building society roll number
-checkYourAnswers.changeAccountName = change-account-name
-checkYourAnswers.changeAccountNumber = change-account-number
-checkYourAnswers.changeSortCode = change-sort-code
-checkYourAnswers.changeRollNumber = change-roll-number
-checkYourAnswers.hiddenText.accountName = change-account-name
-checkYourAnswers.hiddenText.accountNumber = change-account-number
-checkYourAnswers.hiddenText.sortCode = change-sort-code
-checkYourAnswers.hiddenText.rollNumber = change-roll-number
 
 # Confirmation page
 confirmation.title = We''ve received your bank details

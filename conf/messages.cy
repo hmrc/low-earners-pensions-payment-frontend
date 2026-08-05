@@ -104,14 +104,6 @@ checkYourAnswers.title = Gwiriwch eich atebion
 checkYourAnswers.heading = Gwiriwch eich atebion
 checkYourAnswers.bankDetails = Eich manylion banc
 checkYourAnswers.rollNumber = Rhif y gymdeithas adeiladu
-checkYourAnswers.changeAccountName = newid-enw-y-cyfrif
-checkYourAnswers.changeAccountNumber = newid-rhif-cyfrif
-checkYourAnswers.changeSortCode = newid-cod-didoli
-checkYourAnswers.changeRollNumber = rhif-rôl-newid
-checkYourAnswers.hiddenText.accountName = newid-enw-y-cyfrif
-checkYourAnswers.hiddenText.accountNumber = newid-rhif-cyfrif
-checkYourAnswers.hiddenText.sortCode = newid-cod-didoli
-checkYourAnswers.hiddenText.rollNumber = rhif-rôl-newid
 
 # Confirmation page
 confirmation.title = Rydym wedi cael eich manylion banc

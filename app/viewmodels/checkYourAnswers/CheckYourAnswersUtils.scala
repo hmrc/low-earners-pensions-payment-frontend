@@ -72,7 +72,6 @@ object CheckYourAnswersUtils {
           ActionItem(
             href = routes.WhatAreYourBankDetailsController.onPageLoad(CheckMode).url,
             content = Text(messages("site.change")),
-            visuallyHiddenText = Some(messages("checkYourAnswers.bankDetails")), 
             attributes = Map("id" -> "bankDetails_changeAction")
           )
         )
