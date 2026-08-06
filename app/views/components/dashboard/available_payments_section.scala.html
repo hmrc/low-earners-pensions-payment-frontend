@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import models.userAnswers.{LeppSummary, LeppItem, LeppItemStatus}
+@import models.userAnswers.LeppSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
-@import utils.CurrencyFormats
 @import viewmodels.dashboard.DashboardUtils
 
 @this(
@@ -38,12 +37,13 @@
  @contactLinkElement(Some("dashboard.moreInformation"))
 }
 
+@subHeading(msgKey = messages("dashboard.availablePayments.heading"))
+
 @if(leppSummary.hasAvailablePayments){
+
  @if(leppSummary.suspendedItems.nonEmpty) {
   @insetText(InsetTextViewModel(html = suspendedInsetContent))
  }
-
- @subHeading(msgKey = messages("dashboard.availablePayments.heading"))
 
  @table(Table(
   attributes = Map("id" -> tableRef),
@@ -57,6 +57,5 @@
  @availableSummarySection(leppSummary, continueUrl, barsLockFlag, hasAvailableItems)
 
 } else {
- @subHeading(msgKey = messages("dashboard.availablePayments.heading"))
- <p class = "govuk-body">@messages("dashboard.availablePayments.noneAvailable")</p>
+ <p class="govuk-body">@messages("dashboard.availablePayments.noneAvailable")</p>
 }

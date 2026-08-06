@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import models.userAnswers.{LeppSummary, LeppItem, LeppItemStatus}
+@import models.userAnswers.LeppSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
-@import java.time.LocalDate
 @import viewmodels.dashboard.DashboardUtils
 
 @this(
@@ -39,12 +38,17 @@
  </p>
 }
 
+@subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
+
 @if(leppSummary.hasPaymentHistory){
+
  @if(leppSummary.cancelledItems.nonEmpty) {
   @insetText(InsetTextViewModel(cancelledInsetContent))
  }
 
- @subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
+ @if(leppSummary.paidItems.nonEmpty) {
+  @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
+ }
 
  @table(Table(
   attributes = Map("id" -> tableRef),
@@ -55,10 +59,6 @@
   captionClasses = "govuk-visually-hidden"
  ))
 
- @if(leppSummary.paidItems.nonEmpty) {
-  @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
- }
 } else {
- @subHeading(msgKey = messages("dashboard.paymentHistory.heading"))
  <p class="govuk-body">@messages("dashboard.paymentHistory.noneAvailable")</p>
 }

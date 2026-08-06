@@ -49,7 +49,7 @@ class PaymentHistorySectionSpec extends SpecBase {
       result.select(".govuk-body").text() mustBe "You do not have any previous payments."
     }
 
-    "should produce the expected table contents" in new Setup() {
+    "render the expected table contents" in new Setup() {
       val result: Document = view(summaryModel, tableRef)
       result.getElementById(s"${tableRef}_header_taxYear").text() mustBe "Tax year"
       result.getElementById(s"${tableRef}_header_amount").text() mustBe "Amount"

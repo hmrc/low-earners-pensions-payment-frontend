@@ -28,9 +28,33 @@ import views.html.components.dashboard.available_payments_section
 
 class AvailablePaymentsSectionSpec extends SpecBase {
 
-  "available_payments_section" - {
+  "available_payments_section should" - {
 
-    "should produce the expected table contents" in new Setup() {
+    "render the inset text element when there are suspended payments" in new Setup() {
+      val result: Document = view(summaryModel, tableRef, "/href", false)
+
+      result.select("h2").text() mustBe "Available payments"
+      result.select(".govuk-inset-text").text() mustBe
+        "Your payments are suspended. For more information, contact us (opens in new tab)."
+    }
+
+    "not render the inset text if there are no suspended payments" in new Setup() {
+      val summary: LeppSummary = summaryModel.copy(suspendedItems = None)
+      val result: Document = view(summary, tableRef, "/href", false)
+
+      result.select("h2").text() mustBe "Available payments"
+      result.select(".govuk-inset-text").size() mustBe 0
+    }
+
+    "render a separate information paragraph if there are no available or suspended payments" in new Setup() {
+      val summary: LeppSummary = summaryModel.copy(availableItems = None, suspendedItems = None)
+      val result: Document = view(summary, tableRef, "/href", false)
+
+      result.select("h2").text() mustBe "Available payments"
+      result.select(".govuk-body").text() mustBe "You do not have any available payments."
+    }
+
+    "should render the expected table contents" in new Setup() {
       val result: Document = view(summaryModel, tableRef, "/href", false)
       result.getElementById(s"${tableRef}_header_taxYear").text() mustBe "Tax year"
       result.getElementById(s"${tableRef}_header_amount").text() mustBe "Amount"
