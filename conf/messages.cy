@@ -116,12 +116,11 @@ checkYourAnswers.hiddenText.rollNumber = rhif-rôl-newid
 # Confirmation page
 confirmation.title = Rydym wedi cael eich manylion banc
 confirmation.heading = Rydym wedi cael eich manylion banc
-confirmation.keep-a-copy.heading = Cadwch gopi ar gyfer eich cofnodion
-confirmation.keep-a-copy.linkText = Argraffwch y dudalen hon
 confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
+confirmation.what-next.print = Argraffwch y dudalen hon
 confirmation.what-next.linkText = Bwrw golwg dros eich taliadau
-confirmation.failure.tryAgain.single = I''w dderbyn eto, edrychwch ar eich taliadau a dewis '‘Derbyn’'.
-confirmation.failure.tryAgain.multiple = I''w derbyn eto, edrychwch ar eich taliadau a dewiswch ''Derbyn’'.
+confirmation.failure.tryAgain.single = I''w dderbyn eto, edrychwch ar eich taliadau a dewis '‘Derbyn taliad’'.
+confirmation.failure.tryAgain.multiple = I''w derbyn eto, edrychwch ar eich taliadau a dewiswch ''Derbyn taliadau’'.
 confirmation.failure.sub.heading = Methodd rhai o'ch taliadau â phrosesu oherwydd gwall system
 confirmation.table.caption.success = Taliadau llwyddiannus
 confirmation.table.caption.failed = Aliadau aflwyddiannus

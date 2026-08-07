@@ -115,12 +115,11 @@ checkYourAnswers.hiddenText.rollNumber = change-roll-number
 # Confirmation page
 confirmation.title = We''ve received your bank details
 confirmation.heading = We''ve received your bank details
-confirmation.keep-a-copy.heading = Keep a copy for your records
-confirmation.keep-a-copy.linkText = Print this page
 confirmation.what-next.heading = What you can do next
+confirmation.what-next.print = Print this page
 confirmation.what-next.linkText = View your payments
-confirmation.failure.tryAgain.single = To accept it again, view your payments and select ''Accept''.
-confirmation.failure.tryAgain.multiple = To accept them again, view your payments and select ''Accept''.
+confirmation.failure.tryAgain.single = To accept it again, view your payments and select ''Accept payment''.
+confirmation.failure.tryAgain.multiple = To accept them again, view your payments and select ''Accept payments''.
 confirmation.failure.sub.heading = Some of your payments failed to process due to a system error
 confirmation.table.caption.success = Successful payments
 confirmation.table.caption.failed = Failed payments

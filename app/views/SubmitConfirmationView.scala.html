@@ -110,14 +110,12 @@
         }
     }
 
-    @heading2("confirmation.keep-a-copy.heading")
+    @heading2("confirmation.what-next.heading")
     <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="#" data-module="hmrc-print-link">
-            @messages("confirmation.keep-a-copy.linkText")
+        @messages("confirmation.what-next.print")
         </a>
     </p>
-
-    @heading2("confirmation.what-next.heading")
     <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">
             @messages("confirmation.what-next.linkText")

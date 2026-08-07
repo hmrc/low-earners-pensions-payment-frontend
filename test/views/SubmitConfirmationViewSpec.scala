@@ -48,7 +48,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
     id = "A-26-1",
     taxYear = 2026,
     contributions = 1000,
-    taxRate = 20,
+    taxRate = 0.2,
     entitlement = 300,
     status = Available,
     claimDate = None
@@ -84,9 +84,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
 
         view.text.contains("Submitted on")
 
-        view.text.contains("Keep a copy for your records")
-        view.text.contains("Print this page")
         view.text.contains("What you can do next")
+        view.text.contains("Print this page")
         view.text.contains("View your payments")
       }
 
@@ -109,9 +108,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
 
         view.text.contains("Submitted on")
 
-        view.text.contains("Keep a copy for your records")
-        view.text.contains("Print this page")
         view.text.contains("What you can do next")
+        view.text.contains("Print this page")
         view.text.contains("View your payments")
       }
 
@@ -128,6 +126,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.getElementById(s"taxYear_$failedTaxYear").text() mustBe "6 April 2026 to 5 April 2027"
         view.getElementById(s"entitlement_$failedTaxYear").text() mustBe "£300"
 
+        view.text.contains("To accept it again, view your payments and select 'Accept payment'.")
+
         view.text.contains("Successful payments")
         view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
         view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
@@ -140,9 +140,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
 
         view.text.contains("We'll send the payment to the bank account you provided within 7 working days.")
 
-        view.text.contains("Keep a copy for your records")
-        view.text.contains("Print this page")
         view.text.contains("What you can do next")
+        view.text.contains("Print this page")
         view.text.contains("View your payments")
       }
 
@@ -162,6 +161,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.getElementById(s"taxYear_$failedTaxYear2").text() mustBe "6 April 2027 to 5 April 2028"
         view.getElementById(s"entitlement_$failedTaxYear2").text() mustBe "£301"
 
+        view.text.contains("To accept them again, view your payments and select 'Accept payments'.")
+
         view.text.contains("Successful payments")
         view.getElementById(s"${successTableId}_header_taxYear").text() mustBe "Tax year"
         view.getElementById(s"${successTableId}_header_taxYear").hasClass("govuk-table__header") mustBe true
@@ -177,9 +178,8 @@ class SubmitConfirmationViewSpec extends SpecBase {
 
         view.text.contains("We'll send the payments separately to the bank account you provided within 7 working days.")
 
-        view.text.contains("Keep a copy for your records")
-        view.text.contains("Print this page")
         view.text.contains("What you can do next")
+        view.text.contains("Print this page")
         view.text.contains("View your payments")
       }
     }
