@@ -116,15 +116,21 @@ checkYourAnswers.hiddenText.rollNumber = change-roll-number
 confirmation.title = We''ve received your bank details
 confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
-confirmation.what-next.opt1 = View your payments
-confirmation.failure.items.p1 = To accept them again, return to your payments and select ''Accept''.
-confirmation.failure.sub.heading = Some of your payments could not be processed
+confirmation.what-next.print = Print this page
+confirmation.what-next.linkText = View your payments
+confirmation.failure.tryAgain.single = To accept it again, view your payments and select ''Accept payment''.
+confirmation.failure.tryAgain.multiple = To accept them again, view your payments and select ''Accept payments''.
+confirmation.failure.sub.heading = Some of your payments failed to process due to a system error
+confirmation.table.caption.success = Successful payments
+confirmation.table.caption.failed = Failed payments
 confirmation.table.availableUntil = 5 April {0}
 confirmation.table.header.taxYear = Tax year
 confirmation.table.header.amount = Amount
 confirmation.table.header.availableUntil = Available until
-confirmation.details = We''ll send this payment to the bank account you provided within 7 working days.
-confirmation.multiple.details= The following payments were processed successfully. We''ll send them separately to the bank account you provided within 7 working days.
+confirmation.fullSuccess.single.details = We''ll send this payment to the bank account you provided within 7 working days.
+confirmation.fullSuccess.multiple.details = The following payments were processed successfully. We''ll send them separately to the bank account you provided within 7 working days.
+confirmation.partialSuccess.single.details = We''ll send the payment to the bank account you provided within 7 working days.
+confirmation.partialSuccess.multiple.details = We''ll send the payments separately to the bank account you provided within 7 working days.
 confirmation.sub.time = at
 
 # Bars request errors page

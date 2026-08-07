@@ -24,8 +24,7 @@
     table: GovukTable,
     heading: h1,
     layout: templates.Layout,
-    heading2: h2,
-    resultsFooter: results_footer
+    heading2: h2
 )
 
 @(
@@ -38,48 +37,88 @@
 )
 
 @submittedDate = @{ Formatters.submissionDate(formattedTimestamp, messages) }
-
 @tableRefAccepted = @{"confirmation_table_accepted_payments"}
 @tableRefAvailable = @{"confirmation_table_available_payments"}
+
+@successTable = @{
+    table(Table(
+        attributes = Map("id" -> tableRefAccepted),
+        caption = Some(messages("confirmation.table.caption.success")),
+        captionClasses = "govuk-visually-hidden",
+        rows = ConfirmationUtils.acceptedTableRows(tableRefAccepted, acceptedItems),
+        head = Some(ConfirmationUtils.tableHeaders(tableRefAccepted, Seq("taxYear", "amount"))),
+        firstCellIsHeader = true
+    ))
+}
+
+@startSection = {
+    @if(notAcceptedItems.nonEmpty) {
+        @heading("confirmation.failure.sub.heading", headerSize = "l")
+
+        @heading2("confirmation.table.caption.failed")
+
+        @table(Table(
+            attributes = Map("id" -> tableRefAvailable),
+            caption = Some(messages("confirmation.table.caption.failed")),
+            captionClasses = "govuk-visually-hidden",
+            rows = ConfirmationUtils.availableTableRows(tableRefAvailable, notAcceptedItems),
+            head = Some(ConfirmationUtils.tableHeaders(tableRefAvailable, Seq("taxYear", "availableUntil", "amount"))),
+            firstCellIsHeader = true
+        ))
+
+        @if(notAcceptedItems.length == 1) {
+            <p class="govuk-body">@messages("confirmation.failure.tryAgain.single")</p>
+        } else {
+            <p class="govuk-body">@messages("confirmation.failure.tryAgain.multiple")</p>
+        }
+
+    } else {
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">@messages("confirmation.heading")</h1>
+        </div>
+
+        @if(acceptedItems.length == 1){
+            <p class="govuk-body">@messages("confirmation.fullSuccess.single.details")</p>
+        } else {
+            <p class="govuk-body">@messages("confirmation.fullSuccess.multiple.details")</p>
+        }
+    }
+}
 
 @layout(
     pageTitle = titleNoForm(messages("confirmation.title")),
     showBackLink = false
 ) {
+    @startSection
 
     @if(notAcceptedItems.nonEmpty){
-        @heading("confirmation.failure.sub.heading", headerSize = "l")
-        <p class="govuk-body">@messages("confirmation.failure.items.p1")</p>
-
-        @table(Table(
-            attributes = Map("id" -> tableRefAvailable),
-            rows = ConfirmationUtils.availableTableRows(tableRefAvailable, notAcceptedItems),
-            head = Some(ConfirmationUtils.tableHeaders(tableRefAvailable, Seq("taxYear", "availableUntil", "amount"))),
-            firstCellIsHeader = true
-        ))
+        @heading2("confirmation.table.caption.success")
+        @successTable
     } else {
-        <div class="govuk-panel govuk-panel--confirmation">
-            <h1 class="govuk-panel__title">
-                @messages("confirmation.heading")
-            </h1>
-        </div>
-        @if(acceptedItems.length == 1){
-            <p class="govuk-body">@messages("confirmation.details")</p>
+        @successTable
+    }
+
+    <p class="govuk-body">
+        @messages("submitted.on") @submittedDate
+    </p>
+
+    @if(notAcceptedItems.nonEmpty) {
+        @if(acceptedItems.length == 1) {
+            <p class="govuk-body">@messages("confirmation.partialSuccess.single.details")</p>
         } else {
-            <p class="govuk-body">@messages("confirmation.multiple.details")</p>
+            <p class="govuk-body">@messages("confirmation.partialSuccess.multiple.details")</p>
         }
     }
 
-    @table(Table(
-        attributes = Map("id" -> tableRefAccepted),
-        rows = ConfirmationUtils.acceptedTableRows(tableRefAccepted, acceptedItems),
-        head = Some(ConfirmationUtils.tableHeaders(tableRefAccepted, Seq("taxYear", "amount"))),
-        firstCellIsHeader = true
-    ))
-
     @heading2("confirmation.what-next.heading")
-    <p>
-        <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">@messages("confirmation.what-next.opt1")</a>
+    <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="#" data-module="hmrc-print-link">
+        @messages("confirmation.what-next.print")
+        </a>
     </p>
-    @resultsFooter(submittedDate)
+    <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">
+            @messages("confirmation.what-next.linkText")
+        </a>
+    </p>
 }
