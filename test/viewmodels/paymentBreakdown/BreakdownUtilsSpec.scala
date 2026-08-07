@@ -33,7 +33,7 @@ class BreakdownUtilsSpec extends SpecBase {
     id = "S-25-1",
     taxYear = taxYear,
     contributions = 1000,
-    taxRate = 20,
+    taxRate = 0.2,
     entitlement = 200,
     status = Available,
     claimDate = Some(LocalDate.of(2026, 1, 1))
@@ -43,7 +43,7 @@ class BreakdownUtilsSpec extends SpecBase {
     id = "P-25-1",
     taxYear = taxYear,
     contributions = 1000,
-    taxRate = 20,
+    taxRate = 0.2,
     entitlement = 200,
     status = Paid,
     claimDate = Some(LocalDate.of(2026, 1, 1))

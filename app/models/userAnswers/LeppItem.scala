@@ -32,7 +32,7 @@ case class LeppItem(id: String,
                     originalAmount: Option[BigDecimal] = None) {
   val formattedEntitlement: String = CurrencyFormats.format(entitlement)
   val formattedContributions: String = CurrencyFormats.format(contributions)
-  val taxRatePercent = s"${taxRate.toString()}%"
+  val taxRatePercent = s"${(taxRate * 100).intValue.toString}%"
 }
 
 object LeppItem {

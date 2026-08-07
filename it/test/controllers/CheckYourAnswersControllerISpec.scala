@@ -27,10 +27,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{route, writeableOf_AnyContentAsEmpty}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.SessionKeys
 import viewmodels.NormalMode
-import viewmodels.checkYourAnswers.CheckYourAnswersUtils.cyaSummaryListRows
 import viewmodels.formPages.FormPageViewModel
 import views.html.CheckYourAnswersView
 
@@ -306,7 +304,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Available,
               claimDate = None
@@ -315,7 +313,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-2",
               taxYear = 2026,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Available,
               claimDate = None
@@ -326,7 +324,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-3",
               taxYear = 2024,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = Some(LocalDate.of(2025, 1, 1))
@@ -450,7 +448,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-1",
               taxYear = 2025,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Available,
               claimDate = None
@@ -459,7 +457,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-2",
               taxYear = 2026,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Available,
               claimDate = None
@@ -470,7 +468,7 @@ class CheckYourAnswersControllerISpec extends ControllerIntegrationSpecBase {
               id = "id-3",
               taxYear = 2024,
               contributions = 1000,
-              taxRate = 20,
+              taxRate = 0.2,
               entitlement = 200,
               status = Paid,
               claimDate = Some(LocalDate.of(2025, 1, 1))
