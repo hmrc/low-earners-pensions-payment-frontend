@@ -98,10 +98,6 @@
         @successTable
     }
 
-    <p class="govuk-body">
-        @messages("submitted.on") @submittedDate
-    </p>
-
     @if(notAcceptedItems.nonEmpty) {
         @if(acceptedItems.length == 1) {
             <p class="govuk-body">@messages("confirmation.partialSuccess.single.details")</p>
@@ -109,6 +105,10 @@
             <p class="govuk-body">@messages("confirmation.partialSuccess.multiple.details")</p>
         }
     }
+
+    <p class="govuk-body">
+        @messages("submitted.on") @submittedDate
+    </p>
 
     @heading2("confirmation.what-next.heading")
     <p class="govuk-body">

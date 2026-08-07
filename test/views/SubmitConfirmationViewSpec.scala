@@ -136,9 +136,9 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.getElementById(s"taxYear_$successTaxYear").text() mustBe "6 April 2025 to 5 April 2026"
         view.getElementById(s"entitlement_$successTaxYear").text() mustBe "£200"
 
-        view.text.contains("Submitted on")
-
         view.text.contains("We'll send the payment to the bank account you provided within 7 working days.")
+
+        view.text.contains("Submitted on")
 
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
@@ -174,9 +174,9 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.getElementById(s"taxYear_$successTaxYear2").text() mustBe "6 April 2024 to 5 April 2025"
         view.getElementById(s"entitlement_$successTaxYear2").text() mustBe "£201"
 
-        view.text.contains("Submitted on")
-
         view.text.contains("We'll send the payments separately to the bank account you provided within 7 working days.")
+
+        view.text.contains("Submitted on")
 
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
