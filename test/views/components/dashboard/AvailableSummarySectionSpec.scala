@@ -57,7 +57,7 @@ class AvailableSummarySectionSpec extends SpecBase {
     
     "should produce expected HTML element when there are no available payments" in new Setup() {
       val summaryView: Document = view(summaryModel, "/href", false, false)
-      summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
+      summaryView.html mustNot include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
       summaryView.html mustNot include("To accept these payments, you need to provide us with your bank details.")
       summaryView.html mustNot include("""<a href="/href"""")
     }

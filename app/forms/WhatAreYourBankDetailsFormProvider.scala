@@ -35,7 +35,7 @@ class WhatAreYourBankDetailsFormProvider extends BaseForm {
     fieldName = s"$prefix.accountName", 
     minAcceptedLength = 1, 
     maxAcceptedLength = 18, 
-    regex = "^[A-Za-z'&,\\\\=()\\/ -]+$",
+    regex = "^[0-9A-Za-z'&,\\\\=()\\/ -]+$",
     bindMap = accountNameBindMap
   )
 

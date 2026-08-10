@@ -40,6 +40,11 @@
 @tableRefAccepted = @{"confirmation_table_accepted_payments"}
 @tableRefAvailable = @{"confirmation_table_available_payments"}
 
+@titleStr = @{
+    if(notAcceptedItems.nonEmpty){ "confirmation.failure.title"
+    } else { "confirmation.title" }
+}
+
 @successTable = @{
     table(Table(
         attributes = Map("id" -> tableRefAccepted),
@@ -86,7 +91,7 @@
 }
 
 @layout(
-    pageTitle = titleNoForm(messages("confirmation.title")),
+    pageTitle = titleNoForm(messages(titleStr)),
     showBackLink = false
 ) {
     @startSection

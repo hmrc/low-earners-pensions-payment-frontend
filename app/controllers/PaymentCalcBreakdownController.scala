@@ -37,6 +37,20 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) {
 
   def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
+    val (messageKey, entitlement, isUnderPayment) = id match {
+      case Some(value) if request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined =>
+        ("breakdown.single.past.underpayment", request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+      case Some(value) =>
+        ("breakdown.single.past", request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
+      case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
+        if(request.leppSummary.availableItems.get.head.originalAmount.isDefined) {
+          ("breakdown.single.underpayment", request.leppSummary.totalEntitlementString, true)
+        } else {
+          ("breakdown.single", request.leppSummary.totalEntitlementString, false)
+        }
+      case None => ("breakdown.multiple", request.leppSummary.totalEntitlementString, false)
+    }
+    
     Future.successful(
       Ok(
         paymentCalcBreakdownView(
@@ -44,7 +58,10 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
           continueUrl = navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
           backUrl = Some(backLinkUrl(NormalMode, PaymentCalcBreakdownPage).url),
           barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
-          itemId = id
+          itemId = id,
+          messageKey,
+          entitlement,
+          isUnderPayment
         )
       ) 
     )
