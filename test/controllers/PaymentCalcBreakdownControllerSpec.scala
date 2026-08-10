@@ -56,7 +56,11 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view(
           summaryModel,
           routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
-          Some(routes.DashboardController.onPageLoad().url)
+          Some(routes.DashboardController.onPageLoad().url),
+          false,
+          None,
+          "breakdown.single",
+          "£200"
         )(request, messages(application)).toString
         status(result) mustEqual OK
       }
@@ -75,7 +79,9 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
           routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
           Some(routes.DashboardController.onPageLoad().url),
           false,
-          Some("P-25-1")
+          Some("P-25-1"),
+          "breakdown.single.past",
+          "£200"
         )(request, messages(application)).toString
         status(result) mustEqual OK
       }

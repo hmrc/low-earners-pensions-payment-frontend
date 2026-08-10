@@ -51,15 +51,20 @@ dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc or
 
 # Calculation Breakdown page
 breakdown.title = Dadansoddiad eich taliad
+breakdown.single.past.title = Roeddech yn gymwys i gael taliad o {0}
 breakdown.single.past.heading = Roeddech yn gymwys i gael taliad o {0}
 breakdown.single.past.p1 = Roedd y taliad hwn yn ddyledus i chi oherwydd na wnaethoch dderbyn rhyddhad treth ar rai neu bob un o''ch cyfraniadau pensiwn o gyflog net.
+breakdown.single.past.underpayment.title = Roeddech yn gymwys i gael taliad ychwanegol o {0}
 breakdown.single.past.underpayment.heading = Roeddech yn gymwys i gael taliad ychwanegol o {0}
 breakdown.single.past.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
 breakdown.single.past.underpayment.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+breakdown.single.underpayment.title = Rydych chi''n gymwys i gael taliad ychwanegol o {0}
 breakdown.single.underpayment.heading = Rydych chi''n gymwys i gael taliad ychwanegol o {0}
 breakdown.single.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
 breakdown.single.underpayment.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+breakdown.multiple.title = Rydych yn gymwys i gael cyfanswm o {0}
 breakdown.multiple.heading = Rydych yn gymwys i gael cyfanswm o {0}
+breakdown.single.title = Rydych chi''n gymwys i gael taliad o {0}
 breakdown.single.heading = Rydych chi''n gymwys i gael taliad o {0}
 breakdown.multiple.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
 breakdown.single.p1 = Mae''r taliad hwn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar rai neu''r cyfan o''ch cyfraniadau pensiwn cyflog net.
@@ -115,6 +120,7 @@ checkYourAnswers.hiddenText.rollNumber = rhif-rôl-newid
 
 # Confirmation page
 confirmation.title = Rydym wedi cael eich manylion banc
+confirmation.failure.title = Ni ellid prosesu rhai o''ch taliadau
 confirmation.heading = Rydym wedi cael eich manylion banc
 confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
 confirmation.what-next.print = Argraffwch y dudalen hon

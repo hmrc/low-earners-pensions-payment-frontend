@@ -57,7 +57,7 @@ class WhatAreYourBankDetailsFormProviderSpec extends FormSpecBase {
 
     "bind" - {
       Seq(
-        (s"$prefix.accountName", 1, 18, Seq("!!!!!"), Seq("Mr Taxwell Payer", "Aa'&,/\\ -"), "^[A-Za-z'&,\\\\=()\\/ -]+$"),
+        (s"$prefix.accountName", 1, 18, Seq("!!!!!"), Seq("Mr Taxwell Payer", "Aa'&,/\\ -"), "^[0-9A-Za-z'&,\\\\=()\\/ -]+$"),
         (s"$prefix.sortCode", 6, 6, Seq("ABCDEF"), Seq("11-22-33", "112233"), "^[0-9]{6}$"),
         (s"$prefix.accountNumber", 6, 8, Seq("abcdefgj"), Seq("123456", "1234567", "12345678"), "^[0-9]{6,8}$")
       ).foreach(handleForMandatoryField(form))

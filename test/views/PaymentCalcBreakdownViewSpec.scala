@@ -26,6 +26,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import utils.MessageKeys
 import views.html.PaymentCalcBreakdownView
 
 class PaymentCalcBreakdownViewSpec extends SpecBase {
@@ -39,7 +40,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     claimDate = None,
     originalAmount = Some(100)
   )
-  
+
   val summary: LeppSummary = LeppSummary(
     1, 
     Some(Seq(leppItem)), 
@@ -58,7 +59,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
         "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
-    "display correct guidance and text for a single payment" in new Setup {
+    "display correct guidance and text for a single payment" in new Setup(summary, MessageKeys.SINGLE_UNDER_PAYMENT) {
       view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.single.underpayment.heading", summary.totalEntitlementString)
 
       view.html.contains(messages(app)("breakdown.single.underpayment.p1"))
@@ -68,7 +69,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.text.contains(messages(app)("breakdown.l3"))
     }
 
-    "display correct guidance and text for a multiple payment" in new Setup(multipleSummary) {
+    "display correct guidance and text for a multiple payment" in new Setup(multipleSummary, MessageKeys.MULTIPLE_PAYMENT, "£400") {
       view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.multiple.heading", multipleSummary.totalEntitlementString)
 
       view.html.contains(messages(app)("breakdown.multiple.p1"))
@@ -79,11 +80,11 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
         messages(app)("site.continue")
     }
 
-    "display back to dashboard link when locked out" in new Setup(summary, true) {
+    "display back to dashboard link when locked out" in new Setup(summary, MessageKeys.SINGLE_PAYMENT, "£200", true) {
       view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
     }
 
-    "display specific history item details" in new Setup(summary, false, Some("P-id-1")) {
+    "display specific history item details" in new Setup(summary, MessageKeys.SINGLE_PAST_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
 
       val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
@@ -97,7 +98,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       )
     }
 
-    "display available items details" in new Setup(summary, false) {
+    "display available items details" in new Setup(summary, MessageKeys.SINGLE_UNDER_PAYMENT, "£200", false) {
       view.getElementById("id-1").getElementsByClass("govuk-summary-card__title").text() mustBe "For the tax year 6 April 2025 to 5 April 2026"
       
       val elements: Elements = view.getElementById("id-1").getElementsByClass("govuk-summary-card__content")
@@ -112,13 +113,17 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     }
   }
 
-  trait Setup(summary: LeppSummary = summary, barsLock: Boolean = false, id: Option[String] = None) {
+  trait Setup(summary: LeppSummary = summary,
+              messageKey: String = MessageKeys.SINGLE_PAST_UNDER_PAYMENT,
+              entitlement: String = "£200",
+              barsLock: Boolean = false,
+              id: Option[String] = None) {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", Some("back-url"), barsLock, id).body
+      app.injector.instanceOf[PaymentCalcBreakdownView].apply(summary, "some-url", Some("back-url"), barsLock, id, messageKey, entitlement).body
     )
   }
 }

@@ -32,57 +32,36 @@
     continueUrl: String, 
     backUrl: Option[String] = None, 
     barsLockFlag: Boolean = false, 
-    itemId: Option[String] = None
+    itemId: Option[String] = None,
+    messageKey: String,
+    entitlement: String,
+    isUnderPayment: Boolean = false
 )(
     implicit request: Request[_],
     messages: Messages
 )
 
 @layout(
-    pageTitle = titleNoForm(messages("breakdown.title")),
+    pageTitle = titleNoForm(messages(s"$messageKey.title", entitlement)),
     backLinkUrl = backUrl
 ) {
-    @itemId match {
-        case Some(value) => {
-            @if(paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined){
-                @heading(messages("breakdown.single.past.underpayment.heading", paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement), headerSize = "l")
+    @heading(messages(s"$messageKey.heading", entitlement), headerSize = "l")
 
-                <p class="govuk-body">@messages("breakdown.single.past.underpayment.p1")</p>
-                <p class="govuk-body">@messages("breakdown.single.past.underpayment.p2")</p>
-            } else {
-                @heading(messages("breakdown.single.past.heading", paymentSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement), headerSize = "l")
-
-                <p class="govuk-body">@messages("breakdown.single.past.p1")</p>
-            }
-        }
-        case None => {
-            @if(paymentSummary.availableItems.getOrElse(Nil).length == 1) {
-                @if(paymentSummary.availableItems.get.head.originalAmount.isDefined) {
-                    @heading(messages("breakdown.single.underpayment.heading", paymentSummary.totalEntitlementString), headerSize = "l")
-
-                    <p class="govuk-body">@messages("breakdown.single.underpayment.p1")</p>
-                    <p class="govuk-body">@messages("breakdown.single.underpayment.p2")</p>
-                } else {
-                    @heading(messages("breakdown.single.heading", paymentSummary.totalEntitlementString), headerSize = "l")
-
-                    <p class="govuk-body">@messages("breakdown.single.p1")</p>
-                }
-            } else {
-                @heading(messages("breakdown.multiple.heading", paymentSummary.totalEntitlementString), headerSize = "l")
-
-                <p class="govuk-body">@messages("breakdown.multiple.p1")</p>
-            }
-        }
+    <p class="govuk-body">@messages(s"$messageKey.p1")</p>
+    @if(isUnderPayment) {
+        <p class="govuk-body">@messages(s"$messageKey.p2")</p>
     }
 
     @for(summaryList <- paymentSummaryList(paymentSummary, itemId)){
         @govukSummaryList(summaryList)
     }
 
-    <p class="govuk-body">@messages("breakdown.p2")
-        @contactLinkElement()
-    </p>
-    <p class="govuk-body">@messages("breakdown.p3")</p>
+    @if(itemId.isEmpty){
+        <p class="govuk-body">@messages("breakdown.p2")
+            @contactLinkElement()
+        </p>
+        <p class="govuk-body">@messages("breakdown.p3")</p>
+    }
 
     @if(itemId.isDefined || barsLockFlag){
         <p class="govuk-body"><a id="barsLockFlag" class="govuk-link"

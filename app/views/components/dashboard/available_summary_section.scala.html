@@ -21,6 +21,7 @@
 
 @(leppSummary: LeppSummary, continueUrl: String, barsLockFlag: Boolean, hasAvailableItems: Boolean)(implicit messages: Messages)
 
+@if(hasAvailableItems){
 <p class = "govuk-body">
  @if(leppSummary.availableItems.getOrElse(Nil).length == 1) {
   @messages("dashboard.availablePayments.totalAvailableText.single.start")
@@ -37,8 +38,6 @@
  }
 </p>
 
-@if(hasAvailableItems){
-
 <a href="@continueUrl"
    role="button"
    draggable="false"
@@ -51,4 +50,3 @@
  }
 </a>
 }
-<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" style="margin-top: 4px;">
