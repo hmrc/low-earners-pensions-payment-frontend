@@ -23,6 +23,7 @@ import pages.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
+import utils.MessageKeys
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,16 +40,16 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
   def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
     val (messageKey, entitlement, isUnderPayment) = id match {
       case Some(value) if request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined =>
-        ("breakdown.single.past.underpayment", request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+        (MessageKeys.SINGLE_PAST_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
       case Some(value) =>
-        ("breakdown.single.past", request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
+        (MessageKeys.SINGLE_PAST_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
       case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
         if(request.leppSummary.availableItems.get.head.originalAmount.isDefined) {
-          ("breakdown.single.underpayment", request.leppSummary.totalEntitlementString, true)
+          (MessageKeys.SINGLE_UNDER_PAYMENT, request.leppSummary.totalEntitlementString, true)
         } else {
-          ("breakdown.single", request.leppSummary.totalEntitlementString, false)
+          (MessageKeys.SINGLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
         }
-      case None => ("breakdown.multiple", request.leppSummary.totalEntitlementString, false)
+      case None => (MessageKeys.MULTIPLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
     }
     
     Future.successful(
