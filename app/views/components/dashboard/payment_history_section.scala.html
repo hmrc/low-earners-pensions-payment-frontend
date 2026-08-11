@@ -25,8 +25,7 @@
  insetText: GovukInsetText,
  subHeading: h2,
  statusElement: status_element,
- linkElement: link_element,
- contactLinkElement: contact_link_element
+ linkElement: link_element
 )
 
 @(leppSummary: LeppSummary, tableRef: String)(implicit messages: Messages)
@@ -36,7 +35,7 @@
   @messages("dashboard.paymentHistory.cancelledInset.start")
   <strong class="govuk-!-font-weight-bold">@leppSummary.cancelledItems.getOrElse(Nil).length</strong>
   @messages("dashboard.paymentHistory.cancelledInset.end")
-  @contactLinkElement(Some("dashboard.moreInformation"))
+  @messages("dashboard.paymentHistory.cancelledInset.replacement")
  </p>
 }
 

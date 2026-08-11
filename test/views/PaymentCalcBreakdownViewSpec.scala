@@ -38,13 +38,19 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     entitlement = 200,
     status = Available,
     claimDate = None,
-    originalAmount = Some(100)
+    originalAmount = None
   )
 
   val summary: LeppSummary = LeppSummary(
     1, 
-    Some(Seq(leppItem)), 
+    Some(Seq(leppItem)),
     Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid)))
+  )
+
+  val underpaymentSummary: LeppSummary = LeppSummary(
+    1,
+    Some(Seq(leppItem.copy(originalAmount = Some(200)))),
+    Some(Seq(leppItem.copy(originalAmount = Some(200), id = "P-id-1", taxYear = 2024, status = Paid)))
   )
   
   val multipleSummary = LeppSummary(
@@ -59,20 +65,47 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
         "/accept-your-low-earners-pension-payment/account/sign-out-survey"
     }
 
-    "display correct guidance and text for a single payment" in new Setup(summary, MessageKeys.SINGLE_UNDER_PAYMENT) {
-      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.single.underpayment.heading", summary.totalEntitlementString)
+    "display correct guidance and text for a single payment" in new Setup(summary, MessageKeys.SINGLE_PAYMENT) {
+      view.getElementsByTag("h1").text mustBe "You're eligible for a £200 payment"
 
-      view.html.contains(messages(app)("breakdown.single.underpayment.p1"))
-      view.text.contains(messages(app)("breakdown.u1"))
-      view.text.contains(messages(app)("breakdown.l1"))
-      view.text.contains(messages(app)("breakdown.l2"))
-      view.text.contains(messages(app)("breakdown.l3"))
+      view.select(".govuk-body:nth-of-type(1)").text mustBe "This payment is due to you because you did not get " +
+        "tax relief on some or all of your net pay pension contributions."
+      view.select(".govuk-summary-card__title").text mustBe "For the tax year 6 April 2025 to 5 April 2026"
+
+      val tableRowHeadings: String = view.select(".govuk-summary-list__key").text
+      tableRowHeadings.contains("Your net pay pension contributions") mustBe true
+      tableRowHeadings.contains("Your relevant basic tax rate") mustBe true
+      tableRowHeadings.contains("Your payment") mustBe true
+
+      val tableRowValues: String = view.select(".govuk-summary-list__value").text
+      tableRowValues.contains("£1000") mustBe true
+      tableRowValues.contains("20%") mustBe true
+      tableRowValues.contains("£200") mustBe true
+      tableRowValues.contains("£100") mustBe true
+
+      view.select(".govuk-body:nth-of-type(2)").text mustBe
+        "If you think the amount is wrong, you can contact us (opens in new tab)."
+    }
+
+    "display correct guidance and text for an underpayment" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT) {
+      view.getElementsByTag("h1").text mustBe "You're eligible for an additional £200 payment"
+
+      view.select(".govuk-body:nth-of-type(1)").text mustBe "You were not paid enough in your previous payment " +
+        "for this tax year and we've recalculated the amount."
+
+      val tableRowHeadings: String = view.select(".govuk-summary-list__key").text
+      tableRowHeadings.contains("Your new total amount") mustBe true
+      tableRowHeadings.contains("Amount already received") mustBe true
+      tableRowHeadings.contains("Additional amount due") mustBe true
     }
 
     "display correct guidance and text for a multiple payment" in new Setup(multipleSummary, MessageKeys.MULTIPLE_PAYMENT, "£400") {
-      view.getElementsByTag("h1").text() mustBe messages(app)("breakdown.multiple.heading", multipleSummary.totalEntitlementString)
+      view.getElementsByTag("h1").text mustBe "You're eligible for a total of £400"
 
-      view.html.contains(messages(app)("breakdown.multiple.p1"))
+      view.select(".govuk-body:nth-of-type(1)").text mustBe "These payments are due to you because you did not " +
+        "get tax relief on some or all of your net pay pension contributions."
+      view.select(".govuk-body:nth-of-type(2)").text mustBe
+        "If you think the amounts are wrong, you can contact us (opens in new tab)."
     }
 
     "display continue link when not locked out" in new Setup {
@@ -84,7 +117,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
     }
 
-    "display specific history item details" in new Setup(summary, MessageKeys.SINGLE_PAST_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
+    "display specific history item details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_PAST_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
 
       val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
@@ -98,7 +131,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       )
     }
 
-    "display available items details" in new Setup(summary, MessageKeys.SINGLE_UNDER_PAYMENT, "£200", false) {
+    "display available items details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT, "£200", false) {
       view.getElementById("id-1").getElementsByClass("govuk-summary-card__title").text() mustBe "For the tax year 6 April 2025 to 5 April 2026"
       
       val elements: Elements = view.getElementById("id-1").getElementsByClass("govuk-summary-card__content")

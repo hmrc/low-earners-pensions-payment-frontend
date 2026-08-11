@@ -1,7 +1,6 @@
 service.name = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
 outage-page.serviceDisplayName = Derbyn eich taliad pensiwn i'r sawl sy'n ennill incwm isel
 
-
 # What you will need page
 whatYouWillNeed.title = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
 whatYouWillNeed.heading = Derbyn eich taliad pensiwn i''r sawl sy''n ennill incwm isel
@@ -34,6 +33,7 @@ dashboard.paymentHistory.paidInset = Bydd taliadau gyda''r statws ''Wedi talu'' 
 dashboard.paymentHistory.noneAvailable = Nid oes gennych unrhyw daliadau blaenorol.
 dashboard.paymentHistory.cancelledInset.start = Fe wnaethon ni ganslo
 dashboard.paymentHistory.cancelledInset.end = o''ch taliadau.
+dashboard.paymentHistory.cancelledInset.replacement = Bydd taliadau wedi''u canslo yn cael eu disodli gan daliad newydd.
 dashboard.table.header.taxYear = Blwyddyn dreth
 dashboard.table.header.amount = Swm
 dashboard.table.header.availableUntil = Ar gael hyd nes
@@ -47,7 +47,7 @@ dashboard.table.status.suspended = Wedi''i ohirio
 dashboard.table.status.cancelled = Wedi canslo
 dashboard.table.availableUntil = 5 Ebrill {0}
 dashboard.lockout.title = Pwysig
-dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau. Gallwch chi roi cynnig arall arni ar ôl {0}.
+dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau. Gallwch roi cynnig arall arni ar ôl {0}.
 
 # Calculation Breakdown page
 breakdown.title = Dadansoddiad eich taliad
@@ -74,11 +74,11 @@ breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
 breakdown.l3 = Eich taliad
 
 breakdown.underpayment.l1 = Eich cyfanswm newydd
-breakdown.underpayment.l2 = Swm a dderbyniwyd eisoes
+breakdown.underpayment.l2 = Swm sydd eisoes wedi dod i law
 breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
-breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir
-breakdown.p3 = Derbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
+breakdown.p2.single = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
+breakdown.p2.multiple = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
 
 # Bank account details page
 bankDetails.title = Beth yw’ch manylion banc?
@@ -127,7 +127,7 @@ confirmation.table.header.taxYear = Blwyddyn dreth
 confirmation.table.header.amount = Swm
 confirmation.table.header.availableUntil = Ar gael tan
 confirmation.fullSuccess.single.details = Byddwn yn anfon y taliad hwn i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
-confirmation.fullSuccess.multiple.details = Cafodd y taliadau canlynol eu prosesu''n llwyddiannus. Byddwn yn eu hanfon ar wahân i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
+confirmation.fullSuccess.multiple.details = Byddwn yn anfon y taliadau ar wahân i''r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
 confirmation.partialSuccess.single.details = Byddwn yn anfon y taliad i''r cyfrif banc a ddarparoch chi o fewn 7 diwrnod gwaith.
 confirmation.partialSuccess.multiple.details = Byddwn yn anfon y taliadau ar wahân i'’r cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.
 confirmation.sub.time = am
@@ -145,8 +145,8 @@ barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi
 # Bars check failure page
 barsCheckFailed.title = Ni allwn wirio manylion eich cyfrif banc
 barsCheckFailed.heading = Ni allwn wirio manylion eich cyfrif banc
-barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc
-barsCheckFailed.p2 = Ceisiwch eto yn nes ymlaen
+barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc.
+barsCheckFailed.p2 = Ceisiwch eto yn nes ymlaen.
 
 # BARS lockout page
 bars.lockout.title = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
@@ -161,9 +161,9 @@ ineligible.body = Nid ydych chi'n gymwys i gael y taliad pensiwn i'r sawl sy'n e
 ineligible.link = Dychwelyd i'ch cyfrif treth personol
 
 # Something went wrong page
-somethingWentWrong.title = Mae''n ddrwg gennym, mae problem gyda''r gwasanaeth
-somethingWentWrong.heading = Mae'n ddrwg gennym, mae problem gyda'r gwasanaeth
-somethingWentWrong.p1 = Gallwch chi roi cynnig arall arni yn nes ymlaen.
+somethingWentWrong.title = Mae''n ddrwg gennym, ond mae problem gyda''r gwasanaeth
+somethingWentWrong.heading = Mae''n ddrwg gennym, ond mae problem gyda''r gwasanaeth
+somethingWentWrong.p1 = Gallwch roi cynnig arall arni nes ymlaen.
 
 # Session timeout page
 sessionTimeout.title = Er eich diogelwch, fe wnaethon ni eich allgofnodi
@@ -206,11 +206,11 @@ month.12 = Rhagfyr
 # Common content
 common.signOut = Arwyddo allan
 common.taxYearDates = 6 Ebrill {0} i 5 Ebrill {1}
-common.contactUs = cysylltwch â ni (yn agor tab newydd).
+common.contactUs = gysylltu â ni (yn agor tab newydd).
 site.start = Dechreuwch nawr
 site.change = Newid
 site.continue = Parhau
-site.tryAgain = Ceisiwch eto
+site.tryAgain = Rhowch gynnig arall arni
 site.print = Argraffwch y dudalen hon
 site.acceptAndSubmit = Cyflwyno
 site.govuk = GOV.UK
