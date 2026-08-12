@@ -77,8 +77,7 @@ breakdown.underpayment.l1 = Eich cyfanswm newydd
 breakdown.underpayment.l2 = Swm sydd eisoes wedi dod i law
 breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
-breakdown.p2.single = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
-breakdown.p2.multiple = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
+breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
 
 # Bank account details page
 bankDetails.title = Beth yw’ch manylion banc?
@@ -146,7 +145,7 @@ barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi
 barsCheckFailed.title = Ni allwn wirio manylion eich cyfrif banc
 barsCheckFailed.heading = Ni allwn wirio manylion eich cyfrif banc
 barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif banc.
-barsCheckFailed.p2 = Ceisiwch eto yn nes ymlaen.
+barsCheckFailed.p2 = Rhowch gynnig arall arni yn nes ymlaen.
 
 # BARS lockout page
 bars.lockout.title = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
@@ -155,10 +154,10 @@ bars.lockout.p2 = Gallwch chi roi cynnig arall arni ar ôl {0} i gadarnhau manyl
 bars.lockout.go-to-dashboard = Dychwelyd i''ch taliadau
 
 # Not eligible page
-ineligible.title = Ni allwch ddefnyddio'r gwasanaeth hwn
-ineligible.heading = Ni allwch ddefnyddio'r gwasanaeth hwn
-ineligible.body = Nid ydych chi'n gymwys i gael y taliad pensiwn i'r sawl sy'n ennill incwm isel.
-ineligible.link = Dychwelyd i'ch cyfrif treth personol
+ineligible.title = Ni allwch ddefnyddio''r gwasanaeth hwn
+ineligible.heading = Ni allwch ddefnyddio''r gwasanaeth hwn
+ineligible.body = Nid ydych chi''n gymwys i gael y taliad pensiwn i''r sawl sy''n ennill incwm isel.
+ineligible.link = Dychwelyd i''ch cyfrif treth personol
 
 # Something went wrong page
 somethingWentWrong.title = Mae''n ddrwg gennym, ond mae problem gyda''r gwasanaeth
@@ -232,12 +231,12 @@ OCTOBER = Hydref
 NOVEMBER = Tachwedd
 DECEMBER = Rhagfyr
 
-MONDAY = Dydd Llun
-TUESDAY = Dydd Mawrth
-WEDNESDAY = Mercher
+MONDAY = dydd Llun
+TUESDAY = dydd Mawrth
+WEDNESDAY = dydd Mercher
 THURSDAY = dydd Iau
-FRIDAY   = Gwener
-SATURDAY = Dydd Sadwrn
-SUNDAY   = Sul
+FRIDAY = dydd Gwener
+SATURDAY = dydd Sadwrn
+SUNDAY = dydd Sul
 
-between.time.and.date = ymlaen
+between.time.and.date =

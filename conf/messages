@@ -77,8 +77,7 @@ breakdown.underpayment.l1 = Your new total amount
 breakdown.underpayment.l2 = Amount already received
 breakdown.underpayment.l3 = Additional amount due
 
-breakdown.p2.single = If you think the amount is wrong, you can
-breakdown.p2.multiple = If you think the amounts are wrong, you can
+breakdown.p2 = If you think the amounts are wrong, you can
 
 # Bank account details page
 bankDetails.title = What are your bank details?
@@ -157,7 +156,7 @@ bars.lockout.go-to-dashboard = Return to your payments
 # Not eligible page
 ineligible.title = You cannot use this service
 ineligible.heading = You cannot use this service
-ineligible.body = You are not eligible for the low earner's pension payment.
+ineligible.body = You are not eligible for the low earner''s pension payment.
 ineligible.link = Return to your personal tax account
 
 # Something went wrong page

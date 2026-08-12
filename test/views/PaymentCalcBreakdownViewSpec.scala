@@ -84,7 +84,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       tableRowValues.contains("£100") mustBe true
 
       view.select(".govuk-body:nth-of-type(2)").text mustBe
-        "If you think the amount is wrong, you can contact us (opens in new tab)."
+        "If you think the amounts are wrong, you can contact us (opens in new tab)."
     }
 
     "display correct guidance and text for an underpayment" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT) {

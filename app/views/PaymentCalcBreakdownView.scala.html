@@ -57,11 +57,7 @@
     }
 
     @if(itemId.isEmpty){
-        @if(paymentSummary.availableItems.getOrElse(Nil).size == 1) {
-            <p class="govuk-body">@messages("breakdown.p2.single") @contactLinkElement()</p>
-        } else {
-            <p class="govuk-body">@messages("breakdown.p2.multiple") @contactLinkElement()</p>
-        }
+        <p class="govuk-body">@messages("breakdown.p2") @contactLinkElement()</p>
     }
 
     @if(itemId.isDefined || barsLockFlag){
