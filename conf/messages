@@ -33,6 +33,7 @@ dashboard.paymentHistory.paidInset = Payments with the 'Paid' status will be in 
 dashboard.paymentHistory.noneAvailable = You do not have any previous payments.
 dashboard.paymentHistory.cancelledInset.start = We cancelled
 dashboard.paymentHistory.cancelledInset.end = of your payments.
+dashboard.paymentHistory.cancelledInset.replacement = Cancelled payments will be replaced by a new payment.
 dashboard.table.header.taxYear = Tax year
 dashboard.table.header.amount = Amount
 dashboard.table.header.availableUntil = Available until
@@ -77,7 +78,6 @@ breakdown.underpayment.l2 = Amount already received
 breakdown.underpayment.l3 = Additional amount due
 
 breakdown.p2 = If you think the amounts are wrong, you can
-breakdown.p3 = To accept these payments, you need to provide us with your bank details.
 
 # Bank account details page
 bankDetails.title = What are your bank details?
@@ -126,7 +126,7 @@ confirmation.table.header.taxYear = Tax year
 confirmation.table.header.amount = Amount
 confirmation.table.header.availableUntil = Available until
 confirmation.fullSuccess.single.details = We''ll send this payment to the bank account you provided within 7 working days.
-confirmation.fullSuccess.multiple.details = The following payments were processed successfully. We''ll send them separately to the bank account you provided within 7 working days.
+confirmation.fullSuccess.multiple.details = We''ll send the payments separately to the bank account you provided within 7 working days.
 confirmation.partialSuccess.single.details = We''ll send the payment to the bank account you provided within 7 working days.
 confirmation.partialSuccess.multiple.details = We''ll send the payments separately to the bank account you provided within 7 working days.
 confirmation.sub.time = at
@@ -144,8 +144,8 @@ barsRequestErrors.p2 = If this issue persists you may have to
 # Bars check failure page
 barsCheckFailed.title = We could not verify your bank account details
 barsCheckFailed.heading = We could not verify your bank account details
-barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details
-barsCheckFailed.p2 = Try again later
+barsCheckFailed.p1 = An error occurred while attempting to verify your bank account details.
+barsCheckFailed.p2 = Try again later.
 
 # BARS lockout page
 bars.lockout.title = You''ve tried to enter your bank account details too many times
@@ -156,7 +156,7 @@ bars.lockout.go-to-dashboard = Return to your payments
 # Not eligible page
 ineligible.title = You cannot use this service
 ineligible.heading = You cannot use this service
-ineligible.body = You are not eligible for the low earner's pension payment.
+ineligible.body = You are not eligible for the low earner''s pension payment.
 ineligible.link = Return to your personal tax account
 
 # Something went wrong page

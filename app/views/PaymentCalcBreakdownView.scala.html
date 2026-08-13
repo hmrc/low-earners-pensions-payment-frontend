@@ -57,10 +57,7 @@
     }
 
     @if(itemId.isEmpty){
-        <p class="govuk-body">@messages("breakdown.p2")
-            @contactLinkElement()
-        </p>
-        <p class="govuk-body">@messages("breakdown.p3")</p>
+        <p class="govuk-body">@messages("breakdown.p2") @contactLinkElement()</p>
     }
 
     @if(itemId.isDefined || barsLockFlag){
