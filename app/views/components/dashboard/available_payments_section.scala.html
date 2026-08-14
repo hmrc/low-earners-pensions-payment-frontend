@@ -51,7 +51,8 @@
   rows = DashboardUtils.tableRows(leppSummary.availablePaymentItems, statusElement),
   head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status"))),
   firstCellIsHeader = true,
-  captionClasses = "govuk-visually-hidden"
+  captionClasses = "govuk-visually-hidden",
+  classes = "govuk-table--small-text-until-tablet"
  ))
 
  @availableSummarySection(leppSummary, continueUrl, barsLockFlag, hasAvailableItems)

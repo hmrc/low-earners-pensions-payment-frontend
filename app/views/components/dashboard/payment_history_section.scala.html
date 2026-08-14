@@ -56,7 +56,8 @@
   rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
   head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
   firstCellIsHeader = true,
-  captionClasses = "govuk-visually-hidden"
+  captionClasses = "govuk-visually-hidden",
+  classes = "govuk-table--small-text-until-tablet"
  ))
 
 } else {
