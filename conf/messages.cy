@@ -26,6 +26,7 @@ dashboard.availablePayments.totalAvailableText.single.end = ar gael i chi ei dde
 dashboard.availablePayments.single.acceptText = I dderbyn y taliad hwn, mae angen i chi ddarparu eich manylion banc i ni.
 dashboard.availablePayments.multiple.acceptText = I dderbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
 dashboard.availablePayments.button.acceptPayments = Derbyn taliadau
+dashboard.availablePayments.button.acceptPayment = Derbyn taliad
 dashboard.availablePayments.button.viewPayments = Gweld taliadau
 dashboard.availablePayments.button.viewPayment = Gweld taliad
 dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi''u gohirio.
