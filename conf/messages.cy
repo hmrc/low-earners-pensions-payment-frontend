@@ -27,6 +27,7 @@ dashboard.availablePayments.single.acceptText = I dderbyn y taliad hwn, mae ange
 dashboard.availablePayments.multiple.acceptText = I dderbyn y taliadau hyn, mae angen i chi roi eich manylion banc i ni.
 dashboard.availablePayments.button.acceptPayments = Derbyn taliadau
 dashboard.availablePayments.button.viewPayments = Gweld taliadau
+dashboard.availablePayments.button.viewPayment = Gweld taliad
 dashboard.availablePayments.suspendedInset = Mae eich taliadau wedi''u gohirio.
 dashboard.paymentHistory.heading = Hanes taliadau
 dashboard.paymentHistory.paidInset = Bydd taliadau gyda''r statws ''Wedi talu'' yn y cyfrif banc a ddarparwyd gennych o fewn 7 diwrnod gwaith.

@@ -41,11 +41,20 @@
    role="button"
    draggable="false"
    class="govuk-button govuk-button--continue"
-   data-module="govuk-button">
- @if(barsLockFlag){
-  @messages("dashboard.availablePayments.button.viewPayments")
- } else {
-  @messages("dashboard.availablePayments.button.acceptPayments")
+   data-module="govuk-button"
+   id="continue-button">
+ @if(leppSummary.availableItems.getOrElse(Nil).length == 1) {
+  @if(barsLockFlag){
+   @messages("dashboard.availablePayments.button.viewPayment")
+  } else {
+   @messages("dashboard.availablePayments.button.acceptPayment")
+  }
+} else {
+  @if(barsLockFlag){
+   @messages("dashboard.availablePayments.button.viewPayments")
+  } else {
+   @messages("dashboard.availablePayments.button.acceptPayments")
+  }
  }
 </a>
 }
