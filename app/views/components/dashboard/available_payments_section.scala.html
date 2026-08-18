@@ -45,14 +45,20 @@
   @insetText(InsetTextViewModel(html = suspendedInsetContent))
  }
 
- @table(Table(
-  attributes = Map("id" -> tableRef),
-  caption = Some(messages("dashboard.availablePayments.heading")),
-  rows = DashboardUtils.tableRows(leppSummary.availablePaymentItems, statusElement),
-  head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status"))),
-  firstCellIsHeader = true,
-  captionClasses = "govuk-visually-hidden"
- ))
+ <div class="table-scrollable"
+      role="region"
+      aria-describedby=@tableRef
+      tabindex="0">
+    @table(Table(
+        attributes = Map("id" -> tableRef),
+        caption = Some(messages("dashboard.availablePayments.heading")),
+        rows = DashboardUtils.tableRows(leppSummary.availablePaymentItems, statusElement),
+        head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "availableUntil", "status"))),
+        firstCellIsHeader = true,
+        captionClasses = "govuk-visually-hidden",
+        classes = "govuk-table--small-text-until-tablet"
+    ))
+ </div>
 
  @availableSummarySection(leppSummary, continueUrl, barsLockFlag, hasAvailableItems)
 
