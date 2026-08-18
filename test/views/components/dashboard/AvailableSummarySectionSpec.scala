@@ -29,30 +29,33 @@ import views.html.components.dashboard.available_summary_section
 
 class AvailableSummarySectionSpec extends SpecBase {
 
+  val availableItems: Seq[LeppItem] = summaryModel.availableItems.get :+
+    LeppItem(
+      id = "A-25-2",
+      taxYear = 2025,
+      contributions = 1000,
+      taxRate = 0.2,
+      entitlement = 200,
+      status = Available,
+      claimDate = None
+    )
+  
   "available_summary_section" - {
     "should produce expected HTML element if not locked" in new Setup() {
       val summaryView: Document = view(summaryModel, "/href", false, true)
       summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£200</strong>""")
       summaryView.html must include("To accept this payment, you need to provide us with your bank details.")
       summaryView.html must include("""<a href="/href"""")
-      summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
-        messages(app)("dashboard.availablePayments.button.acceptPayments")
+      summaryView.getElementById("continue-button").text() mustBe
+        messages(app)("dashboard.availablePayments.button.acceptPayment")
     }
 
     "should produce expected HTML element when there are multiple available payments" in new Setup() {
-      val availableItems: Seq[LeppItem] = summaryModel.availableItems.get :+
-        LeppItem(
-        id = "A-25-2",
-        taxYear = 2025,
-        contributions = 1000,
-        taxRate = 0.2,
-        entitlement = 200,
-        status = Available,
-        claimDate = None
-      )
       val summaryView: Document = view(summaryModel.copy(availableItems = Some(availableItems)), "/href", false, true)
       summaryView.html must include("""<strong class="govuk-!-font-weight-bold">£400</strong>""")
       summaryView.html must include("To accept these payments, you need to provide us with your bank details.")
+      summaryView.getElementById("continue-button").text() mustBe
+        messages(app)("dashboard.availablePayments.button.acceptPayments")
     }
     
     "should produce expected HTML element when there are no available payments" in new Setup() {
@@ -62,9 +65,15 @@ class AvailableSummarySectionSpec extends SpecBase {
       summaryView.html mustNot include("""<a href="/href"""")
     }
 
-    "display 'view payments' button when locked out" in new Setup() {
+    "display 'view payment' button when locked out" in new Setup() {
       val summaryView: Document = view(summaryModel, "/href", true, true)
-      summaryView.getElementsByClass("govuk-button govuk-button--continue").text() mustBe
+      summaryView.getElementById("continue-button").text() mustBe
+        messages(app)("dashboard.availablePayments.button.viewPayment")
+    }
+
+    "display 'view payments' button when locked out for multiple" in new Setup() {
+      val summaryView: Document = view(summaryModel.copy(availableItems = Some(availableItems)), "/href", true, true)
+      summaryView.getElementById("continue-button").text() mustBe
         messages(app)("dashboard.availablePayments.button.viewPayments")
     }
   }
