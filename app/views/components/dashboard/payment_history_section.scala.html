@@ -50,15 +50,20 @@
   @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
  }
 
- @table(Table(
-  attributes = Map("id" -> tableRef),
-  caption = Some(messages("dashboard.paymentHistory.heading")),
-  rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
-  head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
-  firstCellIsHeader = true,
-  captionClasses = "govuk-visually-hidden",
-  classes = "govuk-table--small-text-until-tablet"
- ))
+ <div class="table-scrollable"
+      role="region"
+      aria-describedby=@tableRef
+      tabindex="0">
+    @table(Table(
+        attributes = Map("id" -> tableRef),
+        caption = Some(messages("dashboard.paymentHistory.heading")),
+        rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
+        head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
+        firstCellIsHeader = true,
+        captionClasses = "govuk-visually-hidden",
+        classes = "govuk-table--small-text-until-tablet"
+    ))
+ </div>
 
 } else {
  <p class="govuk-body">@messages("dashboard.paymentHistory.noneAvailable")</p>
