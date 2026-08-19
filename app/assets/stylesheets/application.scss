@@ -11,7 +11,7 @@ $custom-blue-light: #2b8cc4;
 
 .table-scrollable {
     position: relative;
-    overflow-x: scroll;
+    overflow-x: auto;
     white-space: nowrap;
     max-width: 100%;
 }
