@@ -17,6 +17,7 @@
 package views.auth
 
 import base.SpecBase
+import config.AppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -27,11 +28,13 @@ import views.html.auth.IneligibleView
 
 class IneligibleViewSpec extends SpecBase {
 
-  "view" - {
-    "display correct error information" in new Setup {
-      view.getElementsByTag("h1").text() mustBe messages(app)("ineligible.heading")
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.body"))
-      view.getElementsByClass("govuk-body").text().contains(messages(app)("ineligible.link"))
+  "The Ineligible view" - {
+    "should display correct page content" in new Setup {
+      view.title mustBe "You cannot use this service - Accept your low earner's pension payment - GOV.UK"
+      view.select("h1").text() mustBe "You cannot use this service"
+      view.select(".govuk-body:nth-of-type(1)").text() mustBe "You are not eligible for the low earner's pension payment."
+      view.select(".govuk-body > a").text() mustBe "Return to your personal tax account"
+      view.select(".govuk-body > a").attr("href") mustBe appConfig.ptaUrl
     }
   }
 
@@ -40,6 +43,7 @@ class IneligibleViewSpec extends SpecBase {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
+    val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
     val view: Document =
       Jsoup.parse(app.injector.instanceOf[IneligibleView].apply().body)
