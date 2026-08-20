@@ -37,7 +37,7 @@ class PaymentHistorySectionSpec extends SpecBase {
       result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
         "We cancelled 1 of your payments. Cancelled payments will be replaced by a new payment."
       result.select(".govuk-inset-text:nth-of-type(2)").text() mustBe
-        "Payments with the Paid status will be in the bank account you provided within 7 working days."
+        "Payments with the 'Paid' status will be in the bank account you provided within 7 working days."
     }
 
     "render no inset text, and a separate information paragraph if there is no payment history" in new Setup() {
