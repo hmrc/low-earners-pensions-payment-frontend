@@ -17,7 +17,8 @@
 package views.components.dashboard
 
 import base.SpecBase
-import models.userAnswers.LeppSummary
+import models.userAnswers.{LeppItem, LeppSummary}
+import models.userAnswers.LeppItemStatus.Paid
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -26,18 +27,63 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import views.html.components.dashboard.payment_history_section
 
+import java.time.{Instant, LocalDate}
+
 class PaymentHistorySectionSpec extends SpecBase {
 
   "payment_history_section should" - {
-
-    "render inset text elements when there are paid and cancelled payments" in new Setup() {
-      val result: Document = view(summaryModel, tableRef)
-
+    
+    "render cancelled inset when cancelled items exist" in new Setup {
+      val result: Document = view(summaryModel.copy(paidItems = None), tableRef)
       result.select("h2").text() mustBe "Payment history"
       result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
         "We cancelled 1 of your payments. Cancelled payments will be replaced by a new payment."
-      result.select(".govuk-inset-text:nth-of-type(2)").text() mustBe
-        "Payments with the 'Paid' status will be in the bank account you provided within 7 working days."
+    }
+
+    "render paid inset when paid items exist in the last 10 days" in new Setup {
+      val summaryModelWithPaid: LeppSummary = summaryModel.copy(
+        paidItems = Some(Seq(
+          LeppItem(
+            id = "P-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 0.2,
+            entitlement = 200,
+            status = Paid,
+            claimDate = Some(LocalDate.of(2026, 8, 20))
+          )
+        )),
+        cancelledItems = None
+      )
+      
+      val result: Document = view(summaryModelWithPaid, tableRef, LocalDate.of(2026, 8, 20))
+
+      result.select("h2").text() mustBe "Payment history"
+      result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
+        "Payments with the Paid status will be in the bank account you provided within 7 working days."
+    }
+    
+    "not render paid inset when paid items exist, but not within the last 10 days" in new Setup {
+      val summaryModelWithPaid: LeppSummary = summaryModel.copy(
+        paidItems = Some(Seq(
+          LeppItem(
+            id = "P-25-1",
+            taxYear = 2025,
+            contributions = 1000,
+            taxRate = 0.2,
+            entitlement = 200,
+            status = Paid,
+            claimDate = Some(LocalDate.of(2026, 8, 20))
+          )
+        )),
+        cancelledItems = None
+      )
+
+      val result: Document = view(summaryModelWithPaid, tableRef, LocalDate.of(2026, 8, 30))
+
+      result.select("h2").text() mustBe "Payment history"
+      result.text() must not include 
+        "Payments with the Paid status will be in the bank account you provided within 7 working days."
     }
 
     "render no inset text, and a separate information paragraph if there is no payment history" in new Setup() {
@@ -77,15 +123,21 @@ class PaymentHistorySectionSpec extends SpecBase {
     }
   }
 
-  trait Setup() {
+  trait Setup {
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     val tableRef = "tableRef"
 
-    def view(leppSummary: LeppSummary, tableRef: String): Document = Jsoup.parse(
-      app.injector.instanceOf[payment_history_section].apply(leppSummary, tableRef).body
+    def view(leppSummary: LeppSummary,
+             tableRef: String,
+             currentDate: LocalDate = LocalDate.now()): Document = Jsoup.parse(
+      app.injector.instanceOf[payment_history_section].apply(
+        leppSummary = leppSummary,
+        tableRef = tableRef,
+        currentDate = currentDate
+      ).body
     )
   }
 }
