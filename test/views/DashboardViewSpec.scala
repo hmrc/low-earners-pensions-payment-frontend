@@ -26,12 +26,11 @@ import play.api.test.FakeRequest
 import utils.Formatters
 import views.html.DashboardView
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 
 class DashboardViewSpec extends SpecBase {
 
   "view" - {
-
     "with correct LEPP gov banner" in new Setup {
       view().getElementsByClass("govuk-service-navigation__service-name").text() mustBe messages(app)("service.name")
       view().getElementsByClass("govuk-link hmrc-sign-out-nav__link").attr("href") mustBe
@@ -43,23 +42,29 @@ class DashboardViewSpec extends SpecBase {
     }
 
     "display correct guidance and text if locked" in new Setup {
-      val instant: Instant = Instant.now()
-      val time: String = Formatters.fullDateTime(Some(instant), msg)
-      val html: String = view(true, Some(instant)).html
+      val lockoutExpiry: Instant = Instant.now()
+      val time: String = Formatters.fullDateTime(Some(lockoutExpiry), msg)
+      val html: String = view(barsLockoutExpiryOpt = Some(lockoutExpiry)).html
       html must include("Important")
       html must include(time)
     }
   }
 
   trait Setup() {
-
     val app: Application = applicationBuilder(emptyUserAnswers).build()
     implicit val msg: Messages = messages(app)
     implicit val msgApi: MessagesApi = messageApi(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
-    def view(barsLock: Boolean = false, expiry: Option[Instant] = None): Document = Jsoup.parse(
-      app.injector.instanceOf[DashboardView].apply(summaryModel, None, "some-url", barsLock, expiry).body
+    def view(currentDate: LocalDate = LocalDate.now(),
+             barsLockoutExpiryOpt: Option[Instant] = None): Document = Jsoup.parse(
+      app.injector.instanceOf[DashboardView].apply(
+        leppSummary = summaryModel,
+        backLinkUrl = None,
+        continueUrl = "some-url", 
+        currentDate = currentDate,
+        barsLockoutExpiryOpt = barsLockoutExpiryOpt
+      ).body
     )
   }
 }
