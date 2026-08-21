@@ -115,15 +115,21 @@
         @messages("submitted.on") @submittedDate
     </p>
 
-    @heading2("confirmation.what-next.heading")
     <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="#" data-module="hmrc-print-link">
-        @messages("confirmation.what-next.print")
+            @messages("confirmation.what-next.print")
         </a>
     </p>
+
+    @heading2("confirmation.what-next.heading")
     <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">
             @messages("confirmation.what-next.linkText")
+        </a>
+    </p>
+    <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="@controllers.auth.routes.AuthController.signOut()">
+            @messages("confirmation.what-next.feedback.text")
         </a>
     </p>
 }

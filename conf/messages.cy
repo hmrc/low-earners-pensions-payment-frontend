@@ -118,6 +118,7 @@ confirmation.heading = Rydym wedi cael eich manylion banc
 confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
 confirmation.what-next.print = Argraffwch y dudalen hon
 confirmation.what-next.linkText = Bwrw golwg dros eich taliadau
+confirmation.what-next.feedback.text = Dywedwch wrthym beth yw eich barn am y gwasanaeth hwn (mae''n cymryd 30 eiliad)
 confirmation.failure.tryAgain.single = I''w dderbyn eto, edrychwch ar eich taliadau a dewis '‘Derbyn taliad’'.
 confirmation.failure.tryAgain.multiple = I''w derbyn eto, edrychwch ar eich taliadau a dewiswch ''Derbyn taliadau’'.
 confirmation.failure.sub.heading = Methodd rhai o'ch taliadau â phrosesu oherwydd gwall system

@@ -118,6 +118,7 @@ confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
 confirmation.what-next.print = Print this page
 confirmation.what-next.linkText = View your payments
+confirmation.what-next.feedback.text = Tell us what you think of this service (takes 30 seconds)
 confirmation.failure.tryAgain.single = To accept it again, view your payments and select ''Accept payment''.
 confirmation.failure.tryAgain.multiple = To accept them again, view your payments and select ''Accept payments''.
 confirmation.failure.sub.heading = Some of your payments failed to process due to a system error
