@@ -48,7 +48,7 @@ case class LeppSummary(currentLock: BigInt,
       .flatMap(_.claimDate)
       .reduceOption((date1, date2) => if (date1.isAfter(date2)) date1 else date2)
   )
-  
+
   def showPaidInset(currentLocalDate: LocalDate): Boolean = latestClaimDateOpt.fold(false)(latestClaimDate => {
     latestClaimDate.plusDays(10).isAfter(currentLocalDate)
   })

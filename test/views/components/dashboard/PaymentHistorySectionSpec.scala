@@ -17,8 +17,8 @@
 package views.components.dashboard
 
 import base.SpecBase
-import models.userAnswers.{LeppItem, LeppSummary}
 import models.userAnswers.LeppItemStatus.Paid
+import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -27,7 +27,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import views.html.components.dashboard.payment_history_section
 
-import java.time.{Instant, LocalDate}
+import java.time.LocalDate
 
 class PaymentHistorySectionSpec extends SpecBase {
 
