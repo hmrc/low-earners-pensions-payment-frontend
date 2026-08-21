@@ -27,6 +27,8 @@ import java.time.LocalDate
 
 class LeppSummarySpec extends SpecBase {
   "LeppSummary" - {
+    val claimDate: LocalDate = LocalDate.of(2026, 11, 30)
+    
     val model: LeppSummary = LeppSummary(
       currentLock = 67,
       availableItems = Some(Seq(
@@ -49,7 +51,7 @@ class LeppSummarySpec extends SpecBase {
           taxRate = 0.2,
           entitlement = 200,
           status = Paid,
-          claimDate = None
+          claimDate = Some(claimDate)
         )
       )),
       suspendedItems = Some(Seq(
@@ -107,7 +109,8 @@ class LeppSummarySpec extends SpecBase {
         |     "contributions": 1000.00,
         |     "taxRate": 0.2,
         |     "entitlement": 200.00,
-        |     "status": "Paid"
+        |     "status": "Paid",
+        |     "claimDate": "2026-11-30"
         |   }
         | ],
         | "cancelledItems": [
@@ -542,6 +545,20 @@ class LeppSummarySpec extends SpecBase {
         )
 
         model.hasPaymentHistory mustBe false
+      }
+    }
+    
+    "showPaidInset" - {
+      "should return 'true' when current date is less than 10 days from latest claim date" in {
+        model.showPaidInset(claimDate.plusDays(1)) mustBe true
+      }
+
+      "should return 'false' when current date is more than 10 days from latest claim date" in {
+        model.showPaidInset(claimDate.plusDays(11)) mustBe false
+      }
+
+      "should return 'false' when current date is exactly 10 days from latest claim date" in {
+        model.showPaidInset(claimDate.plusDays(10)) mustBe false
       }
     }
   }

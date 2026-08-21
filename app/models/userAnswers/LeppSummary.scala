@@ -21,6 +21,8 @@ import models.userAnswers.LeppItemStatus.{Available, Cancelled, Paid, Suspended}
 import play.api.libs.json.{Json, OFormat}
 import utils.CurrencyFormats
 
+import java.time.LocalDate
+
 case class LeppSummary(currentLock: BigInt,
                        availableItems: Option[Seq[LeppItem]] = None,
                        paidItems: Option[Seq[LeppItem]] = None,
@@ -40,6 +42,16 @@ case class LeppSummary(currentLock: BigInt,
   val hasPaymentHistory: Boolean = paymentHistoryItems.nonEmpty
 
   val isNonEmpty: Boolean = hasAvailablePayments || hasPaymentHistory
+
+  private val latestClaimDateOpt: Option[LocalDate] = paidItems.flatMap(
+    _
+      .flatMap(_.claimDate)
+      .reduceOption((date1, date2) => if (date1.isAfter(date2)) date1 else date2)
+  )
+  
+  def showPaidInset(currentLocalDate: LocalDate): Boolean = latestClaimDateOpt.fold(false)(latestClaimDate => {
+    latestClaimDate.plusDays(10).isAfter(currentLocalDate)
+  })
 }
 
 object LeppSummary {
