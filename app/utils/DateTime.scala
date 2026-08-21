@@ -16,8 +16,9 @@
 
 package utils
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 
 class DateTime {
   def now(): Instant = Instant.now()
+  def getDate: LocalDate = LocalDate.now()
 }
