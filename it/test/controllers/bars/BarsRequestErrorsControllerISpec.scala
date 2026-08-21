@@ -31,7 +31,7 @@ import scala.concurrent.Future
     "GET /bank-details-not-verified-service" when {
       val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(
         method = "GET",
-        path = "/accept-your-low-earners-pension-payment/bank-details-not-verified-service"
+        path = "/accept-your-low-earners-pension-payment/bank-details-not-verified-user"
       ).withSession(SessionKeys.authToken -> "auth token")
       
       "a valid request is made" should {

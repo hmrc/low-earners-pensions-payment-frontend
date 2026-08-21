@@ -22,8 +22,8 @@ GET    /change-bank-details                     controllers.WhatAreYourBankDetai
 POST   /change-bank-details                     controllers.WhatAreYourBankDetailsController.onSubmit(mode: Mode = CheckMode)
 
 # Bank details error pages
-GET    /bank-details-not-verified-user          controllers.bars.BarsCheckFailedController.onPageLoad()
-GET    /bank-details-not-verified-service       controllers.bars.BarsRequestErrorsController.onPageLoad()
+GET    /bank-details-not-verified-user          controllers.bars.BarsRequestErrorsController.onPageLoad()
+GET    /bank-details-not-verified-service       controllers.bars.BarsCheckFailedController.onPageLoad()
 GET    /bank-details-lockout                    controllers.bars.BarsLockoutController.onPageLoad()
 
 # Check your answers page
