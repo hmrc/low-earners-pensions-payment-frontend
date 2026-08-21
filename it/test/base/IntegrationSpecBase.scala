@@ -40,7 +40,7 @@ import play.api.{Application, inject}
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import utils.DateTime
 
-import java.time.{Instant, ZonedDateTime}
+import java.time.{Instant, LocalDate, ZonedDateTime}
 import scala.util.Random
 
 class IntegrationSpecBase extends AnyWordSpec
@@ -64,8 +64,9 @@ class IntegrationSpecBase extends AnyWordSpec
   
   implicit val testCorrelationId: CorrelationId = CorrelationId("TEST-ID")
   
-  class FakeDateTime extends DateTime {
+  class FakeDateTime(date: LocalDate = LocalDate.now()) extends DateTime {
     override def now(): Instant = Instant.ofEpochMilli(10000L)
+    override def getDate: LocalDate = date
   }
   
   val fakeBarsVerifyStatusConnector: BarsVerifyStatusConnector = mock[BarsVerifyStatusConnector]
@@ -88,6 +89,23 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.host" -> wireMockHost,
         "microservice.services.lepp-backend.port" -> wireMockPort,
         "microservice.services.lepp-backend.host" -> wireMockHost
+      )
+      .build()
+  }
+
+  def applicationWithSetDate(date: LocalDate): Application = {
+    GuiceApplicationBuilder()
+      .configure(
+        "microservice.services.bars.port" -> wireMockPort,
+        "microservice.services.bars.host" -> wireMockHost,
+        "microservice.services.bars.env" -> "local",
+        "microservice.services.auth.port" -> wireMockPort,
+        "microservice.services.auth.host" -> wireMockHost,
+        "microservice.services.lepp-backend.port" -> wireMockPort,
+        "microservice.services.lepp-backend.host" -> wireMockHost
+      )
+      .overrides(
+        bind[DateTime].toInstance(new FakeDateTime(date))
       )
       .build()
   }

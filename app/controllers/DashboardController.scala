@@ -23,6 +23,7 @@ import navigation.Navigator
 import pages.DashboardPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionCacheService
+import utils.DateTime
 import viewmodels.NormalMode
 import views.html.DashboardView
 
@@ -36,7 +37,8 @@ class DashboardController @Inject()(identify: IdentifierAction,
                                     val sessionService: SessionCacheService,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
-                                    navigator: Navigator)
+                                    navigator: Navigator,
+                                    dateTime: DateTime)
                                    (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility.create(withCaching = true)) {
 
@@ -47,8 +49,8 @@ class DashboardController @Inject()(identify: IdentifierAction,
           leppSummary = request.leppSummary,
           backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
           continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
-          barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
-          lockoutExpires = request.barsLockoutExpiryOpt
+          currentDate = dateTime.getDate,
+          barsLockoutExpiryOpt = request.barsLockoutExpiryOpt
         )
       )
     )

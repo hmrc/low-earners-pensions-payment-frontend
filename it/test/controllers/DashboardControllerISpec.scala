@@ -164,71 +164,77 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       }
 
       "serve correct view for a valid response" when {
-        val json: JsValue = Json.parse(
-          """
-            |{
-            | "currentLowEarnersOptimisticLock": 123,
-            | "identifier": "NOT_USED",
-            | "lowEarnersDetailsList": [
-            |   {
-            |     "taxYear": 11,
-            |     "lowEarnersCalculations": [
-            |       {
-            |         "lowEarnersClaimDetails": {
-            |           "claimSequenceNumber": 123,
-            |           "calculationDate": "2023-06-27",
-            |           "claimDate": "2023-06-27",
-            |           "claimStatus": "PAID",
-            |           "entitlementAmount": 10.56,
-            |           "inSelfAssessment": true,
-            |           "originalAmount": 10.56,
-            |           "reissueClaimOutput": true,
-            |           "reminderOutputSent": true
-            |         },
-            |         "lowEarnersDataDetails": {
-            |           "calculationSequenceNumber": 123,
-            |           "basicRatePercentage": 10.56,
-            |           "dataSourceMaster": "CESA",
-            |           "netPayContributionsTotal": 10.56,
-            |           "responseTimestamp": "2023-06-27 09:12:28",
-            |           "totalAllowances": 10.56,
-            |           "totalDeductions": 10.56,
-            |           "totalIncome": 10.56,
-            |           "totalTaxDue": 10.56
-            |         }
-            |       }
-            |     ]
-            |   }
-            | ]
-            |}
-      """.stripMargin
-        )
-        lazy val application: Application = fakeApplication()
-        implicit val msgApi: MessagesApi = application.injector.instanceOf[MessagesApi]
-        implicit val messages: Messages = msgApi.preferred(request)
-
-        val backLink: String = routes.WhatYouWillNeedController.onPageLoad().url
-        val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad(None).url
-
-        val leppSummaryModel: LeppSummary = LeppSummary(
-          currentLock = 123,
-          paidItems = Some(Seq(
-            LeppItem(
-              id = "P-11-1",
-              taxYear = 11,
-              contributions = 10.56,
-              taxRate = 0.23,
-              entitlement = 10.56,
-              status = Paid,
-              claimDate = Some(LocalDate.of(2023, 6, 27))
-            )
-          ))
-        )
+        val dummyDate: LocalDate = LocalDate.of(2023, 6, 27)
         
-        "user not locked" in {
+        trait Test(testDate: LocalDate = LocalDate.now()) {
+          val json: JsValue = Json.parse(
+            """
+              |{
+              | "currentLowEarnersOptimisticLock": 123,
+              | "identifier": "NOT_USED",
+              | "lowEarnersDetailsList": [
+              |   {
+              |     "taxYear": 11,
+              |     "lowEarnersCalculations": [
+              |       {
+              |         "lowEarnersClaimDetails": {
+              |           "claimSequenceNumber": 123,
+              |           "calculationDate": "2023-06-27",
+              |           "claimDate": "2023-06-27",
+              |           "claimStatus": "PAID",
+              |           "entitlementAmount": 10.56,
+              |           "inSelfAssessment": true,
+              |           "originalAmount": 10.56,
+              |           "reissueClaimOutput": true,
+              |           "reminderOutputSent": true
+              |         },
+              |         "lowEarnersDataDetails": {
+              |           "calculationSequenceNumber": 123,
+              |           "basicRatePercentage": 10.56,
+              |           "dataSourceMaster": "CESA",
+              |           "netPayContributionsTotal": 10.56,
+              |           "responseTimestamp": "2023-06-27 09:12:28",
+              |           "totalAllowances": 10.56,
+              |           "totalDeductions": 10.56,
+              |           "totalIncome": 10.56,
+              |           "totalTaxDue": 10.56
+              |         }
+              |       }
+              |     ]
+              |   }
+              | ]
+              |}
+            """.stripMargin
+          )
+
+          lazy val application: Application = applicationWithSetDate(testDate)
+
+          implicit val msgApi: MessagesApi = application.injector.instanceOf[MessagesApi]
+          implicit val messages: Messages = msgApi.preferred(request)
+
+          val backLink: String = routes.WhatYouWillNeedController.onPageLoad().url
+          val continueUrl: String = routes.PaymentCalcBreakdownController.onPageLoad(None).url
+
+          val leppSummaryModel: LeppSummary = LeppSummary(
+            currentLock = 123,
+            paidItems = Some(Seq(
+              LeppItem(
+                id = "P-11-1",
+                taxYear = 11,
+                contributions = 10.56,
+                taxRate = 0.23,
+                entitlement = 10.56,
+                status = Paid,
+                claimDate = Some(dummyDate)
+              )
+            ))
+          ) 
+        }
+        
+        "when user is not locked out" in new Test(dummyDate) {
           mockAuthSuccess()
-          mockBarsVerifyStatus(status = OK,
-            response = Json.obj("attempts" -> 1))
+          mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
+          
           when(
             method = GET,
             uri = "/low-earners-pensions-payment/get-payment-details"
@@ -244,13 +250,21 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
           val view: DashboardView = application.injector.instanceOf[DashboardView]
           
           status(result) shouldBe OK
-          contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, false).toString
+          contentAsString(result) shouldEqual view(
+            leppSummary = leppSummaryModel,
+            backLinkUrl = Some(backLink),
+            continueUrl = continueUrl,
+            currentDate = LocalDate.of(2023, 6, 27)
+          ).toString
         }
 
-        "user locked out" in {
+        "user is locked out" in new Test(dummyDate) {
           mockAuthSuccess()
-          mockBarsVerifyStatus(status = OK,
-            response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z"))
+          mockBarsVerifyStatus(
+            status = OK,
+            response = Json.obj("attempts" -> 3, "lockoutExpiryDateTime" -> "2020-12-26T00:00:00Z")
+          )
+          
           when(
             method = GET,
             uri = "/low-earners-pensions-payment/get-payment-details"
@@ -262,13 +276,21 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
           lazy val result: Future[Result] = route(application, request).getOrElse(
             Future.failed(new RuntimeException("TEST_ERROR"))
           )
-          val lockoutExpiryDateTime = Instant.parse("2020-12-26T00:00:00Z")
+          
+          val lockoutExpiryDateTime: Instant = Instant.parse("2020-12-26T00:00:00Z")
           
           val view: DashboardView = application.injector.instanceOf[DashboardView]
 
           status(result) shouldBe OK
-          contentAsString(result) shouldEqual view(leppSummaryModel, Some(backLink), continueUrl, true, Some(lockoutExpiryDateTime)).toString
+          contentAsString(result) shouldEqual view(
+            leppSummary = leppSummaryModel,
+            backLinkUrl = Some(backLink),
+            continueUrl = continueUrl,
+            currentDate = dummyDate,
+            barsLockoutExpiryOpt = Some(lockoutExpiryDateTime)
+          ).toString
         }
+        
       }
     }
   }
