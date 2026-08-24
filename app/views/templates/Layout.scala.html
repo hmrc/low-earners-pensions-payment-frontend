@@ -66,7 +66,8 @@
             timeoutUrl          = Some(controllers.auth.routes.AuthController.sessionTimeout().url),
             title               = Some(messages("timeout.title")),
             message             = Some(messages("timeout.message")),
-            language            = Some(messages.lang.code)
+            language            = Some(messages.lang.code),
+            synchroniseTabs     = Some(true)
         ))
     }
 }

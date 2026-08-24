@@ -23,10 +23,11 @@ import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-import java.net.URLEncoder
+import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar {
 
@@ -55,20 +56,15 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
   }
 
   "sessionTimeout" - {
-    "must clear users answers and redirect to sign out, specifying SessionTimeout as the continue URL" in {
+    "must clear users answers and redirect to session timeout page" in {
 
-      val application =
-        applicationBuilder()
-          .build()
+      val application = applicationBuilder().build()
 
       running(application) {
-        val appConfig = application.injector.instanceOf[AppConfig]
-        val request   = FakeRequest(GET, routes.AuthController.sessionTimeout().url)
+        val request = FakeRequest(GET, routes.AuthController.sessionTimeout().url)
 
-        val result = route(application, request).value
-
-        val encodedContinueUrl  = URLEncoder.encode(appConfig.host + controllers.auth.routes.SessionTimeoutController.onPageLoad().url, "UTF-8")
-        val expectedRedirectUrl = s"${appConfig.signOutUrl}&continue=$encodedContinueUrl&origin=${appConfig.appName}"
+        val result: Future[Result] = route(application, request).value
+        val expectedRedirectUrl = routes.SessionTimeoutController.onPageLoad().url
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl

@@ -167,9 +167,9 @@ somethingWentWrong.heading = Mae''n ddrwg gennym, ond mae problem gyda''r gwasan
 somethingWentWrong.p1 = Gallwch roi cynnig arall arni nes ymlaen.
 
 # Session timeout page
-sessionTimeout.title = Er eich diogelwch, fe wnaethon ni eich allgofnodi
-sessionTimeout.heading = Er eich diogelwch, fe wnaethon ni eich allgofnodi
-sessionTimeout.signIn = Mewngofnodwch
+sessionTimeout.title = Er eich diogelwch, gwnaethom eich allgofnodi
+sessionTimeout.heading = Er eich diogelwch, gwnaethom eich allgofnodi
+sessionTimeout.signIn = Arwyddo i mewn
 
 # Unauthorised page
 unauthorised.title = Ni allwch gael mynediad i''r gwasanaeth hwn gyda''r cyfrif hwn

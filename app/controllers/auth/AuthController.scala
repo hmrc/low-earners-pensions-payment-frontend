@@ -33,11 +33,4 @@ class AuthController @Inject()(val controllerComponents: MessagesControllerCompo
 
   def sessionTimeout(): Action[AnyContent] = Action:
     implicit * =>
-          Redirect(
-            url = config.signOutUrl,
-            queryStringParams = Map(
-              "continue" -> Seq(config.host + controllers.auth.routes.SessionTimeoutController.onPageLoad().url),
-              "origin" -> Seq(config.appName),
-              config.serviceNavigationString -> Nil
-            )
-          ).withNewSession
+      Redirect(controllers.auth.routes.SessionTimeoutController.onPageLoad().url).withNewSession

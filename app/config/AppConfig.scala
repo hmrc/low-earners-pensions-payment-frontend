@@ -38,7 +38,6 @@ class AppConfig @Inject()(config: Configuration):
   //Authorisation config
   val loginUrl: String = loadConfig("urls.login")
   val loginContinueUrl: String = loadConfig("urls.loginContinue")
-  lazy val signOutUrl: String = loadConfig("urls.signOutWithFeedback") + s"?$serviceNavigationString"
   val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   // Feedback config
