@@ -21,19 +21,21 @@ import connectors.{BarsConnector, ConnectorResponse}
 import models.CorrelationId
 import models.ResponseWrapper.ErrorWrapper
 import models.bars.{BarsFailedCheckError, BarsRequest, BarsRequestError, BarsResponse}
-import models.errors.ErrorResult
 import models.errors.ErrorResult.BarsErrorResult
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.{Logging, MethodContext}
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class BarsService @Inject()(connector: BarsConnector) {
+class BarsService @Inject()(connector: BarsConnector) extends Logging {
   def checkBankAccountDetails(barsRequest: BarsRequest)
                              (implicit hc: HeaderCarrier,
                               ec: ExecutionContext,
                               cid: CorrelationId): ConnectorResponse[BarsResponse] = {
+    given mc: MethodContext = MethodContext("checkBankAccountDetails")
+
     connector
       .checkBankAccountDetails(request = barsRequest)
       .subflatMap(response => response.value.toBarsErrors match {
@@ -46,10 +48,14 @@ class BarsService @Inject()(connector: BarsConnector) {
             case error: BarsRequestError => BarsErrorResult(BAD_REQUEST, error.reason)
           }
 
+          val errorReasons = errors.map(_.reason).mkString(",")
+
           val errorResult: BarsErrorResult = errorResults match {
             case errs if errs.exists(_.status == INTERNAL_SERVER_ERROR) =>
+              logger.error(s"The request to BARS returned server failures, reasons: $errorReasons")
               BarsErrorResult(INTERNAL_SERVER_ERROR, "BARS_CHECK_FAILED", Some(errs))
             case errs =>
+              logger.info(s"The request to BARS returned validation errors, reasons: $errorReasons")
               BarsErrorResult(BAD_REQUEST, "BARS_REQUEST_ERRORS", Some(errs))
           }
 

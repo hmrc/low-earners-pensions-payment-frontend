@@ -24,7 +24,7 @@ import controllers.common.BarsLeppBaseController
 import models.ResponseWrapper.ErrorWrapper
 import models.requests.DataRequest
 import models.userAnswers.BankAccountDetails
-import models.{CorrelationId, ResponseWrapper}
+import models.CorrelationId
 import navigation.Navigator
 import pages.CheckYourAnswersPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -91,14 +91,13 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         case ErrorWrapper(err, _) if err.code == "BARS_REQUEST_ERRORS" =>
           barsVerifyStatusConnector
             .update().map { _ =>
-              logger.info(s"Bars VerifyStatus update successful for correlationId : $cid" 
-              )
+              logger.info(s"Bars VerifyStatus update successful for correlationId: $cid")
             } recover { case e =>
-            logger.error(s"Bars VerifyStatus update failed for: correlationId : $cid"
-            )
-          }
+              logger.error(s"Bars VerifyStatus update failed for: correlationId: $cid, reason: ${e.getMessage}")
+            }
           Redirect(bars.routes.BarsRequestErrorsController.onPageLoad())
         case err =>
+          logger.error(s"BARS check failed for correlationId: $cid, reason: ${err.value.code}")
           Redirect(bars.routes.BarsCheckFailedController.onPageLoad())
       }
       .semiflatMap(_ => f())
