@@ -87,6 +87,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
         view.text.contains("View your payments")
+        view.text.contains("Tell us what you think of this service (takes 30 seconds)")
       }
 
       "when there are multiple successful payments" in new Setup(Seq(acceptedItem, acceptedItem2)) {
@@ -111,6 +112,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
         view.text.contains("View your payments")
+        view.text.contains("Tell us what you think of this service (takes 30 seconds)")
       }
 
       "when there is one successful payment and one failed payment" in new Setup(Seq(acceptedItem),
@@ -143,6 +145,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
         view.text.contains("View your payments")
+        view.text.contains("Tell us what you think of this service (takes 30 seconds)")
       }
 
       "when there are multiple successful and failed payments" in new Setup(Seq(acceptedItem, acceptedItem2),
@@ -181,6 +184,7 @@ class SubmitConfirmationViewSpec extends SpecBase {
         view.text.contains("What you can do next")
         view.text.contains("Print this page")
         view.text.contains("View your payments")
+        view.text.contains("Tell us what you think of this service (takes 30 seconds)")
       }
     }
   }
