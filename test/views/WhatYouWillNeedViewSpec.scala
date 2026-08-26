@@ -60,7 +60,7 @@ class WhatYouWillNeedViewSpec extends SpecBase {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
 
     val view: Document = Jsoup.parse(
-      app.injector.instanceOf[WhatYouWillNeedView].apply(None, "some-url").body
+      app.injector.instanceOf[WhatYouWillNeedView].apply("some-url").body
     )
   }
 
