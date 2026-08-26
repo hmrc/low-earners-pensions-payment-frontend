@@ -36,7 +36,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.BodyParsers
 import play.api.test.{DefaultAwaitTimeout, ResultExtractors}
-import play.api.{Application, inject}
+import play.api.Application
 import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import utils.DateTime
 

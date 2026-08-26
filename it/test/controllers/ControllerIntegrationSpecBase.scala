@@ -21,7 +21,6 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.userAnswers.LeppItemStatus.*
 import models.userAnswers.{BankAccountDetails, LeppItem, LeppSummary, UserAnswers}
 import play.api.libs.json.*
-import play.api.test.Helpers.*
 
 import java.time.*
 import java.time.temporal.ChronoUnit.HOURS
@@ -106,8 +105,6 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
   val initialLocalDate: LocalDate = LocalDate.parse("2020-12-25")
   val clock: Clock = Clock.fixed(initialLocalDate.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneId.of("Z"))
   val expectedLockout: Instant = Instant.now(clock).plus(24, HOURS)
-  
-  private val authoriseUri: String = "/auth/authorise"
 
   val userAnswersWithBankDetails: UserAnswers = emptyUserAnswers.copy(
     data = Json.obj(
@@ -125,18 +122,6 @@ trait ControllerIntegrationSpecBase extends IntegrationSpecBase with AuthSupport
       "isSubmitted" -> JsBoolean(true)
     )
   )
-  
-  def mockAuthSuccess(nino: String = nino): StubMapping = {
-    val authResponseJson: JsObject =
-      Json.obj("confidenceLevel" -> 250) ++
-        Json.obj("nino" -> nino) ++
-        Json.obj("internalId" -> "anId") ++
-        Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment)))
-
-    when(method = POST, uri = authoriseUri)
-      .withRequestBody(authRequestJson)
-      .thenReturn(status = OK, body = authResponseJson)
-  }
 
   def mockBarsVerifyStatus(status: Int = OK,
                       response: JsObject): StubMapping = {
