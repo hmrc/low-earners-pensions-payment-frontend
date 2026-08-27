@@ -60,7 +60,7 @@ class PaymentHistorySectionSpec extends SpecBase {
 
       result.select("h2").text() mustBe "Payment history"
       result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
-        "Payments with the Paid status will be in the bank account you provided within 7 working days."
+        "Payments with the 'Paid' status will be in the bank account you provided within 7 working days."
     }
     
     "not render paid inset when paid items exist, but not within the last 10 days" in new Setup {
@@ -83,7 +83,7 @@ class PaymentHistorySectionSpec extends SpecBase {
 
       result.select("h2").text() mustBe "Payment history"
       result.text() must not include 
-        "Payments with the Paid status will be in the bank account you provided within 7 working days."
+        "Payments with the 'Paid' status will be in the bank account you provided within 7 working days."
     }
 
     "render no inset text, and a separate information paragraph if there is no payment history" in new Setup() {
