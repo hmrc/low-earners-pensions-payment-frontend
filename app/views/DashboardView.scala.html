@@ -19,7 +19,7 @@
 @import views.html.components.dashboard._
 @import viewmodels.govuk._
 @import viewmodels.formPages.FormPageViewModel
-@import java.time.Instant
+@import java.time.{Instant, LocalDate}
 @import utils.Formatters
 
 @this(
@@ -30,9 +30,15 @@
     paymentHistorySection: payment_history_section
 )
 
-@(leppSummary: LeppSummary, backLinkUrl: Option[String], continueUrl: String, barsLockFlag: Boolean, lockoutExpires: Option[Instant] = None)(implicit request: Request[_], messages: Messages)
+@(
+    leppSummary: LeppSummary,
+    backLinkUrl: Option[String],
+    continueUrl: String,
+    currentDate: LocalDate,
+    barsLockoutExpiryOpt: Option[Instant] = None
+)(implicit request: Request[_], messages: Messages)
 
-@expiryTimeString = @{ Formatters.fullDateTime(lockoutExpires, messages) }
+@expiryTimeString = @{ Formatters.fullDateTime(barsLockoutExpiryOpt, messages) }
 
 @bannerHtml = {
     <p class="govuk-notification-banner__heading">@{Html(messages("dashboard.lockout.message", expiryTimeString))}
@@ -44,7 +50,7 @@
     backLinkUrl = backLinkUrl,
     fullWidthContent = true
 ) {
-    @if(barsLockFlag){
+    @if(barsLockoutExpiryOpt.nonEmpty){
         @govukNotificationBanner(NotificationBanner(
             title = Text(messages("dashboard.lockout.title")),
             content = HtmlContent(bannerHtml),
@@ -57,11 +63,12 @@
         leppSummary: LeppSummary,
         tableRef = "dashboard_table_available_payments",
         continueUrl = continueUrl,
-        barsLockFlag = barsLockFlag
+        barsLockFlag = barsLockoutExpiryOpt.nonEmpty
     )
 
     @paymentHistorySection(
         leppSummary: LeppSummary,
-        tableRef = "dashboard_table_payment_history"
+        tableRef = "dashboard_table_payment_history",
+        currentDate = currentDate
     )
 }

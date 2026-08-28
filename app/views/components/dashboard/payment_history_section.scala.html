@@ -17,6 +17,7 @@
 @import models.userAnswers.LeppSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
+@import java.time.LocalDate
 @import viewmodels.dashboard.DashboardUtils
 
 @this(
@@ -27,7 +28,7 @@
  linkElement: link_element
 )
 
-@(leppSummary: LeppSummary, tableRef: String)(implicit messages: Messages)
+@(leppSummary: LeppSummary, tableRef: String, currentDate: LocalDate)(implicit messages: Messages)
 
 @cancelledInsetContent = {
  <p>
@@ -46,7 +47,7 @@
   @insetText(InsetTextViewModel(cancelledInsetContent))
  }
 
- @if(leppSummary.paidItems.nonEmpty) {
+ @if(leppSummary.showPaidInset(currentDate)) {
   @insetText(InsetTextViewModel(Text(messages("dashboard.paymentHistory.paidInset"))))
  }
 
