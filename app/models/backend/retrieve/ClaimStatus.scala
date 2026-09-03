@@ -20,7 +20,7 @@ import models.userAnswers.LeppItemStatus
 import play.api.libs.json.*
 
 enum ClaimStatus {
-  case Available, Paid, Suspended, Cancelled, AvailableCapacitor, DeceasedCapacitor, DeceasedNoCapacitor
+  case Available, Paid, Suspended, Cancelled, DeceasedCapacitor, DeceasedNoCapacitor
   
   def toLeppItemStatus: LeppItemStatus = this match {
     case ClaimStatus.Available => LeppItemStatus.Available
@@ -38,7 +38,7 @@ object ClaimStatus {
     case JsString("DECEASED - NO CAPACITOR") => JsSuccess(DeceasedNoCapacitor)
     case JsString("PAID") => JsSuccess(Paid)
     case JsString("PENDING") => JsSuccess(Available)
-    case JsString("PENDING - CAPACITOR") => JsSuccess(AvailableCapacitor)
+    case JsString("PENDING - CAPACITOR") => JsSuccess(Available)
     case JsString("SUSPENDED - RLS") => JsSuccess(Suspended)
     case _ => JsError("error.claimStatus.invalid")
   }
