@@ -40,7 +40,6 @@ trait AuthSupport extends WireMockMethods {
       |   "internalId",
       |   "nino",
       |   "confidenceLevel",
-      |   "authorisedEnrolments",
       |   "optionalItmpName"
       | ]
       |}

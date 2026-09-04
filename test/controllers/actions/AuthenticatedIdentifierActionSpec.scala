@@ -42,9 +42,8 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
   def authResult(internalId: Option[String],
                  nino: Option[String],
-                 confidenceLevel: ConfidenceLevel,
-                 enrolments: Enrolment*): Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName] =
-    internalId and nino and confidenceLevel and Enrolments(enrolments.toSet) and Option.empty[ItmpName]
+                 confidenceLevel: ConfidenceLevel): Option[String] ~ Option[String] ~ ConfidenceLevel ~ Option[ItmpName] =
+    internalId and nino and confidenceLevel and Option.empty[ItmpName]
 
   val ptaEnrolment: Enrolment =
     Enrolment(Constants.ptaEnrolmentKey, Seq(EnrolmentIdentifier("Some_Id", "A2100001")), "Activated")
@@ -52,7 +51,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
   val invalidEnrolment: Enrolment =
     Enrolment("INVALID", Seq.empty, "Activated")
 
-  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName]): Unit =
+  def setAuthValue(value: Option[String] ~ Option[String] ~ ConfidenceLevel ~ Option[ItmpName]): Unit =
     setAuthValue(Future.successful(value))
 
   def setAuthValue[A](value: Future[A]): Unit =
@@ -66,7 +65,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
   "Auth Action" - {
     "when the user logged in" - {
       "must return a valid IdentifierRequest" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250))
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
         running(application) {
@@ -88,7 +87,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
       }
 
       "must return a valid IdentifierRequest when added to user allow list and private beta enabled" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250))
         when(mockUserAllowListConnector.check(any(), any())(any())).thenReturn(Future.successful(true))
         val servicesConfig: Map[String, Any] = Map(
           "feature-switch.privateBetaEnabled" -> true
@@ -115,7 +114,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
       }
 
       "must redirect to unauthorised page when not added to user allow list" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, ptaEnrolment))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250))
         when(mockUserAllowListConnector.check(any(), any())(any())).thenReturn(Future.successful(false))
         val servicesConfig: Map[String, Any] = Map(
           "feature-switch.privateBetaEnabled" -> true
@@ -143,9 +142,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
         }
       }
       
-      "but not enrolled must return unauthorised page" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L250, invalidEnrolment))
-        
+      "must redirect the user to the wrong account unauthorised page when they don't have the required enrolment" in {
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 
         running(application) {
@@ -153,7 +150,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
           val appConfig = application.injector.instanceOf[AppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            authConnector = mockAuthConnector,
+            authConnector = new FakeFailingAuthConnector(InsufficientEnrolments()),
             userAllowListConnector = mockUserAllowListConnector,
             config = appConfig,
             playBodyParsers = bodyParsers
@@ -161,7 +158,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
-          val expectedUrl = controllers.auth.routes.UnauthorisedController.onPageLoad().url
+          val expectedUrl = controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad().url
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe expectedUrl
@@ -171,7 +168,7 @@ class AuthenticatedIdentifierActionSpec extends SpecBase with StubPlayBodyParser
 
     "when the user has confidence level less than 250" - {
       "must redirect to IV uplift journey" in {
-        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200, ptaEnrolment))
+        setAuthValue(authResult(Some("internalId"), Some("AA123456C"), L200))
         
         val application = applicationBuilder(userAnswers = emptyUserAnswers).build()
 

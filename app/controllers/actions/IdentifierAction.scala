@@ -48,16 +48,15 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     given mc: MethodContext = MethodContext("invokeBlock")
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    val retrievals: Retrieval[Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName]] =
+    val retrievals: Retrieval[Option[String] ~ Option[String] ~ ConfidenceLevel ~ Option[ItmpName]] =
       Retrievals.internalId and 
         Retrievals.nino and
         Retrievals.confidenceLevel and
-        Retrievals.authorisedEnrolments and
         Retrievals.itmpName
     
     authorised(Enrolment(Constants.ptaEnrolmentKey))
       .retrieve(retrievals) {
-        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt if hasEnrolments(enrolments) =>
+        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ nameOpt =>
           if(confidenceLevel >= config.confidenceLevelMinimum) {
             isValidUser(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)), block)
           } else {
@@ -65,13 +64,16 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
             Future.successful(Redirect(config.ivUpliftUrl))
           }
         case _ =>
-          logger.info("User doesn't have PTA enrolment, not authorised to access this service.")
+          logger.info("Could not retrieve internalId or nino from user auth profile")
           Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
       } recoverWith {
+      case _: InsufficientEnrolments =>
+        logger.info("User doesn't have PTA enrolment, not authorised to access this service.")
+        Future.successful(Redirect(controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad()))
       case _: NoActiveSession =>
-        Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
+        Future.successful(Redirect(config.loginWithContinueUrl))
       case err: AuthorisationException =>
-        logger.underlying.error(s"[${logger.cc}][$mc] - " + s"An authorisation error occurred with message", err)
+        logger.error("An authorisation error occurred with message", err)
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
     }
   }
@@ -86,6 +88,3 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     } else {
       block(request)
     }
-    
-  private def hasEnrolments(enrolments: Enrolments): Boolean =
-    enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty

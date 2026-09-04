@@ -179,6 +179,12 @@ unauthorised.guidance.preform = If you think you need access to this service, yo
 unauthorised.guidance.formLink = request it through the feedback form
 unauthorised.guidance.postform = . We will respond to you within 5 working days.
 
+# Wrong account unauthorised page
+wrongAccount.title = Sign in with your personal tax account
+wrongAccount.heading = Sign in with your personal tax account
+wrongAccount.p1 = You can only use this service with a personal tax account.
+wrongAccount.signIn = Sign in
+
 # Uplift failure page
 ivUpliftFailure.title = There''s a problem
 ivUpliftFailure.p1 = You cannot access this service. This may be because:

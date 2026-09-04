@@ -16,10 +16,8 @@
 
 package controllers
 
-import base.IntegrationSpecBase
 import config.AppConfig
 import play.api.Application
-import play.api.http.Status.SEE_OTHER
 import play.api.http.Writeable
 import play.api.libs.json.*
 import play.api.mvc.Result
@@ -39,6 +37,7 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
   )
 
   val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
+  val wrongAccountUnauthorisedUrl: String = controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad().url
   val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
 
   private def handleForAuthError[A: Writeable](request: FakeRequest[A],
@@ -67,14 +66,12 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
                                                   internalIdOpt: Option[String],
                                                   ninoOpt: Option[String],
                                                   confidenceLevel: Int,
-                                                  enrolments: Seq[JsValue],
                                                   expectedRedirect: String): Unit = {
     s"return expected result for scenario - $scenarioName" in {
       val authResponseJson: JsObject =
         Json.obj("confidenceLevel" -> confidenceLevel) ++
           ninoOpt.map(nino => Json.obj("nino" -> nino)).getOrElse(JsObject.empty) ++
-          internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty) ++
-          Json.obj("authorisedEnrolments" -> JsArray(enrolments))
+          internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty)
 
       when(method = POST, uri = authoriseUri)
         .withRequestBody(authRequestJson)
@@ -105,7 +102,8 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
       s"for GET of url: $url" when {
         Seq(
           ("InvalidBearerToken", loginUrl),
-          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+          ("InternalError", unauthorisedUrl),
+          ("InsufficientEnrolments", wrongAccountUnauthorisedUrl)
         ).foreach((error, redirect) => handleForAuthError(
           FakeRequest(
             method = "GET",
@@ -123,17 +121,16 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
     ).foreach(url =>
       s"for POST of url: $url" when {
         Seq(
-          ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
+          ("internalId is missing", None, Some(validNino()), 250, unauthorisedUrl),
+          ("nino is missing", Some("id"), None, 250, unauthorisedUrl),
+          ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, ivUpliftUrl)
         ).foreach(
-          (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(FakeRequest(
+          (sn, id, nino, cl, rdr) => handleForAuthRedirect(FakeRequest(
             method = "POST",
             path = url
           )
             .withSession(SessionKeys.authToken -> "auth token")
-            .withFormUrlEncodedBody())(sn, id, nino, cl, enrls, rdr)
+            .withFormUrlEncodedBody())(sn, id, nino, cl, rdr)
         )
       }
     )
