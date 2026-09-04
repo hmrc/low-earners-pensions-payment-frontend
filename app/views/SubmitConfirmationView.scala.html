@@ -116,19 +116,19 @@
     </p>
 
     <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="#" data-module="hmrc-print-link">
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="#" data-module="hmrc-print-link">
             @messages("confirmation.what-next.print")
         </a>
     </p>
 
-    @heading2("confirmation.what-next.heading")
+    @heading2("confirmation.what-next.heading", true)
     <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="@routes.DashboardController.onPageLoad()">
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="@routes.DashboardController.onPageLoad()">
             @messages("confirmation.what-next.linkText")
         </a>
     </p>
     <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="@controllers.auth.routes.AuthController.signOut()">
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="@controllers.auth.routes.AuthController.signOut()">
             @messages("confirmation.what-next.feedback.text")
         </a>
     </p>
