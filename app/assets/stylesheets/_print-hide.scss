@@ -1,0 +1,11 @@
+@media print {
+    .hmrc-sign-out-nav__link,
+    .govuk-button,
+    .gem-c-print-link__button,
+    .govuk-footer__section,
+    .govuk-footer__inline-list,
+    .hmrc-report-technical-issue,
+    .print-hide {
+        display: none !important;
+    }
+}
