@@ -18,11 +18,12 @@
 
 @(
  msgKey: String,
+ isPrintPage: Boolean = false,
  headingArgs: Option[String] = None,
  headerSize: String = "m",
  marginBottom: String = "12"
 )(implicit messages: Messages)
 
-<h2 class="govuk-heading-@{headerSize} govuk-!-margin-bottom-@{marginBottom}">
+<h2 class="govuk-heading-@{headerSize} govuk-!-margin-bottom-@{marginBottom} @if(isPrintPage) {govuk-!-display-none-print}">
  @{headingArgs.fold(messages(msgKey))(messages(msgKey, _))}
 </h2>
