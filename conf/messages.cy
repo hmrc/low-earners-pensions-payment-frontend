@@ -179,6 +179,12 @@ unauthorised.guidance.preform = Os ydych chi'n meddwl bod angen mynediad i''r gw
 unauthorised.guidance.formLink = gofynnwch amdano drwy''r ffurflen adborth
 unauthorised.guidance.postform = . Byddwn yn ymateb i chi o fewn 5 diwrnod gwaith.
 
+# Wrong account unauthorised page
+wrongAccount.title = Mewngofnodwch gyda''ch cyfrif treth personol
+wrongAccount.heading = Mewngofnodwch gyda''ch cyfrif treth personol
+wrongAccount.p1 = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn.
+wrongAccount.signIn = Mewngofnodwch
+
 # Uplift failure page
 ivUpliftFailure.title = Mae problem
 ivUpliftFailure.p1 = Ni allwch gael mynediad i''r gwasanaeth hwn. Gallai hyn fod oherwydd:
