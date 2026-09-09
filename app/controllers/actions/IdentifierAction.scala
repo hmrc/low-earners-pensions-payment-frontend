@@ -46,30 +46,37 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     given mc: MethodContext = MethodContext("invokeBlock")
+
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     val retrievals: Retrieval[Option[String] ~ Option[String] ~ ConfidenceLevel ~ Enrolments ~ Option[ItmpName]] =
-      Retrievals.internalId and 
+      Retrievals.internalId and
         Retrievals.nino and
         Retrievals.confidenceLevel and
         Retrievals.authorisedEnrolments and
         Retrievals.itmpName
-    
-    authorised(Enrolment(Constants.ptaEnrolmentKey))
-      .retrieve(retrievals) {
-        case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt if hasEnrolments(enrolments) =>
-          if(confidenceLevel >= config.confidenceLevelMinimum) {
-            isValidUser(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)), block)
-          } else {
-            logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
-            Future.successful(Redirect(config.ivUpliftUrl))
-          }
-        case _ =>
-          logger.info("User doesn't have PTA enrolment, not authorised to access this service.")
-          Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
-      } recoverWith {
+
+    authorised().retrieve(retrievals) {
+      case None ~ _ ~ _ ~ _ ~ _ =>
+        logger.warn("Could not retrieve internalId for user. Redirecting to unauthorised page")
+        Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
+      case _ ~ None ~ _ ~ _ ~ _ =>        
+        logger.info("Could not retrieve NINO for user. Redirecting to wrong account page")
+        Future.successful(Redirect(controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad()))
+      case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt =>
+        if (!isPtaEnrolled(enrolments)) {
+          logger.info("User is missing PTA enrolment. Redirecting to PTA service")
+          Future.successful(Redirect(config.ptaUrl))
+        } else if (confidenceLevel < config.confidenceLevelMinimum) {
+          logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
+          Future.successful(Redirect(config.ivUpliftUrl))
+        } else {
+          isValidUser(IdentifierRequest(request, AuthUser(internalId, nino, nameOpt)), block)
+        }
+    }.recoverWith {
       case _: NoActiveSession =>
-        Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
+        logger.info("User has no active session. Redirecting to login journey")
+        Future.successful(Redirect(config.loginWithContinueUrl))
       case err: AuthorisationException =>
         logger.underlying.error(s"[${logger.cc}][$mc] - " + s"An authorisation error occurred with message", err)
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
@@ -87,5 +94,5 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       block(request)
     }
     
-  private def hasEnrolments(enrolments: Enrolments): Boolean =
+  private def isPtaEnrolled(enrolments: Enrolments): Boolean =
     enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty
