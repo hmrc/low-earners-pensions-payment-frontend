@@ -39,6 +39,7 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
   )
 
   val unauthorisedUrl: String = controllers.auth.routes.UnauthorisedController.onPageLoad().url
+  val wrongAccountUrl: String = controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad().url
   val ivUpliftUrl: String = fakeApplication().injector.instanceOf[AppConfig].ivUpliftUrl
 
   private def handleForAuthError[A: Writeable](request: FakeRequest[A],
@@ -124,9 +125,9 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
       s"for POST of url: $url" when {
         Seq(
           ("internalId is missing", None, Some(validNino()), 250, Seq(ptaEnrolment), unauthorisedUrl),
-          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), unauthorisedUrl),
+          ("nino is missing", Some("id"), None, 250, Seq(ptaEnrolment), wrongAccountUrl),
           ("confidenceLevel is too low", Some("id"), Some(validNino()), 50, Seq(ptaEnrolment), ivUpliftUrl),
-          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, unauthorisedUrl)
+          ("PTA enrolment is missing", Some("id"), Some(validNino()), 250, Nil, config.ptaUrl)
         ).foreach(
           (sn, id, nino, cl, enrls, rdr) => handleForAuthRedirect(FakeRequest(
             method = "POST",

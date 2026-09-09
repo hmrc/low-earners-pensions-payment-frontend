@@ -29,13 +29,7 @@ trait AuthSupport extends WireMockMethods {
   val authRequestJson: JsValue = Json.parse(
     """
       |{
-      | "authorise": [
-      |   {
-      |      "identifiers": [],
-      |      "state": "Activated",
-      |      "enrolment": "HMRC-PT"
-      |   }
-      | ],
+      | "authorise": [],
       | "retrieve": [
       |   "internalId",
       |   "nino",
