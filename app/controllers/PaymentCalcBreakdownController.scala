@@ -40,9 +40,15 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
   def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
     val (messageKey, entitlement, isUnderPayment) = id match {
       case Some(value) if request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined =>
-        (MessageKeys.SINGLE_PAST_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+        if(value.startsWith("C")) {
+          (MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+        } else
+          (MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
       case Some(value) =>
-        (MessageKeys.SINGLE_PAST_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
+        if(value.startsWith("C")) {
+          (MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+        } else
+          (MessageKeys.SINGLE_PAST_PAID_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
       case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
         if(request.leppSummary.availableItems.get.head.originalAmount.isDefined) {
           (MessageKeys.SINGLE_UNDER_PAYMENT, request.leppSummary.totalEntitlementString, true)

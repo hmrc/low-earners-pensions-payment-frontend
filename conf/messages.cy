@@ -53,13 +53,22 @@ dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc or
 
 # Calculation Breakdown page
 breakdown.title = Dadansoddiad eich taliad
-breakdown.single.past.title = Roeddech yn gymwys i gael taliad o {0}
-breakdown.single.past.heading = Roeddech yn gymwys i gael taliad o {0}
-breakdown.single.past.p1 = Roedd y taliad hwn yn ddyledus i chi oherwydd na wnaethoch dderbyn rhyddhad treth ar rai neu bob un o''ch cyfraniadau pensiwn o gyflog net.
-breakdown.single.past.underpayment.title = Roeddech yn gymwys i gael taliad ychwanegol o {0}
-breakdown.single.past.underpayment.heading = Roeddech yn gymwys i gael taliad ychwanegol o {0}
-breakdown.single.past.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
-breakdown.single.past.underpayment.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+breakdown.single.past.paid.title = Cyfrifiad o''ch taliad o {0} a dalwyd
+breakdown.single.past.paid.heading = Cyfrifiad o''ch taliad o {0} a dalwyd
+breakdown.single.past.paid.p1 = Roedd y taliad hwn yn ddyledus i chi oherwydd na wnaethoch dderbyn rhyddhad treth ar rai neu bob un o''ch cyfraniadau pensiwn o gyflog net.
+breakdown.single.past.underpayment.paid.title = Roeddech yn gymwys i gael taliad ychwanegol o {0}
+breakdown.single.past.underpayment.paid.heading = Roeddech yn gymwys i gael taliad ychwanegol o {0}
+breakdown.single.past.underpayment.paid.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
+breakdown.single.past.underpayment.paid.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+
+breakdown.single.past.cancelled.title = Cyfrifiad o''ch taliad o {0} a ganslwyd
+breakdown.single.past.cancelled.heading = Cyfrifiad o''ch taliad o {0} a ganslwyd
+breakdown.single.past.cancelled.p1 = Roedd y taliad hwn yn ddyledus i chi oherwydd na wnaethoch dderbyn rhyddhad treth ar rai neu bob un o''ch cyfraniadau pensiwn o gyflog net.
+breakdown.single.past.underpayment.cancelled.title = Cyfrifiad o''ch taliad o {0} a ganslwyd
+breakdown.single.past.underpayment.cancelled.heading = Cyfrifiad o''ch taliad o {0} a ganslwyd
+breakdown.single.past.underpayment.cancelled.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
+breakdown.single.past.underpayment.cancelled.p2 = Mae hyn oherwydd ein bod wedi cael gwybodaeth newydd ynghylch faint rydych wedi''i ennill.
+
 breakdown.single.underpayment.title = Rydych chi''n gymwys i gael taliad ychwanegol o {0}
 breakdown.single.underpayment.heading = Rydych chi''n gymwys i gael taliad ychwanegol o {0}
 breakdown.single.underpayment.p1 = Nid oedd swm y taliad blaenrorol a wnaed i chi''n ddigonol ar gyfer y flwyddyn dreth hon ac rydym wedi ailgyfrifo''r swm.
