@@ -20,7 +20,9 @@ object MessageKeys {
 
   val SINGLE_PAYMENT = "breakdown.single"
   val SINGLE_UNDER_PAYMENT = "breakdown.single.underpayment"
-  val SINGLE_PAST_PAYMENT = "breakdown.single.past"
-  val SINGLE_PAST_UNDER_PAYMENT = "breakdown.single.past.underpayment"
+  val SINGLE_PAST_PAID_PAYMENT = "breakdown.single.past.paid"
+  val SINGLE_PAST_PAID_UNDER_PAYMENT = "breakdown.single.past.underpayment.paid"
+  val SINGLE_PAST_CANCELLED_PAYMENT = "breakdown.single.past.cancelled"
+  val SINGLE_PAST_CANCELLED_UNDER_PAYMENT = "breakdown.single.past.underpayment.cancelled"
   val MULTIPLE_PAYMENT = "breakdown.multiple"
 }

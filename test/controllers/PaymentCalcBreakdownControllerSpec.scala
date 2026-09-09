@@ -80,7 +80,7 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
           Some(routes.DashboardController.onPageLoad().url),
           false,
           Some("P-25-1"),
-          "breakdown.single.past",
+          "breakdown.single.past.paid",
           "£200"
         )(request, messages(application)).toString
         status(result) mustEqual OK
