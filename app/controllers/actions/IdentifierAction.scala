@@ -60,7 +60,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       case None ~ _ ~ _ ~ _ ~ _ =>
         logger.warn("Could not retrieve internalId for user. Redirecting to unauthorised page")
         Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
-      case _ ~ None ~ _ ~ _ ~ _ =>        
+      case _ ~ None ~ _ ~ _ ~ _ =>
         logger.info("Could not retrieve NINO for user. Redirecting to wrong account page")
         Future.successful(Redirect(controllers.auth.routes.WrongAccountUnauthorisedController.onPageLoad()))
       case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt =>
@@ -95,4 +95,4 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     }
     
   private def isPtaEnrolled(enrolments: Enrolments): Boolean =
-    enrolments.getEnrolment(Constants.ptaEnrolmentKey).nonEmpty
+    enrolments.getEnrolment(Constants.ptaEnrolmentKey).exists(_.isActivated)

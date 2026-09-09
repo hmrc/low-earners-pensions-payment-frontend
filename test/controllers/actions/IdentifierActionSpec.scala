@@ -133,6 +133,15 @@ class IdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
         )
       }
 
+      "if PTA enrolment is inactive should redirect to PTA" in {
+        authTest(
+          enrolments = Seq(ptaEnrolment.copy(state = "Inactive"))
+        )(
+          expectedStatus = SEE_OTHER,
+          expectedRedirectOpt = Some(appConfig.ptaUrl)
+        )
+      }
+
       "if confidence level is less than 250 should redirect to IV uplift" in {
         authTest(
           confidenceLevel = ConfidenceLevel.L50
