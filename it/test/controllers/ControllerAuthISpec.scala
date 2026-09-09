@@ -75,7 +75,7 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
         Json.obj("confidenceLevel" -> confidenceLevel) ++
           ninoOpt.map(nino => Json.obj("nino" -> nino)).getOrElse(JsObject.empty) ++
           internalIdOpt.map(id => Json.obj("internalId" -> id)).getOrElse(JsObject.empty) ++
-          Json.obj("authorisedEnrolments" -> JsArray(enrolments))
+          Json.obj("allEnrolments" -> JsArray(enrolments))
 
       when(method = POST, uri = authoriseUri)
         .withRequestBody(authRequestJson)

@@ -53,7 +53,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       Retrievals.internalId and
         Retrievals.nino and
         Retrievals.confidenceLevel and
-        Retrievals.authorisedEnrolments and
+        Retrievals.allEnrolments and
         Retrievals.itmpName
 
     authorised().retrieve(retrievals) {
@@ -94,5 +94,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       block(request)
     }
     
-  private def isPtaEnrolled(enrolments: Enrolments): Boolean =
+  private def isPtaEnrolled(enrolments: Enrolments): Boolean = {
+    println(enrolments.enrolments)
     enrolments.getEnrolment(Constants.ptaEnrolmentKey).exists(_.isActivated)
+  }
