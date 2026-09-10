@@ -48,7 +48,8 @@
     @heading(messages(s"$messageKey.heading", entitlement), headerSize = "l")
 
     <p class="govuk-body">@messages(s"$messageKey.p1")</p>
-    @if(isUnderPayment & itemId.isDefined & itemId.get.startsWith("P")) {
+
+    @if(isUnderPayment && itemId.isDefined && itemId.get.startsWith("P")) {
         <p class="govuk-body">@messages(s"$messageKey.p2")</p>
     }
 

@@ -125,7 +125,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
 
     "display paid history item details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
-      view.getElementsByTag("h1").text mustBe "Your £200 paid payment calculation"
+      view.getElementsByTag("h1").text mustBe "Your additional £200 paid payment calculation"
       
       val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
       elements.forEach(
@@ -140,11 +140,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
 
     "display cancelled history item details" in new Setup(cancelledUnderpaymentSummary, MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, "£200", false, Some("C-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
-<<<<<<< HEAD
       view.getElementsByTag("h1").text mustBe "Your additional £200 cancelled payment calculation"
-=======
-      view.getElementsByTag("h1").text mustBe "Your £200 cancelled payment calculation"
->>>>>>> main
     }
 
     "display available items details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT, "£200", false) {
