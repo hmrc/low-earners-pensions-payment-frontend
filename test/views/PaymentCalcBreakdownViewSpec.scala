@@ -47,6 +47,12 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
     Some(Seq(leppItem.copy(id = "P-id-1", taxYear = 2024, status = Paid)))
   )
 
+  val cancelledSummary: LeppSummary = LeppSummary(
+    1,
+    Some(Seq(leppItem)),
+    Some(Seq(leppItem.copy(id = "C-id-1", taxYear = 2024, status = Paid)))
+  )
+
   val underpaymentSummary: LeppSummary = LeppSummary(
     1,
     Some(Seq(leppItem.copy(originalAmount = Some(200)))),
@@ -123,7 +129,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.getElementById("barsLockFlag").text() mustBe messages(app)("bars.lockout.go-to-dashboard")
     }
 
-    "display paid history item details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
+    "display paid underpayment history item details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, "£200", false, Some("P-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
       view.getElementsByTag("h1").text mustBe "Your additional £200 paid payment calculation"
       
@@ -138,11 +144,16 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       )
     }
 
-    "display cancelled history item details" in new Setup(cancelledUnderpaymentSummary, MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, "£200", false, Some("C-id-1")) {
+    "display cancelled underpayment history item details" in new Setup(cancelledUnderpaymentSummary, MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, "£200", false, Some("C-id-1")) {
       view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
       view.getElementsByTag("h1").text mustBe "Your additional £200 cancelled payment calculation"
     }
 
+    "display cancelled history item details" in new Setup(cancelledSummary, MessageKeys.SINGLE_PAST_CANCELLED_PAYMENT, "£200", false, Some("C-id-1")) {
+      view.getElementsByClass("govuk-summary-card__title-wrapper").text() mustBe "For the tax year 6 April 2024 to 5 April 2025"
+      view.getElementsByTag("h1").text mustBe "Your £200 cancelled payment calculation"
+    }
+    
     "display available items details" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT, "£200", false) {
       view.getElementById("id-1").getElementsByClass("govuk-summary-card__title").text() mustBe "For the tax year 6 April 2025 to 5 April 2026"
       
