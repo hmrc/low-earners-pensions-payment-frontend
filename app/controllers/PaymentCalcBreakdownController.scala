@@ -46,7 +46,7 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
           (MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
       case Some(value) =>
         if(value.startsWith("C")) {
-          (MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+          (MessageKeys.SINGLE_PAST_CANCELLED_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
         } else
           (MessageKeys.SINGLE_PAST_PAID_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
       case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
