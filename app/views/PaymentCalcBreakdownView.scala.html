@@ -51,6 +51,8 @@
 
     @if(isUnderPayment && itemId.isDefined && itemId.get.startsWith("P")) {
         <p class="govuk-body">@messages(s"$messageKey.p2")</p>
+    } else if(isUnderPayment && itemId.isEmpty){
+        <p class="govuk-body">@messages(s"$messageKey.p2")</p>
     }
 
     @for(summaryList <- paymentSummaryList(paymentSummary, itemId)){
