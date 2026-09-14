@@ -106,7 +106,7 @@ class ControllerAuthISpec extends ControllerIntegrationSpecBase {
       s"for GET of url: $url" when {
         Seq(
           ("InvalidBearerToken", loginUrl),
-          ("InternalError", controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+          ("InternalError", controllers.routes.SomethingWentWrongController.onPageLoad().url)
         ).foreach((error, redirect) => handleForAuthError(
           FakeRequest(
             method = "GET",

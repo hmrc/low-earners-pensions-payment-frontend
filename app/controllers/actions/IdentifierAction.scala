@@ -79,7 +79,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
         Future.successful(Redirect(config.loginWithContinueUrl))
       case err: AuthorisationException =>
         logger.underlying.error(s"[${logger.cc}][$mc] - " + s"An authorisation error occurred with message", err)
-        Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
+        Future.successful(Redirect(controllers.routes.SomethingWentWrongController.onPageLoad()))
     }
   }
 

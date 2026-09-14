@@ -188,7 +188,7 @@ class IdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
         }
       }
 
-      "if an unhandled authorisation exception occurs should redirect to unauthorised page" in {
+      "if an unhandled authorisation exception occurs should redirect to default error page" in {
         running(application) {
           val authAction: AuthenticatedIdentifierAction = new AuthenticatedIdentifierAction(
             authConnector = new FakeFailingAuthConnector(InternalError()),
@@ -201,7 +201,7 @@ class IdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
           val result: Future[Result] = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result) mustBe Some(controllers.routes.SomethingWentWrongController.onPageLoad().url)
         }
       }
       
