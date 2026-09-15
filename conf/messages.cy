@@ -50,6 +50,7 @@ dashboard.table.status.cancelled = Wedi canslo
 dashboard.table.availableUntil = 5 Ebrill {0}
 dashboard.lockout.title = Pwysig
 dashboard.lockout.message = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau. Gallwch roi cynnig arall arni ar ôl {0}.
+dashboard.availablePayments.suspendedInset.privateBeta = Mae eich taliadau wedi''u hatal. Am ragor o wybodaeth, gallwch ein ffonio ar 0300 322 9665.
 
 # Calculation Breakdown page
 breakdown.title = Dadansoddiad eich taliad
@@ -88,6 +89,7 @@ breakdown.underpayment.l2 = Swm sydd eisoes wedi dod i law
 breakdown.underpayment.l3 = Swm ychwanegol sy''n ddyledus
 
 breakdown.p2 = Os ydych o''r farn bod y ffigyrau''n anghywir, gallwch
+breakdown.p2.privateBeta = Os ydych chi''n meddwl bod y symiau''n anghywir, gallwch ein ffonio ar 0300 322 9665.
 
 # Bank account details page
 bankDetails.title = Beth yw’ch manylion banc?
@@ -151,6 +153,7 @@ barsRequestErrors.u1.l2 = nid yw''r cyfrif a ddarparwyd yn derbyn credyd uniongy
 barsRequestErrors.u1.l3 = methwyd dod o hyd i unrhyw gyfrif gyda''r manylion a ddarparwyd
 barsRequestErrors.u1.l4 = nid oedd yr enw ar y cyfrif yn cyfateb i''r hyn a ddarparwyd
 barsRequestErrors.p2 = Os yw''r broblem yn parhau, efallai y bydd yn rhaid i chi
+barsRequestErrors.p2.privateBeta = Os yw''r broblem hon yn parhau, efallai y bydd yn rhaid i chi ein ffonio ni ar 0300 322 9665.
 
 # Bars check failure page
 barsCheckFailed.title = Ni allwn wirio manylion eich cyfrif banc

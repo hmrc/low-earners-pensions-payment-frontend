@@ -96,9 +96,15 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       tableRowValues.contains("£100") mustBe true
 
       view.select(".govuk-body:nth-of-type(2)").text mustBe
-        "If you think the amounts are wrong, you can contact us (opens in new tab)."
+        "If you think the amounts are wrong, you can call us on 0300 322 9665."
     }
 
+    "display correct contactUs content based on release" in new Setup(summary = summary,
+      messageKey = MessageKeys.SINGLE_PAYMENT, publicBetaEnabled = true) {
+      view.select(".govuk-body:nth-of-type(2)").text mustBe
+        "If you think the amounts are wrong, you can contact us (opens in new tab)."
+    }
+    
     "display correct guidance and text for an underpayment" in new Setup(underpaymentSummary, MessageKeys.SINGLE_UNDER_PAYMENT) {
       view.getElementsByTag("h1").text mustBe "You're eligible for an additional £200 payment"
 
@@ -117,7 +123,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.select(".govuk-body:nth-of-type(1)").text mustBe "These payments are due to you because you did not " +
         "get tax relief on some or all of your net pay pension contributions."
       view.select(".govuk-body:nth-of-type(2)").text mustBe
-        "If you think the amounts are wrong, you can contact us (opens in new tab)."
+        "If you think the amounts are wrong, you can call us on 0300 322 9665."
     }
 
     "display continue link when not locked out" in new Setup {
@@ -173,8 +179,11 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
               messageKey: String = MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT,
               entitlement: String = "£200",
               barsLock: Boolean = false,
-              id: Option[String] = None) {
-    val app: Application = applicationBuilder(emptyUserAnswers).build()
+              id: Option[String] = None,
+              publicBetaEnabled: Boolean = false) {
+    
+    val app: Application = applicationBuilder(emptyUserAnswers,
+      servicesConfig = servicesConfig ++ Map("feature-switch.publicBetaContactUsEnabled" -> publicBetaEnabled)).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     

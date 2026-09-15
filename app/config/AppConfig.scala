@@ -106,3 +106,5 @@ class AppConfig @Inject()(config: Configuration):
   val privateBetaEnabled: Boolean = config.get[Boolean]("feature-switch.privateBetaEnabled")
   val userAllowListService: Service = config.get[Service]("microservice.services.user-allow-list")
   val internalAuthToken: String = config.get[String]("internal-auth.token")
+  // Contact us link feature switch for Public Beta
+  val publicBetaContactUsEnabled: Boolean = config.get[Boolean]("feature-switch.publicBetaContactUsEnabled")
