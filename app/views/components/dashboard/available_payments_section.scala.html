@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.components._
 @import viewmodels.dashboard.DashboardUtils
+@import config.AppConfig
 
 @this(
  table: GovukTable,
@@ -26,6 +27,7 @@
  statusElement: status_element,
  contactLinkElement: contact_link_element,
  availableSummarySection: available_summary_section,
+ appConfig: AppConfig
 )
 
 @(leppSummary: LeppSummary, tableRef: String, continueUrl: String, barsLockFlag: Boolean)(implicit messages: Messages)
@@ -33,8 +35,12 @@
 @hasAvailableItems = @{leppSummary.availableItems.getOrElse(Nil).nonEmpty}
 
 @suspendedInsetContent = {
- @messages("dashboard.availablePayments.suspendedInset")
- @contactLinkElement(Some("dashboard.moreInformation"))
+    @if(appConfig.publicBetaContactUsEnabled){
+        @messages("dashboard.availablePayments.suspendedInset")
+        @contactLinkElement(Some("dashboard.moreInformation"))
+    } else {
+        @messages("dashboard.availablePayments.suspendedInset.privateBeta")
+    }
 }
 
 @subHeading(msgKey = messages("dashboard.availablePayments.heading"))

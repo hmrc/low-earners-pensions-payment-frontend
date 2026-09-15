@@ -50,6 +50,7 @@ dashboard.table.status.cancelled = Cancelled
 dashboard.table.availableUntil = 5 April {0}
 dashboard.lockout.title = Important
 dashboard.lockout.message = You''ve tried to enter your bank account details too many times. You can try again after {0}.
+dashboard.availablePayments.suspendedInset.privateBeta = Your payments are suspended. For more information, you can call us on 0300 322 9665.
 
 # Calculation Breakdown page
 breakdown.title = Your payment breakdown
@@ -88,6 +89,7 @@ breakdown.underpayment.l2 = Amount already received
 breakdown.underpayment.l3 = Additional amount due
 
 breakdown.p2 = If you think the amounts are wrong, you can
+breakdown.p2.privateBeta = If you think the amounts are wrong, you can call us on 0300 322 9665.
 
 # Bank account details page
 bankDetails.title = What are your bank details?
@@ -151,6 +153,7 @@ barsRequestErrors.u1.l2 = the supplied account does not support direct credit
 barsRequestErrors.u1.l3 = no account with the supplied details could be found
 barsRequestErrors.u1.l4 = the name on the account did not match what was supplied
 barsRequestErrors.p2 = If this issue persists you may have to
+barsRequestErrors.p2.privateBeta = If this issue persists you may have to call us on 0300 322 9665.
 
 # Bars check failure page
 barsCheckFailed.title = We could not verify your bank account details

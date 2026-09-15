@@ -19,12 +19,14 @@
 @import models.userAnswers._
 @import models.userAnswers.LeppSummary
 @import viewmodels.paymentBreakdown.BreakdownUtils._
+@import config.AppConfig
 
 @this(
     layout: templates.Layout,
     heading: h1,
     govukSummaryList: GovukSummaryList,
-    contactLinkElement: contact_link_element
+    contactLinkElement: contact_link_element,
+    appConfig: AppConfig
 )
 
 @(
@@ -60,7 +62,11 @@
     }
 
     @if(itemId.isEmpty){
-        <p class="govuk-body">@messages("breakdown.p2") @contactLinkElement()</p>
+        @if(appConfig.publicBetaContactUsEnabled){
+            <p class="govuk-body">@messages("breakdown.p2") @contactLinkElement()</p>
+        } else {
+            <p class="govuk-body">@messages("breakdown.p2.privateBeta") </p>
+        }
     }
 
     @if(itemId.isDefined || barsLockFlag){

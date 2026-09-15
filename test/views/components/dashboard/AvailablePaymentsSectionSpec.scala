@@ -35,6 +35,14 @@ class AvailablePaymentsSectionSpec extends SpecBase {
 
       result.select("h2").text() mustBe "Available payments"
       result.select(".govuk-inset-text").text() mustBe
+        "Your payments are suspended. For more information, you can call us on 0300 322 9665."
+    }
+
+    "render the inset text element with valid contactUs content when there are suspended payments" in new Setup(true) {
+      val result: Document = view(summaryModel, tableRef, "/href", false)
+
+      result.select("h2").text() mustBe "Available payments"
+      result.select(".govuk-inset-text").text() mustBe
         "Your payments are suspended. For more information, contact us (opens in new tab)."
     }
 
@@ -75,8 +83,9 @@ class AvailablePaymentsSectionSpec extends SpecBase {
     }
   }
 
-  trait Setup() {
-    val app: Application = applicationBuilder(emptyUserAnswers).build()
+  trait Setup(publicBetaEnabled: Boolean = false) {
+    val app: Application = applicationBuilder(emptyUserAnswers,
+      servicesConfig = servicesConfig ++ Map("feature-switch.publicBetaContactUsEnabled" -> publicBetaEnabled)).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
