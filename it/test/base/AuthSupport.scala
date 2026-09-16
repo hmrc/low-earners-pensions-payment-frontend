@@ -29,18 +29,12 @@ trait AuthSupport extends WireMockMethods {
   val authRequestJson: JsValue = Json.parse(
     """
       |{
-      | "authorise": [
-      |   {
-      |      "identifiers": [],
-      |      "state": "Activated",
-      |      "enrolment": "HMRC-PT"
-      |   }
-      | ],
+      | "authorise": [],
       | "retrieve": [
       |   "internalId",
       |   "nino",
       |   "confidenceLevel",
-      |   "authorisedEnrolments",
+      |   "allEnrolments",
       |   "optionalItmpName"
       | ]
       |}
@@ -69,7 +63,7 @@ trait AuthSupport extends WireMockMethods {
       Json.obj("confidenceLevel" -> 250) ++
         Json.obj("nino" -> nino) ++
         Json.obj("internalId" -> "anId") ++
-        Json.obj("authorisedEnrolments" -> JsArray(Seq(ptaEnrolment))) ++
+        Json.obj("allEnrolments" -> JsArray(Seq(ptaEnrolment))) ++
         Json.obj("optionalItmpName" -> Json.obj("givenName" -> JsString("Name")))
 
     when(method = POST, uri = authoriseUri)

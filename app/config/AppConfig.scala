@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.ConfidenceLevel.L250
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.webchat.config.Service
 
+import java.net.URLEncoder
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -38,6 +39,7 @@ class AppConfig @Inject()(config: Configuration):
   //Authorisation config
   val loginUrl: String = loadConfig("urls.login")
   val loginContinueUrl: String = loadConfig("urls.loginContinue")
+  val loginWithContinueUrl: String = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
   val ptaUrl: String = loadConfig("urls.ptaUrl")
 
   // Feedback config
