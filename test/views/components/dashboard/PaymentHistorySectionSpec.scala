@@ -17,7 +17,7 @@
 package views.components.dashboard
 
 import base.SpecBase
-import models.userAnswers.LeppItemStatus.Paid
+import models.userAnswers.LeppItemStatus.{Cancelled, Paid}
 import models.userAnswers.{LeppItem, LeppSummary}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -31,13 +31,41 @@ import java.time.LocalDate
 
 class PaymentHistorySectionSpec extends SpecBase {
 
+  val cancelledItems = Some(Seq(
+    LeppItem(
+      id = "C-25-1",
+      taxYear = 2025,
+      contributions = 1000,
+      taxRate = 0.2,
+      entitlement = 200,
+      status = Cancelled,
+      claimDate = None
+    ),
+    LeppItem(
+      id = "C-25-2",
+      taxYear = 2024,
+      contributions = 1000,
+      taxRate = 0.2,
+      entitlement = 200,
+      status = Cancelled,
+      claimDate = None
+    )
+  ))
+    
   "payment_history_section should" - {
     
     "render cancelled inset when cancelled items exist" in new Setup {
       val result: Document = view(summaryModel.copy(paidItems = None), tableRef)
       result.select("h2").text() mustBe "Payment history"
       result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
-        "We cancelled 1 of your payments. Cancelled payments will be replaced by a new payment."
+        "Following a review of your entitlement, we have cancelled 1 of your payments. As a result, this payment will not be made."
+    }
+
+    "render cancelled inset when multiple cancelled items exist" in new Setup {
+      val result: Document = view(summaryModel.copy(paidItems = None, cancelledItems = cancelledItems), tableRef)
+      result.select("h2").text() mustBe "Payment history"
+      result.select(".govuk-inset-text:nth-of-type(1)").text() mustBe
+        "Following a review of your entitlement, we have cancelled 2 of your payments. As a result, these payments will not be made."
     }
 
     "render paid inset when paid items exist in the last 10 days" in new Setup {

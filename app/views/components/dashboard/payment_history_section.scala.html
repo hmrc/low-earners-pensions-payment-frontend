@@ -30,12 +30,18 @@
 
 @(leppSummary: LeppSummary, tableRef: String, currentDate: LocalDate)(implicit messages: Messages)
 
+@cancelledItemsCount = @{ leppSummary.cancelledItems.getOrElse(Nil).length }
+
 @cancelledInsetContent = {
  <p>
   @messages("dashboard.paymentHistory.cancelledInset.start")
-  <strong class="govuk-!-font-weight-bold">@leppSummary.cancelledItems.getOrElse(Nil).length</strong>
+  <strong class="govuk-!-font-weight-bold">@cancelledItemsCount</strong>
   @messages("dashboard.paymentHistory.cancelledInset.end")
-  @messages("dashboard.paymentHistory.cancelledInset.replacement")
+  @if(cancelledItemsCount == 1){
+    @messages("dashboard.paymentHistory.cancelledInset.result.single")
+  } else {
+    @messages("dashboard.paymentHistory.cancelledInset.result.multiple")
+  }
  </p>
 }
 
