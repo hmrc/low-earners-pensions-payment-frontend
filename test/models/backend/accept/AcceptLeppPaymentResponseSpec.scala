@@ -23,16 +23,22 @@ class AcceptLeppPaymentResponseSpec extends SpecBase {
   "AcceptLeppPaymentResponse" - {
     val model: AcceptLeppPaymentResponse = AcceptLeppPaymentResponse(123)
     val validJson: JsValue = Json.parse("""{"updatedLowEarnersOptimisticLock": 123}""")
+
     "reads" - {
       "should return the expected model for valid JSON" in {
         validJson.validate[AcceptLeppPaymentResponse] mustBe a[JsSuccess[_]]
         validJson.as[AcceptLeppPaymentResponse] mustBe model
       }
-      
+
       "should return a JsError for invalid JSON" in {
         JsObject.empty.validate[AcceptLeppPaymentResponse] mustBe a[JsError]
       }
     }
-  }
 
+    "writes" - {
+      "convert AcceptLeppPaymentResponse to JSON" in {
+        Json.toJson(model) mustBe validJson
+      }
+    }
+  }
 }
