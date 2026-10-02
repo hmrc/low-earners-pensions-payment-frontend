@@ -124,21 +124,21 @@ class IdentifierActionSpec extends SpecBase with StubPlayBodyParsersFactory {
         )
       }
 
-      "if PTA enrolment is missing from auth response should redirect to unauthorised page" in {
+      "if PTA enrolment is missing from auth response should redirect to no pta account page" in {
         authTest(
           enrolments = Nil
         )(
           expectedStatus = SEE_OTHER,
-          expectedRedirectOpt = Some(controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+          expectedRedirectOpt = Some(controllers.auth.routes.NoPtaAccountUnauthorisedController.onPageLoad().url)
         )
       }
 
-      "if PTA enrolment is inactive should redirect to unauthorised page" in {
+      "if PTA enrolment is inactive should redirect to no pta account page" in {
         authTest(
           enrolments = Seq(ptaEnrolment.copy(state = "Inactive"))
         )(
           expectedStatus = SEE_OTHER,
-          expectedRedirectOpt = Some(controllers.auth.routes.UnauthorisedController.onPageLoad().url)
+          expectedRedirectOpt = Some(controllers.auth.routes.NoPtaAccountUnauthorisedController.onPageLoad().url)
         )
       }
 
