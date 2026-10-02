@@ -66,7 +66,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       case Some(internalId) ~ Some(nino) ~ confidenceLevel ~ enrolments ~ nameOpt =>
         if (!isPtaEnrolled(enrolments)) {
           logger.info("User is missing PTA enrolment. Redirecting to unauthorised page")
-          Future.successful(Redirect(controllers.auth.routes.UnauthorisedController.onPageLoad()))
+          Future.successful(Redirect(controllers.auth.routes.NoPtaAccountUnauthorisedController.onPageLoad()))
         } else if (confidenceLevel < config.confidenceLevelMinimum) {
           logger.info("User has insufficient confidence level. Redirecting to IV uplift journey")
           Future.successful(Redirect(config.ivUpliftUrl))
