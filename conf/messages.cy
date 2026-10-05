@@ -198,10 +198,10 @@ wrongAccount.p1 = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gw
 wrongAccount.signIn = Mewngofnodwch
 
 # No PTA account unauthorised page
-noPtaAccount.title = You can only use this service with a personal tax account
-noPtaAccount.heading = You can only use this service with a personal tax account
-noPtaAccount.p1 = To check if you're eligible for the low earner's pension payment,
-noPtaAccount.linkText = set up a personal tax account.
+noPtaAccount.title = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn
+noPtaAccount.heading = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn
+noPtaAccount.p1 = I wirio a ydych yn gymwys i gael taliad pensiwn i bobl ar incwm isel,
+noPtaAccount.linkText = sefydlwch gyfrif treth personol.
 
 # Uplift failure page
 ivUpliftFailure.title = Mae problem
