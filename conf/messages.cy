@@ -197,6 +197,12 @@ wrongAccount.heading = Mewngofnodwch gyda''ch cyfrif treth personol
 wrongAccount.p1 = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn.
 wrongAccount.signIn = Mewngofnodwch
 
+# No PTA account unauthorised page
+noPtaAccount.title = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn
+noPtaAccount.heading = Dim ond gyda chyfrif treth personol y gallwch ddefnyddio''r gwasanaeth hwn
+noPtaAccount.p1 = I wirio a ydych yn gymwys i gael taliad pensiwn i bobl ar incwm isel,
+noPtaAccount.linkText = sefydlwch gyfrif treth personol.
+
 # Uplift failure page
 ivUpliftFailure.title = Mae problem
 ivUpliftFailure.p1 = Ni allwch gael mynediad i''r gwasanaeth hwn. Gallai hyn fod oherwydd:

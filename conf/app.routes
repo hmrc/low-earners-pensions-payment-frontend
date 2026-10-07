@@ -41,6 +41,7 @@ GET    /not-eligible                            controllers.auth.IneligibleContr
 GET    /service-timed-out                       controllers.auth.SessionTimeoutController.onPageLoad()
 GET    /unauthorised                            controllers.auth.UnauthorisedController.onPageLoad()
 GET    /wrong-account                           controllers.auth.WrongAccountUnauthorisedController.onPageLoad()
+GET    /set-up-personal-tax-account             controllers.auth.NoPtaAccountUnauthorisedController.onPageLoad()
 GET    /we-could-not-confirm-your-details       controllers.auth.IvUpliftFailureController.onPageLoad(journeyId: Option[String])
 GET    /account/sign-out-survey                 controllers.auth.AuthController.signOut()
 GET    /account/timeout                         controllers.auth.AuthController.sessionTimeout()
