@@ -132,7 +132,7 @@ confirmation.what-next.linkText = Bwrw golwg dros eich taliadau
 confirmation.what-next.feedback.text = Dywedwch wrthym beth yw eich barn am y gwasanaeth hwn (mae''n cymryd 30 eiliad)
 confirmation.failure.tryAgain.single = I''w dderbyn eto, edrychwch ar eich taliadau a dewis '‘Derbyn taliad’'.
 confirmation.failure.tryAgain.multiple = I''w derbyn eto, edrychwch ar eich taliadau a dewiswch ''Derbyn taliadau’'.
-confirmation.failure.sub.heading = Methodd rhai o'ch taliadau â phrosesu oherwydd gwall system
+confirmation.failure.sub.heading = Methodd rhai o''ch taliadau â phrosesu oherwydd gwall system
 confirmation.table.caption.success = Taliadau llwyddiannus
 confirmation.table.caption.failed = Aliadau aflwyddiannus
 confirmation.table.availableUntil = 5 Ebrill {0}
@@ -163,9 +163,9 @@ barsCheckFailed.p1 = Digwyddodd gwall wrth geisio gwirio manylion eich cyfrif ba
 barsCheckFailed.p2 = Rhowch gynnig arall arni yn nes ymlaen.
 
 # BARS lockout page
-bars.lockout.title = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
-bars.lockout.heading = Rydych chi wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
-bars.lockout.p2 = Gallwch chi roi cynnig arall arni ar ôl {0} i gadarnhau manylion eich banc.
+bars.lockout.title = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
+bars.lockout.heading = Rydych wedi ceisio rhoi manylion eich cyfrif banc ormod o weithiau
+bars.lockout.p2 = Gallwch roi cynnig arall arni ar ôl {0}.
 bars.lockout.go-to-dashboard = Dychwelyd i''ch taliadau
 
 # Not eligible page
