@@ -32,7 +32,7 @@ class NoPtaAccountUnauthorisedViewSpec extends SpecBase {
     "render the correct content and link" in new Setup() {
       view.title() mustBe "You can only use this service with a personal tax account - Accept your low earner's pension payment - GOV.UK"
       view.select("h1").text() mustBe "You can only use this service with a personal tax account"
-      view.select(".govuk-body").text() mustBe "To check if you're eligible for the low earner's pension payment,"
+      view.select(".govuk-body").text() must include("To check if you're eligible for the low earner's pension payment,")
       println(view.body())
       view.getElementById("pta-link").text() mustBe "set up a personal tax account."
       view.getElementById("pta-link").attr("href") mustBe appConfig.ptaUrl

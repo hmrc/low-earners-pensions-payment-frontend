@@ -28,10 +28,12 @@
     showSignOut = true
 ) {
     <h1 class="govuk-heading-l">@messages("noPtaAccount.heading")</h1>
-    <p class="govuk-body">@messages("noPtaAccount.p1")</p>
-    <a id="pta-link"
-       class="pta-link govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
-       href="@appConfig.ptaUrl">
-        @messages("noPtaAccount.linkText")
-    </a>
+    <p class="govuk-body">
+        @messages("noPtaAccount.p1")
+        <a id="pta-link"
+           class="pta-link govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
+           href="@appConfig.ptaUrl">
+            @messages("noPtaAccount.linkText")
+        </a>
+    </p>
 }
