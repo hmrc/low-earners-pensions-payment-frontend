@@ -124,7 +124,7 @@ checkYourAnswers.rollNumber = Building society roll number
 
 # Confirmation page
 confirmation.title = We''ve received your bank details
-confirmation.failure.title = Some of your payments could not be processed
+confirmation.failure.title = Some of your payments failed to process due to a system error
 confirmation.heading = We''ve received your bank details
 confirmation.what-next.heading = What you can do next
 confirmation.what-next.print = Print this page
@@ -165,7 +165,7 @@ barsCheckFailed.p2 = Try again later.
 # BARS lockout page
 bars.lockout.title = You''ve tried to enter your bank account details too many times
 bars.lockout.heading = You''ve tried to enter your bank account details too many times
-bars.lockout.p2 = You can try again after {0} to confirm your bank details.
+bars.lockout.p2 = You can try again after {0}.
 bars.lockout.go-to-dashboard = Return to your payments
 
 # Not eligible page

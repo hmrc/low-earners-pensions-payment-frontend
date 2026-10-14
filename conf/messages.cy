@@ -124,7 +124,7 @@ checkYourAnswers.rollNumber = Rhif y gymdeithas adeiladu
 
 # Confirmation page
 confirmation.title = Rydym wedi cael eich manylion banc
-confirmation.failure.title = Ni ellid prosesu rhai o''ch taliadau
+confirmation.failure.title = Methodd rhai o''ch taliadau â phrosesu oherwydd gwall system
 confirmation.heading = Rydym wedi cael eich manylion banc
 confirmation.what-next.heading = Yr hyn y gallwch ei wneud nesaf
 confirmation.what-next.print = Argraffwch y dudalen hon
