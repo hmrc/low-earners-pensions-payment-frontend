@@ -119,9 +119,9 @@ class LeppRetrievalServiceSpec extends SpecBase {
             LeppItem(
               id = "P-11-1",
               taxYear = 11,
-              contributions = 10.56,
-              taxRate = 0.23,
-              entitlement = 10.56,
+              contributions = 100,
+              taxRate = 0.2,
+              entitlement = 20,
               status = Paid,
               claimDate = Some(LocalDate.of(2023, 6, 27)),
               originalAmount = Some(10.56)

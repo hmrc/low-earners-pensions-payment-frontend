@@ -81,7 +81,7 @@ breakdown.single.heading = You''re eligible for a {0} payment
 breakdown.multiple.p1 = These payments are due to you because you did not get tax relief on some or all of your net pay pension contributions.
 breakdown.single.p1 = This payment is due to you because you did not get tax relief on some or all of your net pay pension contributions.
 breakdown.u1 = For the tax year 6 April {0} to 5 April {1}
-breakdown.l1 = Your net pay pension contributions
+breakdown.l1 = Your qualifying net pay pension contributions
 breakdown.l2 = Your relevant basic tax rate
 breakdown.l3 = Your payment
 

@@ -273,7 +273,7 @@ class LeppSummarySpec extends SpecBase {
           )
         )
         
-        val leppItem = LeppItem("A-2025-1", 2025, 10.56, 10.56, 10.56, Available, None, Some(10.56))
+        val leppItem = LeppItem("A-2025-1", 2025, 10.56, Some(1), 10.56, 10.56, Available, None, Some(10.56))
 
         LeppSummary(retrieveResponse) mustBe LeppSummary(
           currentLock = 123,
@@ -297,7 +297,7 @@ class LeppSummarySpec extends SpecBase {
       }
       
       "not include empty sequences" in {
-        val leppItem = LeppItem("P-11-1", 11, 10.56, 0.23, 10.56, Paid, Some(LocalDate.of(2023, 6, 27)), Some(10.56))
+        val leppItem = LeppItem("P-11-1", 11, 100, None, 0.2, 20, Paid, Some(LocalDate.of(2023, 6, 27)), Some(10.56))
 
         LeppSummary(retrieveResponse) mustBe LeppSummary(
           currentLock = 123,

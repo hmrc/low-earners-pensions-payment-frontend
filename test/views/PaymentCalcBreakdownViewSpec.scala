@@ -85,7 +85,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       view.select(".govuk-summary-card__title").text mustBe "For the tax year 6 April 2025 to 5 April 2026"
 
       val tableRowHeadings: String = view.select(".govuk-summary-list__key").text
-      tableRowHeadings.contains("Your net pay pension contributions") mustBe true
+      tableRowHeadings.contains("Your qualifying net pay pension contributions") mustBe true
       tableRowHeadings.contains("Your relevant basic tax rate") mustBe true
       tableRowHeadings.contains("Your payment") mustBe true
 
@@ -142,7 +142,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       val elements: Elements = view.getElementById("P-id-1").getElementsByClass("govuk-summary-card__content")
       elements.forEach(
         element =>
-          element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your net pay pension contributions"
+          element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your qualifying net pay pension contributions"
           element.getElementsByClass("govuk-summary-list__value").first().text() mustBe "£1000"
 
           element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Additional amount due"
@@ -166,7 +166,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
       val elements: Elements = view.getElementById("id-1").getElementsByClass("govuk-summary-card__content")
       elements.forEach(
         element =>
-         element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your net pay pension contributions"
+         element.getElementsByClass("govuk-summary-list__key").first().text() mustBe "Your qualifying net pay pension contributions"
          element.getElementsByClass("govuk-summary-list__value").first().text() mustBe "£1000"
 
          element.getElementsByClass("govuk-summary-list__key").last().text() mustBe "Additional amount due"

@@ -17,6 +17,7 @@
 package models.userAnswers
 
 import base.SpecBase
+import models.backend.retrieve.LowEarnersCalculation
 import models.userAnswers.LeppItemStatus.Paid
 import play.api.libs.json.*
 
@@ -84,6 +85,13 @@ class LeppItemSpec extends SpecBase {
       "should return the expected value for a number with decimals" in {
         model.copy(contributions = 200.1).formattedContributions mustBe "£200.10"
       }
+      
+      "should use calculated qualifying contributions when it is defined" in {
+        model.copy(
+          contributions = 200.1,
+          qualifyingContributionsOpt = Some(200.2)
+        ).formattedContributions mustBe "£200.20"
+      }
     }
     
     "apply" - {
@@ -91,9 +99,28 @@ class LeppItemSpec extends SpecBase {
         LeppItem(2025, calculation, 1) mustBe LeppItem(
           id = "P-2025-1",
           taxYear = 2025,
-          contributions = 10.56,
-          taxRate = 0.23,
-          entitlement = 10.56,
+          contributions = 100,
+          taxRate = 0.20,
+          entitlement = 20,
+          status = Paid,
+          claimDate = Some(LocalDate.of(2023, 6, 27)),
+          Some(10.56)
+        )
+      }
+
+      "should populate qualifying contributions field when a calculation discrepancy exists" in {
+        val calculation: LowEarnersCalculation = LowEarnersCalculation(
+          lowEarnersClaimDetails = claimDetails,
+          lowEarnersDataDetails = dataDetails.copy(netPayContributionsTotal = Some(110))
+        )
+       
+        LeppItem(2025, calculation, 1) mustBe LeppItem(
+          id = "P-2025-1",
+          taxYear = 2025,
+          contributions = 110,
+          qualifyingContributionsOpt = Some(100),
+          taxRate = 0.2,
+          entitlement = 20,
           status = Paid,
           claimDate = Some(LocalDate.of(2023, 6, 27)),
           Some(10.56)
