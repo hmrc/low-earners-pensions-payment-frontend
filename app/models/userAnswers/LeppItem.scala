@@ -22,33 +22,42 @@ import utils.CurrencyFormats
 
 import java.time.LocalDate
 
-case class LeppItem(id: String, 
+case class LeppItem(id: String,
                     taxYear: Int,
                     contributions: BigDecimal,
+                    qualifyingContributionsOpt: Option[BigDecimal] = None,
                     taxRate: BigDecimal,
                     entitlement: BigDecimal,
                     status: LeppItemStatus,
                     claimDate: Option[LocalDate],
                     originalAmount: Option[BigDecimal] = None) {
   val formattedEntitlement: String = CurrencyFormats.format(entitlement)
-  val formattedContributions: String = CurrencyFormats.format(contributions)
+  val formattedContributions: String = CurrencyFormats.format(qualifyingContributionsOpt.getOrElse(contributions))
   val taxRatePercent = s"${(taxRate * 100).intValue.toString}%"
 }
 
 object LeppItem {
   def apply(taxYear: Int, calculation: LowEarnersCalculation, index: Int): LeppItem = {
-    val leppStatus: LeppItemStatus = calculation.lowEarnersClaimDetails.claimStatus.toLeppItemStatus
-    val id: String = s"${leppStatus.toString.take(1)}-$taxYear-$index" 
+    import calculation.lowEarnersClaimDetails.*
+    import calculation.lowEarnersDataDetails.*
+    val leppStatus: LeppItemStatus = claimStatus.toLeppItemStatus
+    val id: String = s"${leppStatus.toString.take(1)}-$taxYear-$index"
     
+    val calculatedQualifyingContributionsOpt = {
+      val calc = entitlementAmount.getOrElse(BigDecimal(0)) / basicRatePercentage.getOrElse(BigDecimal(0))
+      if (calc == netPayContributionsTotal.getOrElse(0)) None else Some(calc)
+    }
+
     LeppItem(
       id = id,
       taxYear = taxYear,
-      contributions = calculation.lowEarnersDataDetails.netPayContributionsTotal.getOrElse(0),
-      taxRate = calculation.lowEarnersDataDetails.basicRatePercentage.getOrElse(0),
-      entitlement = calculation.lowEarnersClaimDetails.entitlementAmount.getOrElse(0),
-      status = calculation.lowEarnersClaimDetails.claimStatus.toLeppItemStatus,
-      claimDate = calculation.lowEarnersClaimDetails.claimDate.map(LocalDate.parse(_)),
-      originalAmount = calculation.lowEarnersClaimDetails.originalAmount
+      contributions = netPayContributionsTotal.getOrElse(0),
+      qualifyingContributionsOpt = calculatedQualifyingContributionsOpt,
+      taxRate = basicRatePercentage.getOrElse(0),
+      entitlement = entitlementAmount.getOrElse(0),
+      status = claimStatus.toLeppItemStatus,
+      claimDate = claimDate.map(LocalDate.parse(_)),
+      originalAmount = originalAmount
     )
   }
   

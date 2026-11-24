@@ -81,7 +81,7 @@ breakdown.single.heading = Rydych chi''n gymwys i gael taliad o {0}
 breakdown.multiple.p1 = Mae''r taliadau hyn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar ar rai o''ch cyfraniadau pensiwn cyflog net, neu bob un ohonynt.
 breakdown.single.p1 = Mae''r taliad hwn yn ddyledus i chi oherwydd na chawsoch ryddhad treth ar rai neu''r cyfan o''ch cyfraniadau pensiwn cyflog net.
 breakdown.u1 = Ar gyfer blwyddyn dreth 6 Ebrill {0} i 5 Ebrill {1}
-breakdown.l1 = Eich cyfraniadau pensiwn cyflog net
+breakdown.l1 = Eich cyfraniadau pensiwn cyflog net cymhwyso
 breakdown.l2 = Eich cyfradd dreth sylfaenol berthnasol
 breakdown.l3 = Eich taliad
 

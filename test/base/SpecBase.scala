@@ -243,21 +243,21 @@ trait SpecBase
     correlationId = testCorrelationId
   )
   
-  private val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
+  val dataDetails: LowEarnersDataDetails = LowEarnersDataDetails(
     responseTimestamp = Some("2023-06-27 09:12:28"),
     calculationSequenceNumber = 123,
     dataSourceMaster = "CESA",
-    netPayContributionsTotal = Some(10.56),
-    basicRatePercentage = Some(0.23),
+    netPayContributionsTotal = Some(100),
+    basicRatePercentage = Some(0.20),
     totalAllowances = Some(10.56),
     totalIncome = Some(10.56),
     totalDeductions = Some(10.56),
     totalTaxDue = Some(10.56)
   )
 
-  private val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
+  val claimDetails: LowEarnersClaimDetails = LowEarnersClaimDetails(
     claimSequenceNumber = 123,
-    entitlementAmount = Some(10.56),
+    entitlementAmount = Some(20),
     claimStatus = NpsPaid,
     inSelfAssessment = true,
     calculationDate = Some("2023-06-27"),
