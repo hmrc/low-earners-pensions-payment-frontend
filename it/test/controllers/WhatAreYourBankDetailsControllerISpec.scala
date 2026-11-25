@@ -69,6 +69,32 @@ class WhatAreYourBankDetailsControllerISpec extends ControllerIntegrationSpecBas
         status(result) shouldBe OK
         contentAsString(result) shouldEqual view(form, formViewModel)(request, messages).toString
       }
+      
+      "return bank details view with correct back link when removeBreakdownEnabled is true" in {
+        mockAuthSuccess()
+        mockBarsVerifyStatus(status = OK,
+          response = Json.obj("attempts" -> 1))
+
+        val application: Application = applicationWithUserAnswers(
+          answers = userAnswersWithLeppSummary,
+          removeBreakdownEnabled = true
+        )
+
+        lazy val result: Future[Result] = route(application, request).getOrElse(
+          Future.failed(new RuntimeException("TEST_ERROR"))
+        )
+
+        val view: WhatAreYourBankDetailsView = application.injector.instanceOf[WhatAreYourBankDetailsView]
+        val messages: Messages = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val viewModel: FormPageViewModel = FormPageViewModel(
+          onSubmit = onSubmitUrl,
+          backLinkUrl = Some(routes.DashboardController.onPageLoad().url)
+        )
+        
+        status(result) shouldBe OK
+        contentAsString(result) shouldEqual view(form, viewModel)(request, messages).toString
+      }
     }
 
     "user locked out for too many BARS attempts" should {
