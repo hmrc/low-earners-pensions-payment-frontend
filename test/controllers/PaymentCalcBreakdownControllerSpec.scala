@@ -107,5 +107,40 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
         redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
       }
     }
+    
+    "must redirect to dashboard page for a request where id is populated and removeBreakdownEnabled is enabled" in {
+      val application: Application = applicationBuilder(
+        userAnswers = userAnswers,
+        servicesConfig = servicesConfig ++ Map(
+          "feature-switch.removeBreakdownEnabled" -> true
+        )
+      ).build()
+      
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(Some("P-25-1")).url)
+
+        val result: Future[Result] = route(application, request).value
+        redirectLocation(result) mustBe Some(controllers.routes.DashboardController.onPageLoad().url)
+      }
+    }
+
+    "must redirect to bank details page for a request where id is not populated and removeBreakdownEnabled is enabled" in {
+      val application: Application = applicationBuilder(
+        userAnswers = userAnswers,
+        servicesConfig = servicesConfig ++ Map(
+          "feature-switch.removeBreakdownEnabled" -> true
+        )
+      ).build()
+
+      running(application) {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+          FakeRequest(GET, controllers.routes.PaymentCalcBreakdownController.onPageLoad(None).url)
+
+        val result: Future[Result] = route(application, request).value
+        redirectLocation(result) mustBe Some(controllers.routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url)
+      }
+    }
+
   }
 }

@@ -16,11 +16,12 @@
 
 package controllers
 
+import config.AppConfig
 import controllers.actions.{AcceptPaymentCheckEligibilityAction, DataRetrievalAction, IdentifierAction, NoRedirectBarsLockoutAction}
 import controllers.common.BarsLeppBaseController
 import navigation.Navigator
 import pages.*
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import viewmodels.NormalMode
 import views.html.PaymentCalcBreakdownView
 import utils.MessageKeys
@@ -34,44 +35,59 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
                                                checkEligibility: AcceptPaymentCheckEligibilityAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                paymentCalcBreakdownView: PaymentCalcBreakdownView,
-                                               navigator: Navigator)(implicit val ec: ExecutionContext)
+                                               navigator: Navigator,
+                                               appConfig: AppConfig)(implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility) {
 
   def onPageLoad(id: Option[String] = None): Action[AnyContent] = handleWithSubmissionCheck { implicit request =>
-    val (messageKey, entitlement, isUnderPayment) = id match {
-      case Some(value) if request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined =>
-        if(value.startsWith("C")) {
-          (MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
-        } else
-          (MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
-      case Some(value) =>
-        if(value.startsWith("C")) {
-          (MessageKeys.SINGLE_PAST_CANCELLED_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
-        } else
-          (MessageKeys.SINGLE_PAST_PAID_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
-      case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
-        if(request.leppSummary.availableItems.get.head.originalAmount.isDefined) {
-          (MessageKeys.SINGLE_UNDER_PAYMENT, request.leppSummary.totalEntitlementString, true)
-        } else {
-          (MessageKeys.SINGLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
-        }
-      case None => (MessageKeys.MULTIPLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
-    }
-    
-    Future.successful(
-      Ok(
-        paymentCalcBreakdownView(
-          paymentSummary = request.leppSummary,
-          continueUrl = navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
-          backUrl = Some(backLinkUrl(NormalMode, PaymentCalcBreakdownPage).url),
-          barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
-          itemId = id,
-          messageKey,
-          entitlement,
-          isUnderPayment
+    def doPageLoad(): Future[Result] = {
+      val (messageKey, entitlement, isUnderPayment) = id match {
+        case Some(value) if request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.originalAmount.isDefined =>
+          if (value.startsWith("C")) {
+            (MessageKeys.SINGLE_PAST_CANCELLED_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+          } else
+            (MessageKeys.SINGLE_PAST_PAID_UNDER_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+        case Some(value) =>
+          if (value.startsWith("C")) {
+            (MessageKeys.SINGLE_PAST_CANCELLED_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, true)
+          } else
+            (MessageKeys.SINGLE_PAST_PAID_PAYMENT, request.leppSummary.paymentHistoryItems.filter(item => item.id == value).head.formattedEntitlement, false)
+        case None if request.leppSummary.availableItems.getOrElse(Nil).length == 1 =>
+          if (request.leppSummary.availableItems.get.head.originalAmount.isDefined) {
+            (MessageKeys.SINGLE_UNDER_PAYMENT, request.leppSummary.totalEntitlementString, true)
+          } else {
+            (MessageKeys.SINGLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
+          }
+        case None => (MessageKeys.MULTIPLE_PAYMENT, request.leppSummary.totalEntitlementString, false)
+      }
+
+      Future.successful(
+        Ok(
+          paymentCalcBreakdownView(
+            paymentSummary = request.leppSummary,
+            continueUrl = navigator.nextPage(PaymentCalcBreakdownPage, NormalMode).url,
+            backUrl = Some(backLinkUrl(NormalMode, PaymentCalcBreakdownPage).url),
+            barsLockFlag = request.barsLockoutExpiryOpt.nonEmpty,
+            itemId = id,
+            messageKey,
+            entitlement,
+            isUnderPayment
+          )
         )
-      ) 
-    )
+      )
+    }
+
+    (appConfig.removeBreakdownEnabled, id) match {
+      case (true, None) => 
+        println("!")
+        Future.successful(Redirect(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode)))
+      case (true, Some(_)) =>
+        println("!!")
+        Future.successful(Redirect(routes.DashboardController.onPageLoad()))
+      case (false, _) =>
+        println("!!!")
+        doPageLoad()
+    }
   }
 }
   

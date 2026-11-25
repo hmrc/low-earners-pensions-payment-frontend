@@ -110,3 +110,5 @@ class AppConfig @Inject()(config: Configuration):
   val internalAuthToken: String = config.get[String]("internal-auth.token")
   // Contact us link feature switch for Public Beta
   val publicBetaContactUsEnabled: Boolean = config.get[Boolean]("feature-switch.publicBetaContactUsEnabled")
+  
+  val removeBreakdownEnabled: Boolean = config.get[Boolean]("feature-switch.removeBreakdownEnabled")
