@@ -166,7 +166,7 @@ class PaymentHistorySectionSpec extends SpecBase {
       result.select(s"$row1 > td:nth-of-type(1)").text() mustBe "£200"
       result.select(s"$row1 > td:nth-of-type(2)").text() mustBe "N/A"
       result.select(s"$row1 > td:nth-of-type(3)").text() mustBe "Cancelled"
-      result.select(s"$row2 > td:nth-of-type(4)").hasText mustBe false
+      result.select(s"$row1 > td:nth-of-type(4)").hasText mustBe false
       result.select(s"$row1 > td:nth-of-type(4) .govuk-visually-hidden").size() mustBe 0
 
       val row2 = "tbody > tr:nth-of-type(2)"
@@ -182,9 +182,7 @@ class PaymentHistorySectionSpec extends SpecBase {
   trait Setup(removeBreakdownEnabled: Boolean = false) {
     val app: Application = applicationBuilder(
       emptyUserAnswers,
-      servicesConfig = servicesConfig ++ Map(
-        "feature-switch.removeBreakdownEnabled" -> removeBreakdownEnabled
-      )
+      servicesConfig = servicesConfig(removeBreakdownEnabled)
     ).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()

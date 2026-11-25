@@ -111,9 +111,7 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
     "must redirect to dashboard page for a request where id is populated and removeBreakdownEnabled is enabled" in {
       val application: Application = applicationBuilder(
         userAnswers = userAnswers,
-        servicesConfig = servicesConfig ++ Map(
-          "feature-switch.removeBreakdownEnabled" -> true
-        )
+        servicesConfig = servicesConfig(removeBreakdownEnabled = true)
       ).build()
       
       running(application) {
@@ -128,9 +126,7 @@ class PaymentCalcBreakdownControllerSpec extends SpecBase {
     "must redirect to bank details page for a request where id is not populated and removeBreakdownEnabled is enabled" in {
       val application: Application = applicationBuilder(
         userAnswers = userAnswers,
-        servicesConfig = servicesConfig ++ Map(
-          "feature-switch.removeBreakdownEnabled" -> true
-        )
+        servicesConfig = servicesConfig(removeBreakdownEnabled = true)
       ).build()
 
       running(application) {

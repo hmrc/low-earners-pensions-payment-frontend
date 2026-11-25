@@ -183,7 +183,7 @@ class PaymentCalcBreakdownViewSpec extends SpecBase {
               publicBetaEnabled: Boolean = false) {
     
     val app: Application = applicationBuilder(emptyUserAnswers,
-      servicesConfig = servicesConfig ++ Map("feature-switch.publicBetaContactUsEnabled" -> publicBetaEnabled)).build()
+      servicesConfig = servicesConfig() ++ Map("feature-switch.publicBetaContactUsEnabled" -> publicBetaEnabled)).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some/resource/path")
     
