@@ -78,14 +78,11 @@ class PaymentCalcBreakdownController @Inject()(identify: IdentifierAction,
     }
 
     (appConfig.removeBreakdownEnabled, id) match {
-      case (true, None) => 
-        println("!")
+      case (true, None) =>
         Future.successful(Redirect(routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode)))
       case (true, Some(_)) =>
-        println("!!")
         Future.successful(Redirect(routes.DashboardController.onPageLoad()))
       case (false, _) =>
-        println("!!!")
         doPageLoad()
     }
   }
