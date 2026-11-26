@@ -19,13 +19,15 @@
 @import views.html.components._
 @import java.time.LocalDate
 @import viewmodels.dashboard.DashboardUtils
+@import config.AppConfig
 
 @this(
  table: GovukTable,
  insetText: GovukInsetText,
  subHeading: h2,
  statusElement: status_element,
- linkElement: link_element
+ linkElement: link_element,
+ config: AppConfig
 )
 
 @(leppSummary: LeppSummary, tableRef: String, currentDate: LocalDate)(implicit messages: Messages)
@@ -64,8 +66,17 @@
     @table(Table(
         attributes = Map("id" -> tableRef),
         caption = Some(messages("dashboard.paymentHistory.heading")),
-        rows =  DashboardUtils.tableRows(leppSummary.paymentHistoryItems, statusElement, Some(linkElement), isHistoric = true),
-        head = Some(DashboardUtils.tableHeaders(tableRef, Seq("taxYear", "amount", "dateAccepted", "status", "action"))),
+        rows = DashboardUtils.tableRows(
+            leppSummary.paymentHistoryItems,
+            statusElement,
+            Some(linkElement),
+            isHistoric = true
+        ),
+        head = Some(DashboardUtils.tableHeaders(
+                 tableRef, 
+                 Seq("taxYear", "amount", "dateAccepted", "status", "action"),
+                 false
+               )),
         firstCellIsHeader = true,
         captionClasses = "govuk-visually-hidden",
         classes = "govuk-table--small-text-until-tablet"

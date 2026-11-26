@@ -149,10 +149,41 @@ class PaymentHistorySectionSpec extends SpecBase {
       result.select(s"$row2 > td:nth-of-type(4)").text() mustBe "Check calculation 6 April 2025 to 5 April 2026"
       result.select(s"$row2 > td:nth-of-type(4) .govuk-visually-hidden").text() mustBe "6 April 2025 to 5 April 2026"
     }
+
+
+    "not render action links when feature switch is enabled" in new Setup(removeBreakdownEnabled = true) {
+      val result: Document = view(summaryModel, tableRef)
+      result.getElementById(s"${tableRef}_header_taxYear").text() mustBe "Tax year"
+      result.getElementById(s"${tableRef}_header_amount").text() mustBe "Amount"
+      result.getElementById(s"${tableRef}_header_dateAccepted").text() mustBe "Date accepted"
+      result.getElementById(s"${tableRef}_header_status").text() mustBe "Status"
+      result.getElementById(s"${tableRef}_header_action") mustBe null
+
+      result.select("tbody tr").size() mustBe summaryModel.paymentHistoryItems.size
+
+      val row1 = "tbody > tr:nth-of-type(1)"
+      result.select(s"$row1 > th").text() mustBe "6 April 2025 to 5 April 2026"
+      result.select(s"$row1 > td:nth-of-type(1)").text() mustBe "£200"
+      result.select(s"$row1 > td:nth-of-type(2)").text() mustBe "N/A"
+      result.select(s"$row1 > td:nth-of-type(3)").text() mustBe "Cancelled"
+      result.select(s"$row1 > td:nth-of-type(4)").hasText mustBe false
+      result.select(s"$row1 > td:nth-of-type(4) .govuk-visually-hidden").size() mustBe 0
+
+      val row2 = "tbody > tr:nth-of-type(2)"
+      result.select(s"$row2 > th").text() mustBe "6 April 2025 to 5 April 2026"
+      result.select(s"$row2 > td:nth-of-type(1)").text() mustBe "£200"
+      result.select(s"$row2 > td:nth-of-type(2)").text() mustBe "N/A"
+      result.select(s"$row2 > td:nth-of-type(3)").text() mustBe "Paid"
+      result.select(s"$row2 > td:nth-of-type(4)").hasText mustBe false
+      result.select(s"$row2 > td:nth-of-type(4) .govuk-visually-hidden").size() mustBe 0
+    }
   }
 
-  trait Setup {
-    val app: Application = applicationBuilder(emptyUserAnswers).build()
+  trait Setup(removeBreakdownEnabled: Boolean = false) {
+    val app: Application = applicationBuilder(
+      emptyUserAnswers,
+      servicesConfig = servicesConfig(removeBreakdownEnabled)
+    ).build()
     implicit val msg: Messages = messages(app)
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 

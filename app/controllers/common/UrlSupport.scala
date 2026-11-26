@@ -23,10 +23,12 @@ import viewmodels.formPages.FormPageViewModel
 import viewmodels.{CheckMode, Mode}
 
 trait UrlSupport {
-  protected def viewModel(mode: Mode, page: Page): FormPageViewModel =
+  protected def viewModel(mode: Mode,
+                          page: Page,
+                          removeBreakdownEnabled: Boolean = false): FormPageViewModel =
     FormPageViewModel(
       onSubmit = submitUrl(mode, page),
-      backLinkUrl = Some(backLinkUrl(mode, page).url)
+      backLinkUrl = Some(backLinkUrl(mode, page, removeBreakdownEnabled).url)
     )
 
   protected[controllers] def submitUrl(mode: Mode, page: Page): Call = page match {
@@ -36,14 +38,17 @@ trait UrlSupport {
     case _ => routes.DashboardController.onPageLoad()
   }
 
-  protected[controllers] def backLinkUrl(mode: Mode, page: Page): Call = {
-    val backPage: Page = (mode, page) match {
-      case (CheckMode, _) => CheckYourAnswersPage
-      case (_, DashboardPage) => WhatYouWillNeedPage
-      case (_, PaymentCalcBreakdownPage) => DashboardPage
-      case (_, WhatAreYourBankDetailsPage) => PaymentCalcBreakdownPage
-      case (_, CheckYourAnswersPage) => WhatAreYourBankDetailsPage
-      case (_, SubmissionPage) => DashboardPage
+  protected[controllers] def backLinkUrl(mode: Mode,
+                                         page: Page,
+                                         removeBreakdownEnabled: Boolean = false): Call = {
+    val backPage: Page = (mode, removeBreakdownEnabled, page) match {
+      case (CheckMode, _, _) => CheckYourAnswersPage
+      case (_, _, DashboardPage) => WhatYouWillNeedPage
+      case (_, _, PaymentCalcBreakdownPage) => DashboardPage
+      case (_, false, WhatAreYourBankDetailsPage) => PaymentCalcBreakdownPage
+      case (_, true, WhatAreYourBankDetailsPage) => DashboardPage
+      case (_, _, CheckYourAnswersPage) => WhatAreYourBankDetailsPage
+      case (_, _, SubmissionPage) => DashboardPage
       case _ => WhatYouWillNeedPage
     }
     backPage.route(mode)
