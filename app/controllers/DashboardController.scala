@@ -26,6 +26,7 @@ import services.SessionCacheService
 import utils.DateTime
 import viewmodels.NormalMode
 import views.html.DashboardView
+import config.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,7 +39,8 @@ class DashboardController @Inject()(identify: IdentifierAction,
                                     val controllerComponents: MessagesControllerComponents,
                                     view: DashboardView,
                                     navigator: Navigator,
-                                    dateTime: DateTime)
+                                    dateTime: DateTime,
+                                    appConfig: AppConfig)
                                    (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility.create(withCaching = true)) {
 
@@ -48,7 +50,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
         view(
           leppSummary = request.leppSummary,
           backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
-          continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
+          continueUrl = navigator.nextPage(DashboardPage, NormalMode, appConfig.removeBreakdownEnabled).url,
           currentDate = dateTime.getDate,
           barsLockoutExpiryOpt = request.barsLockoutExpiryOpt
         )
