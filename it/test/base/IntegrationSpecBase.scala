@@ -79,6 +79,8 @@ class IntegrationSpecBase extends AnyWordSpec
     prefix + f"$str$num%06d$suffix".drop(prefix.length)
   }
   
+  def removeBreakdownEnabled(): Boolean = false
+  
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder()
       .configure(
@@ -88,12 +90,13 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.port" -> wireMockPort,
         "microservice.services.auth.host" -> wireMockHost,
         "microservice.services.lepp-backend.port" -> wireMockPort,
-        "microservice.services.lepp-backend.host" -> wireMockHost
+        "microservice.services.lepp-backend.host" -> wireMockHost,
+        "feature-switch.removeBreakdownEnabled" -> removeBreakdownEnabled()
       )
       .build()
   }
 
-  def applicationWithSetDate(date: LocalDate): Application = {
+  def applicationWithSetDate(date: LocalDate, removeBreakdownEnabled: Boolean = false): Application = {
     GuiceApplicationBuilder()
       .configure(
         "microservice.services.bars.port" -> wireMockPort,
@@ -102,7 +105,8 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.port" -> wireMockPort,
         "microservice.services.auth.host" -> wireMockHost,
         "microservice.services.lepp-backend.port" -> wireMockPort,
-        "microservice.services.lepp-backend.host" -> wireMockHost
+        "microservice.services.lepp-backend.host" -> wireMockHost,
+        "feature-switch.removeBreakdownEnabled" -> removeBreakdownEnabled
       )
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime(date))
@@ -110,7 +114,9 @@ class IntegrationSpecBase extends AnyWordSpec
       .build()
   }
 
-  def applicationWithUserAnswers(answers: UserAnswers, time: ZonedDateTime = ZonedDateTime.now()): Application = {
+  def applicationWithUserAnswers(answers: UserAnswers,
+                                 time: ZonedDateTime = ZonedDateTime.now(), 
+                                 removeBreakdownEnabled: Boolean = false): Application = {
     GuiceApplicationBuilder()
       .configure(
         "microservice.services.bars.port" -> wireMockPort,
@@ -119,7 +125,8 @@ class IntegrationSpecBase extends AnyWordSpec
         "microservice.services.auth.port" -> wireMockPort,
         "microservice.services.auth.host" -> wireMockHost,
         "microservice.services.lepp-backend.port" -> wireMockPort,
-        "microservice.services.lepp-backend.host" -> wireMockHost
+        "microservice.services.lepp-backend.host" -> wireMockHost,
+        "feature-switch.removeBreakdownEnabled" -> removeBreakdownEnabled
       )
       .overrides(
         bind[DateTime].toInstance(new FakeDateTime()),

@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
+import config.AppConfig
 import controllers.actions.*
 import controllers.common.BarsLeppBaseController
 import forms.WhatAreYourBankDetailsFormProvider
@@ -27,6 +28,7 @@ import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.*
 import viewmodels.Mode
+import viewmodels.formPages.FormPageViewModel
 import views.html.WhatAreYourBankDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +42,7 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
                                                  formProvider: WhatAreYourBankDetailsFormProvider,
                                                  view: WhatAreYourBankDetailsView,
                                                  navigator: Navigator,
+                                                 appConfig: AppConfig,
                                                  val controllerComponents: MessagesControllerComponents)
                                                 (implicit val ec: ExecutionContext)
   extends BarsLeppBaseController(identify, barsLockout, getData, checkEligibility){
@@ -47,9 +50,10 @@ class WhatAreYourBankDetailsController @Inject()(identify: IdentifierAction,
   private val form: Form[BankAccountDetails] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = handleWithSubmissionCheck { implicit req =>
+    val backViewModel: FormPageViewModel = viewModel(mode, WhatAreYourBankDetailsPage, appConfig.removeBreakdownEnabled)
     req.userAnswers.get(WhatAreYourBankDetailsPage) match {
-      case Some(value) => Future.successful(Ok(view(form.fill(value), viewModel(mode, WhatAreYourBankDetailsPage))))
-      case None => Future.successful(Ok(view(form, viewModel(mode, WhatAreYourBankDetailsPage))))
+      case Some(value) => Future.successful(Ok(view(form.fill(value), backViewModel)))
+      case None => Future.successful(Ok(view(form, backViewModel)))
     }
   }
 

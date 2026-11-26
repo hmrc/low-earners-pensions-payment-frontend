@@ -38,17 +38,18 @@ class UrlSupportSpec extends SpecBase {
   }
 
   "backLinkUrl" - {
-    def testBackLink(mode: Mode, page: Page, link: String): Unit =
-      s"should return correct back link for page: ${page.toString}, and mode: $mode" in {
-        UrlSupportTest.backLinkUrl(mode, page).url mustBe link
+    def testBackLink(mode: Mode, page: Page, link: String, removeBreakdownEnabled: Boolean): Unit =
+      s"should return correct back link for page: ${page.toString}, mode: $mode, and removeBreakdownEnabled: $removeBreakdownEnabled" in {
+        UrlSupportTest.backLinkUrl(mode, page, removeBreakdownEnabled).url mustBe link
       }
 
     Seq(
-      (NormalMode, DashboardPage, "/accept-your-low-earners-pension-payment/start"),
-      (NormalMode, PaymentCalcBreakdownPage, "/accept-your-low-earners-pension-payment/payments"),
-      (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/payment-breakdown"),
-      (CheckMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/check-your-answers"),
-      (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/bank-details")
+      (NormalMode, DashboardPage, "/accept-your-low-earners-pension-payment/start", false),
+      (NormalMode, PaymentCalcBreakdownPage, "/accept-your-low-earners-pension-payment/payments", false),
+      (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/payment-breakdown", false),
+      (NormalMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/payments", true),
+      (CheckMode, WhatAreYourBankDetailsPage, "/accept-your-low-earners-pension-payment/check-your-answers", false),
+      (NormalMode, CheckYourAnswersPage, "/accept-your-low-earners-pension-payment/bank-details", false)
     ).foreach(testBackLink)
   }
 }

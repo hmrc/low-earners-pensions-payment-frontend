@@ -26,6 +26,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
+import viewmodels.NormalMode
 import views.html.DashboardView
 
 import java.time.{Instant, LocalDate}
@@ -166,7 +167,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
       "serve correct view for a valid response" when {
         val dummyDate: LocalDate = LocalDate.of(2023, 6, 27)
         
-        trait Test(testDate: LocalDate = LocalDate.now()) {
+        trait Test(testDate: LocalDate = LocalDate.now(), removeBreakdownEnabled: Boolean = false) {
           val json: JsValue = Json.parse(
             """
               |{
@@ -207,7 +208,7 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
             """.stripMargin
           )
 
-          lazy val application: Application = applicationWithSetDate(testDate)
+          lazy val application: Application = applicationWithSetDate(testDate, removeBreakdownEnabled)
 
           implicit val msgApi: MessagesApi = application.injector.instanceOf[MessagesApi]
           implicit val messages: Messages = msgApi.preferred(request)
@@ -290,7 +291,36 @@ class DashboardControllerISpec extends ControllerIntegrationSpecBase {
             barsLockoutExpiryOpt = Some(lockoutExpiryDateTime)
           ).toString
         }
-        
+
+        "when user is not locked out and removeBreakdownEnabled is true" in new Test(
+          testDate = dummyDate,
+          removeBreakdownEnabled = true
+        ) {
+          mockAuthSuccess()
+          mockBarsVerifyStatus(status = OK, response = Json.obj("attempts" -> 1))
+
+          when(
+            method = GET,
+            uri = "/low-earners-pensions-payment/get-payment-details"
+          ).thenReturn(
+            status = OK,
+            body = json.toString
+          )
+
+          lazy val result: Future[Result] = route(application, request).getOrElse(
+            Future.failed(new RuntimeException("TEST_ERROR"))
+          )
+
+          val view: DashboardView = application.injector.instanceOf[DashboardView]
+
+          status(result) shouldBe OK
+          contentAsString(result) shouldEqual view(
+            leppSummary = leppSummaryModel,
+            backLinkUrl = Some(backLink),
+            continueUrl = routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode).url,
+            currentDate = LocalDate.of(2023, 6, 27)
+          ).toString
+        }
       }
     }
   }

@@ -21,5 +21,5 @@ import play.api.mvc.Call
 import viewmodels.Mode
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
-  override def nextPage(page: Page, mode: Mode): Call = desiredRoute
+  override def nextPage(page: Page, mode: Mode, removeBreakdownEnabled: Boolean): Call = desiredRoute
 }

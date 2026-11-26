@@ -132,7 +132,7 @@ trait SpecBase
                                    barsFailedAttemptCount: Int = 0,
                                    barsLockoutTimestampOpt: Option[Instant] = None,
                                    identifierAction: IdentifierAction = fakeIdentifierAction,
-                                   servicesConfig: Map[String, Any] = servicesConfig,
+                                   servicesConfig: Map[String, Any] = servicesConfig(),
                                    startPageCheckEligibilityBuilder: StartPageCheckEligibilityActionBuilder = mockStartPageEligibilityActionBuilder): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(servicesConfig)
@@ -151,9 +151,10 @@ trait SpecBase
 
   def urlEncode(input: String): String = URLEncoder.encode(input, "utf-8")
 
-  val servicesConfig: Map[String, Any] = Map(
+  def servicesConfig(removeBreakdownEnabled: Boolean = false): Map[String, Any] = Map(
     "microservice.services.lepp-backend.host" -> wireMockHost,
-    "microservice.services.lepp-backend.port" -> wireMockPort
+    "microservice.services.lepp-backend.port" -> wireMockPort,
+    "feature-switch.removeBreakdownEnabled" -> removeBreakdownEnabled
   )
   
   implicit val testCorrelationId: CorrelationId = CorrelationId("some-id")
