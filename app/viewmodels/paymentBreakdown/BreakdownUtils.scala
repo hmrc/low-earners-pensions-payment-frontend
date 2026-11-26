@@ -54,10 +54,10 @@ object BreakdownUtils {
   }
 
   private[paymentBreakdown] def commonSummaryListRows(item: LeppItem)(implicit messages: Messages): Seq[SummaryListRow] =
-    Seq(SummaryListRow(
+    /*Seq(SummaryListRow(
       Key(HtmlContent(messages("breakdown.l1"))),
       Value(HtmlContent(item.formattedContributions), classes = "right-align")))
-      ++
+      ++*/
       Seq(SummaryListRow(
         Key(HtmlContent(messages("breakdown.l2"))),
         Value(HtmlContent(item.taxRatePercent), classes = "right-align")))
