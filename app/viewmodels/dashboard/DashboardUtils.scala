@@ -25,12 +25,10 @@ import views.html.components.dashboard.status_element
 import views.html.components.link_element
 
 object DashboardUtils {
-  def tableHeaders(tableRef: String, headerNames: Seq[String], removeBreakdownEnabled: Boolean = false)
+  def tableHeaders(tableRef: String, headerNames: Seq[String])
                   (implicit messages: Messages): Seq[HeadCell] = {
     
-    val filteredHeaderNames = if (removeBreakdownEnabled) headerNames.filterNot(hn => hn == "action") else headerNames
-
-    filteredHeaderNames.map(headerName => {
+    headerNames.map(headerName => {
       HeadCell(
         content = Text(messages(s"dashboard.table.header.$headerName")),
         attributes = Map("id" -> s"${tableRef}_header_$headerName")

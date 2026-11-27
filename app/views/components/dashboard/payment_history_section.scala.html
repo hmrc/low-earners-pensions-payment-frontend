@@ -26,8 +26,7 @@
  insetText: GovukInsetText,
  subHeading: h2,
  statusElement: status_element,
- linkElement: link_element,
- config: AppConfig
+ linkElement: link_element
 )
 
 @(leppSummary: LeppSummary, tableRef: String, currentDate: LocalDate)(implicit messages: Messages)
@@ -69,14 +68,13 @@
         rows = DashboardUtils.tableRows(
             leppSummary.paymentHistoryItems,
             statusElement,
-            if (config.removeBreakdownEnabled) None else Some(linkElement),
+            Some(linkElement),
             isHistoric = true
         ),
         head = Some(DashboardUtils.tableHeaders(
-                 tableRef, 
-                 Seq("taxYear", "amount", "dateAccepted", "status", "action"),
-                 config.removeBreakdownEnabled
-               )),
+            tableRef,
+            Seq("taxYear", "amount", "dateAccepted", "status", "action")
+        )),
         firstCellIsHeader = true,
         captionClasses = "govuk-visually-hidden",
         classes = "govuk-table--small-text-until-tablet"
