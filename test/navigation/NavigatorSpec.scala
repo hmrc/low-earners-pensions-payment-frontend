@@ -46,16 +46,6 @@ class NavigatorSpec extends SpecBase {
       "should go to the correct location when in CheckMode for an unknown page" in {
         navigator.nextPage(UnknownPage, CheckMode) mustBe routes.DashboardController.onPageLoad()
       }
-
-      "should handle removeBreakdownEnabled feature switch correctly when it is enabled" in {
-        navigator.nextPage(page = DashboardPage, mode = NormalMode, removeBreakdownEnabled = true) mustBe
-          routes.WhatAreYourBankDetailsController.onPageLoad(NormalMode)
-      }
-
-      "should handle removeBreakdownEnabled feature switch correctly when it is disabled" in {
-        navigator.nextPage(page = DashboardPage, mode = NormalMode) mustBe
-          routes.PaymentCalcBreakdownController.onPageLoad(None)
-      }
     }
   }
 }

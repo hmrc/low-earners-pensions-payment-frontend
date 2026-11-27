@@ -50,7 +50,7 @@ class DashboardController @Inject()(identify: IdentifierAction,
         view(
           leppSummary = request.leppSummary,
           backLinkUrl = Some(backLinkUrl(NormalMode, DashboardPage).url),
-          continueUrl = navigator.nextPage(DashboardPage, NormalMode, appConfig.removeBreakdownEnabled).url,
+          continueUrl = navigator.nextPage(DashboardPage, NormalMode).url,
           currentDate = dateTime.getDate,
           barsLockoutExpiryOpt = request.barsLockoutExpiryOpt
         )

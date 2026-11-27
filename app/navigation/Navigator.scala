@@ -24,14 +24,12 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() {
-  private def normalRoutes(removeBreakdownEnabled: Boolean = false): Page => Page =
-    (page: Page) => (page, removeBreakdownEnabled) match {
-      case (WhatYouWillNeedPage, _) => DashboardPage
-      case (DashboardPage, true) => WhatAreYourBankDetailsPage
-      case (DashboardPage, false) => PaymentCalcBreakdownPage
-      case (PaymentCalcBreakdownPage, _) => WhatAreYourBankDetailsPage
-      case (WhatAreYourBankDetailsPage, _) => CheckYourAnswersPage
-      case (CheckYourAnswersPage, _) => SubmissionPage
+  private def normalRoutes: Page => Page = {
+      case WhatYouWillNeedPage => DashboardPage
+      case DashboardPage => PaymentCalcBreakdownPage
+      case PaymentCalcBreakdownPage => WhatAreYourBankDetailsPage
+      case WhatAreYourBankDetailsPage => CheckYourAnswersPage
+      case CheckYourAnswersPage => SubmissionPage
       case _ => DashboardPage
     }
 
@@ -40,10 +38,8 @@ class Navigator @Inject() {
     case _ => DashboardPage
   } 
 
-  def nextPage(page: Page,
-               mode: Mode,
-               removeBreakdownEnabled: Boolean = false): Call = mode match {
-    case NormalMode => normalRoutes(removeBreakdownEnabled)(page).route(mode)
+  def nextPage(page: Page, mode: Mode): Call = mode match {
+    case NormalMode => normalRoutes(page).route(mode)
     case CheckMode => checkRouteMap(page).route(mode)
   }
 }
